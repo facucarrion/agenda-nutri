@@ -64,6 +64,7 @@ export async function POST(
     lastName: str("last_name"),
     email: str("email"),
     phone: str("phone"),
+    consent: body.consent === true,
   });
 
   if (!result.ok) {

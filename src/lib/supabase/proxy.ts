@@ -8,6 +8,8 @@ const PUBLIC_PATHS = [
   "/register",
   "/auth",
   "/reservar",
+  "/privacidad",
+  "/terminos",
   "/api/public",
   "/api/cron", // authenticated with CRON_SECRET inside the route
 ];
