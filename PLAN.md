@@ -10,7 +10,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 |---|---|---|
 | [x] | Proyecto Next.js + repo remoto privado | Facu |
 | [ ] | Proteger `main` (PR + 1 revisión) en GitHub | Facu |
-| [ ] | Proyecto Supabase y variables de entorno (`.env.local`, Vercel) | Facu |
+| [~] | Proyecto Supabase y variables de entorno (`.env.local`, Vercel) | Facu |
 | [ ] | Deploy inicial en Vercel | Facu |
 | [ ] | Layout base, componentes UI y tema Tailwind | Bruno |
 
@@ -18,10 +18,10 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 
 | Estado | Tarea | Responsable |
 |---|---|---|
-| [ ] | Tablas: `nutritionists`, `patients`, `availability_rules`, `appointments` | Facu |
-| [ ] | Políticas RLS por nutricionista y tests de aislamiento | Facu |
-| [ ] | Migraciones versionadas en `supabase/migrations` | Facu |
-| [ ] | Tipos TypeScript generados desde Supabase | Facu |
+| [x] | Tablas: `nutritionists`, `patients`, `availability_rules`, `appointments` | Facu |
+| [~] | Políticas RLS por nutricionista y tests de aislamiento | Facu |
+| [x] | Migraciones versionadas en `supabase/migrations` | Facu |
+| [x] | Tipos TypeScript generados desde Supabase | Facu |
 
 ## Fase 2 – Auth y disponibilidad
 
