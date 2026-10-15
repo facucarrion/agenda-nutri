@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       appointments: {
         Row: {
+          appointment_type_id: string | null
           confirmation_token_hash: string | null
           created_at: string
           ends_at: string
@@ -30,6 +31,7 @@ export type Database = {
           status: Database["public"]["Enums"]["appointment_status"]
         }
         Insert: {
+          appointment_type_id?: string | null
           confirmation_token_hash?: string | null
           created_at?: string
           ends_at: string
@@ -44,6 +46,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["appointment_status"]
         }
         Update: {
+          appointment_type_id?: string | null
           confirmation_token_hash?: string | null
           created_at?: string
           ends_at?: string
@@ -59,6 +62,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "appointments_appointment_type_id_fkey"
+            columns: ["appointment_type_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_types"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "appointments_nutritionist_id_fkey"
             columns: ["nutritionist_id"]
             isOneToOne: false
@@ -70,6 +80,41 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointment_types: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          id: string
+          is_active: boolean
+          name: string
+          nutritionist_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes: number
+          id?: string
+          is_active?: boolean
+          name: string
+          nutritionist_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          nutritionist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_types_nutritionist_id_fkey"
+            columns: ["nutritionist_id"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
             referencedColumns: ["id"]
           },
         ]
@@ -143,6 +188,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          min_notice_hours: number
           slot_minutes: number
           slug: string
           timezone: string
@@ -151,6 +197,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id: string
+          min_notice_hours?: number
           slot_minutes?: number
           slug: string
           timezone?: string
@@ -159,6 +206,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          min_notice_hours?: number
           slot_minutes?: number
           slug?: string
           timezone?: string
