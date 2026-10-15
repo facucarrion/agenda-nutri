@@ -29,7 +29,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 |---|---|---|
 | [x] | Registro y login de nutricionistas (Supabase Auth) | Facu |
 | [~] | Pantallas de registro/login y protección de rutas | Bruno |
-| [ ] | Disponibilidad configurable: días, horarios, duración del turno (API) | Facu |
+| [x] | Disponibilidad configurable: días, horarios, duración del turno (API) | Facu |
 | [ ] | Pantalla de configuración de disponibilidad | Bruno |
 
 ## Fase 3 – Agenda y pacientes
