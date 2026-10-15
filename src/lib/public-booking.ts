@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHash, randomBytes } from "node:crypto";
+import { POLICY_VERSION } from "@/lib/legal";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { computeSlots, parseDate } from "@/lib/slots";
 
@@ -146,6 +147,8 @@ export type BookingInput = {
   lastName: string;
   email: string;
   phone: string;
+  /** The patient accepted the privacy notice. */
+  consent: boolean;
 };
 
 export type BookingResult =
@@ -179,6 +182,12 @@ export async function createPublicBooking(
   }
   if (!phone) {
     return { ok: false, error: "Completá tu teléfono." };
+  }
+  if (!input.consent) {
+    return {
+      ok: false,
+      error: "Tenés que aceptar la política de privacidad para reservar.",
+    };
   }
 
   const startsAt = new Date(input.startsAt);
@@ -225,7 +234,19 @@ export async function createPublicBooking(
     .maybeSingle();
   patientId = existing.data?.id ?? null;
 
-  if (!patientId) {
+  const consent = {
+    consent_at: new Date().toISOString(),
+    consent_version: POLICY_VERSION,
+  };
+
+  if (patientId) {
+    // Only record consent; the rest of the ficha is left untouched.
+    await admin
+      .from("patients")
+      .update(consent)
+      .eq("id", patientId)
+      .is("consent_at", null);
+  } else {
     const created = await admin
       .from("patients")
       .insert({
@@ -234,6 +255,7 @@ export async function createPublicBooking(
         last_name: lastName,
         email,
         phone,
+        ...consent,
       })
       .select("id")
       .single();

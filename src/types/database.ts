@@ -216,6 +216,8 @@ export type Database = {
       patients: {
         Row: {
           birth_date: string | null
+          consent_at: string | null
+          consent_version: string | null
           created_at: string
           dni: string | null
           email: string | null
@@ -230,6 +232,8 @@ export type Database = {
         }
         Insert: {
           birth_date?: string | null
+          consent_at?: string | null
+          consent_version?: string | null
           created_at?: string
           dni?: string | null
           email?: string | null
@@ -244,6 +248,8 @@ export type Database = {
         }
         Update: {
           birth_date?: string | null
+          consent_at?: string | null
+          consent_version?: string | null
           created_at?: string
           dni?: string | null
           email?: string | null

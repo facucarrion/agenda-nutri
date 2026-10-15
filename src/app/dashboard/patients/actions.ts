@@ -141,6 +141,35 @@ export async function updatePatient(
   return { ok: true, id: data.id };
 }
 
+// Right of access: everything stored about a patient, as plain data the UI
+// can offer as a download. RLS limits it to the signed-in nutritionist.
+export async function exportPatientData(id: string) {
+  const { supabase, userId } = await context();
+  if (!userId) return { ok: false, error: "Tu sesión expiró. Volvé a ingresar." } as const;
+
+  const [patient, appointments] = await Promise.all([
+    supabase.from("patients").select("*").eq("id", id).maybeSingle(),
+    supabase
+      .from("appointments")
+      .select("starts_at, ends_at, status, source, notes, appointment_types(name)")
+      .eq("patient_id", id)
+      .order("starts_at"),
+  ]);
+
+  if (patient.error || appointments.error || !patient.data) {
+    return { ok: false, error: "No encontramos al paciente." } as const;
+  }
+
+  return {
+    ok: true,
+    data: {
+      exported_at: new Date().toISOString(),
+      patient: patient.data,
+      appointments: appointments.data,
+    },
+  } as const;
+}
+
 // Also deletes the patient's appointments (on delete cascade): the UI must
 // ask for confirmation first.
 export async function deletePatient(id: string): Promise<PatientResult> {
