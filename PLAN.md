@@ -45,7 +45,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 
 | Estado | Tarea | Responsable |
 |---|---|---|
-| [ ] | Cálculo de slots libres y endpoint público de reserva (sin exponer datos) | Facu |
+| [x] | Cálculo de slots libres y endpoint público de reserva (sin exponer datos) | Facu |
 | [ ] | Página pública `/reservar/[slug]` para que el paciente reserve solo | Bruno |
 | [ ] | Emails de confirmación y recordatorio con Resend | Facu |
 | [ ] | Plantillas de email | Bruno |
