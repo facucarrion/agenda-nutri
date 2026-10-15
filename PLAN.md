@@ -47,9 +47,9 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 |---|---|---|
 | [x] | Cálculo de slots libres y endpoint público de reserva (sin exponer datos) | Facu |
 | [ ] | Página pública `/reservar/[slug]` para que el paciente reserve solo | Bruno |
-| [ ] | Emails de confirmación y recordatorio con Resend | Facu |
+| [x] | Emails de confirmación y recordatorio con Resend | Facu |
 | [ ] | Plantillas de email | Bruno |
-| [ ] | Job programado para recordatorios (Vercel Cron) | Facu |
+| [x] | Job programado para recordatorios (Vercel Cron) | Facu |
 
 ## Fase 5 – Piloto
 

@@ -9,6 +9,7 @@ const PUBLIC_PATHS = [
   "/auth",
   "/reservar",
   "/api/public",
+  "/api/cron", // authenticated with CRON_SECRET inside the route
 ];
 
 function isPublic(pathname: string) {

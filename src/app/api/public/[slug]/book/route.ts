@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createPublicBooking } from "@/lib/public-booking";
+import { sendEmail, siteUrl } from "@/lib/email";
+import { confirmationEmail } from "@/lib/email-templates";
+import { cancelPendingBooking, createPublicBooking } from "@/lib/public-booking";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 function tooMany(retryAfter: number) {
@@ -68,7 +70,25 @@ export async function POST(
     return NextResponse.json({ error: result.error }, { status: 409 });
   }
 
-  // TODO(email): send result.confirmationToken to result.email via Resend.
-  // The token must never be returned to the browser.
+  // The token only travels by email; it is never returned to the browser.
+  const confirmUrl = `${siteUrl(request.nextUrl.origin)}/api/public/confirm?token=${encodeURIComponent(result.confirmationToken)}`;
+  const message = confirmationEmail({
+    patientName: result.patientName,
+    nutritionistName: result.nutritionistName || "tu nutricionista",
+    startsAt: result.startsAt,
+    timezone: result.timezone,
+    confirmUrl,
+    validMinutes: result.pendingMinutes,
+  });
+
+  const sent = await sendEmail({ to: result.email, ...message });
+  if (!sent) {
+    await cancelPendingBooking(result.appointmentId);
+    return NextResponse.json(
+      { error: "No pudimos enviarte el email de confirmación. Probá de nuevo." },
+      { status: 502 },
+    );
+  }
+
   return NextResponse.json({ ok: true }, { status: 201 });
 }
