@@ -155,8 +155,11 @@ export type BookingResult =
       confirmationToken: string;
       appointmentId: string;
       email: string;
+      patientName: string;
       startsAt: string;
+      timezone: string;
       nutritionistName: string;
+      pendingMinutes: number;
     }
   | { ok: false; error: string };
 
@@ -280,9 +283,26 @@ export async function createPublicBooking(
     confirmationToken: token,
     appointmentId: data.id,
     email,
+    patientName: firstName,
     startsAt: startsAt.toISOString(),
+    timezone: profile.timezone,
     nutritionistName: profile.full_name,
+    pendingMinutes: PENDING_MINUTES,
   };
+}
+
+// Frees the slot when the confirmation email could not be sent.
+export async function cancelPendingBooking(appointmentId: string) {
+  const admin = createAdminClient();
+  await admin
+    .from("appointments")
+    .update({
+      status: "cancelled",
+      confirmation_token_hash: null,
+      pending_expires_at: null,
+    })
+    .eq("id", appointmentId)
+    .eq("status", "pending");
 }
 
 export async function confirmPublicBooking(token: string) {
