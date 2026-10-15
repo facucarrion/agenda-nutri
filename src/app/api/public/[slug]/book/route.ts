@@ -1,5 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createPublicBooking } from "@/lib/public-booking";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
+
+function tooMany(retryAfter: number) {
+  return NextResponse.json(
+    { error: "Demasiados intentos. Probá de nuevo más tarde." },
+    { status: 429, headers: { "Retry-After": String(retryAfter) } },
+  );
+}
 
 // POST /api/public/:slug/book
 // body: { type, starts_at, first_name, last_name, email, phone, website? }
@@ -7,6 +15,15 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  // 5 attempts per IP every 10 minutes.
+  const ipAllowed = await rateLimit({
+    name: "book:ip",
+    id: clientIp(request),
+    max: 5,
+    windowSeconds: 600,
+  });
+  if (!ipAllowed) return tooMany(600);
+
   const { slug } = await params;
 
   let body: Record<string, unknown>;
@@ -22,6 +39,19 @@ export async function POST(
   // Honeypot: real users never fill this hidden field.
   if (str("website")) {
     return NextResponse.json({ ok: true });
+  }
+
+  // 3 attempts per email and professional every hour, so the form cannot be
+  // used to spam someone's inbox.
+  const email = str("email").trim().toLowerCase();
+  if (email) {
+    const emailAllowed = await rateLimit({
+      name: "book:email",
+      id: `${slug}:${email}`,
+      max: 3,
+      windowSeconds: 3600,
+    });
+    if (!emailAllowed) return tooMany(3600);
   }
 
   const result = await createPublicBooking({
