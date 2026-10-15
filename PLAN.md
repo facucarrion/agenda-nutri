@@ -19,7 +19,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | Estado | Tarea | Responsable |
 |---|---|---|
 | [x] | Tablas: `nutritionists`, `patients`, `availability_rules`, `appointments` | Facu |
-| [~] | Políticas RLS por nutricionista y tests de aislamiento | Facu |
+| [x] | Políticas RLS por nutricionista y tests de aislamiento | Facu |
 | [x] | Migraciones versionadas en `supabase/migrations` | Facu |
 | [x] | Tipos TypeScript generados desde Supabase | Facu |
 
@@ -38,7 +38,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 |---|---|---|
 | [x] | CRUD de pacientes (ficha mínima) – Server Actions | Facu |
 | [ ] | Pantallas de listado y ficha de paciente | Bruno |
-| [ ] | CRUD de turnos con validación de solapamientos – Server Actions | Facu |
+| [x] | CRUD de turnos con validación de solapamientos – Server Actions | Facu |
 | [ ] | Agenda semanal: alta, edición y cancelación de turnos | Bruno |
 
 ## Fase 4 – Reserva pública y recordatorios
