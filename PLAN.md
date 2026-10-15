@@ -36,7 +36,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 
 | Estado | Tarea | Responsable |
 |---|---|---|
-| [ ] | CRUD de pacientes (ficha mínima) – Server Actions | Facu |
+| [x] | CRUD de pacientes (ficha mínima) – Server Actions | Facu |
 | [ ] | Pantallas de listado y ficha de paciente | Bruno |
 | [ ] | CRUD de turnos con validación de solapamientos – Server Actions | Facu |
 | [ ] | Agenda semanal: alta, edición y cancelación de turnos | Bruno |
