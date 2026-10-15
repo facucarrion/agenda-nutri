@@ -27,8 +27,8 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 
 | Estado | Tarea | Responsable |
 |---|---|---|
-| [ ] | Registro y login de nutricionistas (Supabase Auth) | Facu |
-| [ ] | Pantallas de registro/login y protección de rutas | Bruno |
+| [x] | Registro y login de nutricionistas (Supabase Auth) | Facu |
+| [~] | Pantallas de registro/login y protección de rutas | Bruno |
 | [ ] | Disponibilidad configurable: días, horarios, duración del turno (API) | Facu |
 | [ ] | Pantalla de configuración de disponibilidad | Bruno |
 
