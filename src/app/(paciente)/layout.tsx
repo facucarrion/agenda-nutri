@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Inter } from "next/font/google";
+import { FruitLogo } from "./_components/fruit-logo";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,10 +30,12 @@ export default function PatientLayout({
         backgroundAttachment: "fixed",
       }}
     >
-      <header className="border-b border-line bg-surface/80 px-4 py-5 backdrop-blur sm:px-12">
-        <Link href="/" className="inline-flex items-center gap-2.5">
-          <span className="h-7 w-7 rounded-full bg-primary" aria-hidden />
-          <span className="text-[22px] font-bold text-primary">NutriSol</span>
+      <header className="border-b border-line bg-surface/80 px-4 py-4 backdrop-blur sm:px-12">
+        <Link href="/" className="group inline-flex items-center gap-2.5">
+          <FruitLogo />
+          <span className="bg-[linear-gradient(90deg,#2f6b4f,#47996f)] bg-clip-text text-[22px] font-bold text-transparent transition-transform duration-300 ease-out group-hover:translate-x-0.5 motion-reduce:transition-none">
+            NutriSol
+          </span>
         </Link>
       </header>
       {children}
