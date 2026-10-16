@@ -586,15 +586,36 @@ export function BookingForm({ profile }: { profile: PublicProfile }) {
                   .
                 </p>
                 {hasModes && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      switchMode(mode === "virtual" ? "presencial" : "virtual")
-                    }
-                    className={primaryButton}
+                  <div
+                    role="group"
+                    aria-label="Modalidad del turno"
+                    className="relative grid grid-cols-2 rounded-full bg-primary-soft p-1"
                   >
-                    {mode === "virtual" ? "Modo Presencial" : "Modo Virtual"}
-                  </button>
+                    <span
+                      aria-hidden
+                      className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-primary shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${
+                        mode === "virtual" ? "translate-x-full" : "translate-x-0"
+                      }`}
+                    />
+                    {(["presencial", "virtual"] as const).map((option) => {
+                      const selected = mode === option;
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          aria-pressed={selected}
+                          onClick={() => switchMode(option)}
+                          className={`relative z-10 rounded-full px-4 py-2.5 text-[15px] font-semibold transition-colors duration-300 motion-reduce:transition-none ${
+                            selected
+                              ? "text-white"
+                              : "text-primary/60 hover:text-primary"
+                          }`}
+                        >
+                          {option === "virtual" ? "Virtual" : "Presencial"}
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
               </section>
             )}
