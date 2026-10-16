@@ -48,3 +48,4 @@ npm run lint    # ESLint
 ## Documentos
 
 - `PLAN.md`: tareas del MVP y responsables.
+- `docs/api.md`: referencia del backend para la UI (endpoints, actions, campos, errores).
