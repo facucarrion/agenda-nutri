@@ -1,11 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
+import { asSessionCookie, SESSION_ONLY_COOKIE } from "./session-cookie";
 
 const PUBLIC_PATHS = [
   "/",
   "/login",
   "/register",
+  "/recuperar",
+  "/restablecer", // the page itself checks for the recovery session
   "/auth",
   "/reservar",
   "/privacidad",
@@ -30,6 +33,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   let response = NextResponse.next({ request });
+  const sessionOnly = request.cookies.get(SESSION_ONLY_COOKIE)?.value === "1";
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -45,7 +49,11 @@ export async function updateSession(request: NextRequest) {
           );
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
+            response.cookies.set(
+              name,
+              value,
+              sessionOnly && value ? asSessionCookie(options) : options,
+            ),
           );
         },
       },
@@ -64,7 +72,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && (pathname === "/login" || pathname === "/register")) {
+  if (
+    user &&
+    (pathname === "/login" || pathname === "/register" || pathname === "/recuperar")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);

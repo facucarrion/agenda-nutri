@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import { logout } from "@/app/(auth)/actions";
 import { FruitLogo } from "@/app/(paciente)/_components/fruit-logo";
+import { AccountPerson, AccountTitle } from "./_components/account-names";
 import { DashboardNav } from "./_components/dashboard-nav";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Gestión · NutriSol",
+  title: "Gestión · Agenda Nutri",
 };
-
-// TODO(backend): read the name from the nutritionists table.
-const MOCK_NAME = "Sol Oyola";
 
 // Shell for the nutritionist's private pages. Same palette and warm
 // background as the patient pages, always light on purpose.
@@ -40,17 +39,20 @@ export default function DashboardLayout({
             className="group inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
             <FruitLogo />
-            <span className="bg-[linear-gradient(90deg,#2f6b4f,#47996f)] bg-clip-text text-[22px] font-bold text-transparent">
-              NutriSol
+            {/* The account's business name, or the nutritionist's name. */}
+            <span className="max-w-[45vw] truncate bg-[linear-gradient(90deg,#2f6b4f,#47996f)] bg-clip-text text-[22px] font-bold text-transparent sm:max-w-[420px]">
+              <Suspense fallback="Agenda Nutri">
+                <AccountTitle />
+              </Suspense>
             </span>
             <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-xs font-semibold text-primary">
               Gestión
             </span>
           </Link>
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm font-medium sm:inline">
-              {MOCK_NAME}
-            </span>
+            <Suspense>
+              <AccountPerson />
+            </Suspense>
             <form action={logout}>
               <button
                 type="submit"
