@@ -9,12 +9,11 @@ import {
   ChevronRightIcon,
 } from "../../_components/icons";
 import { Stepper } from "../../_components/stepper";
-import {
-  getMockSlots,
-  mockBook,
-  type PublicAppointmentType,
-  type PublicProfile,
-} from "./mock-data";
+import type {
+  BookingRequest,
+  PublicAppointmentType,
+  PublicProfile,
+} from "./types";
 
 // The API allows up to 31 days per request, so the calendar loads one month
 // at a time and lets the patient look a few months ahead.
@@ -144,19 +143,29 @@ export function BookingForm({ profile }: { profile: PublicProfile }) {
   const loading = !ready;
 
   useEffect(() => {
-    let cancelled = false;
-    // TODO(backend): GET /api/public/<slug>/slots?type=&from=&to=
-    getMockSlots(typeId, month.from, month.to)
-      .then((slots) => {
-        if (!cancelled) setData({ key: dataKey, slots });
+    const controller = new AbortController();
+    const query = new URLSearchParams({
+      type: typeId,
+      from: month.from,
+      to: month.to,
+    });
+
+    fetch(`/api/public/${profile.slug}/slots?${query}`, {
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("slots request failed");
+        const body: { slots: string[] } = await response.json();
+        setData({ key: dataKey, slots: body.slots });
       })
       .catch(() => {
-        if (!cancelled) setData({ key: dataKey, slots: [], failed: true });
+        if (!controller.signal.aborted) {
+          setData({ key: dataKey, slots: [], failed: true });
+        }
       });
-    return () => {
-      cancelled = true;
-    };
-  }, [dataKey, typeId, month.from, month.to]);
+
+    return () => controller.abort();
+  }, [dataKey, typeId, month.from, month.to, profile.slug]);
 
   const slotsByDay = new Map<string, string[]>();
   if (ready) {
@@ -204,14 +213,14 @@ export function BookingForm({ profile }: { profile: PublicProfile }) {
     const form = new FormData(event.currentTarget);
     const field = (name: string) => String(form.get(name) ?? "").trim();
     const consent = form.get("consent") === "on";
-    const body = {
+    const body: BookingRequest = {
       type: type.id,
       starts_at: slot,
       first_name: field("first_name"),
       last_name: field("last_name"),
       email: field("email").toLowerCase(),
       phone: field("phone"),
-      consent: true as const,
+      consent: true,
       website: field("website"),
     };
 
@@ -235,13 +244,20 @@ export function BookingForm({ profile }: { profile: PublicProfile }) {
     setError(null);
     setSubmitting(true);
     try {
-      // TODO(backend): POST /api/public/<slug>/book with this body.
-      const result = await mockBook(body);
-      if (result.ok) {
+      const response = await fetch(`/api/public/${profile.slug}/book`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) {
         setEmail(body.email);
         setStep(3);
       } else {
-        setError(result.error);
+        const result: { error?: string } = await response
+          .json()
+          .catch(() => ({}));
+        setError(result.error ?? "No pudimos reservar el turno. Probá de nuevo.");
       }
     } catch {
       setError("No pudimos reservar el turno. Probá de nuevo.");
