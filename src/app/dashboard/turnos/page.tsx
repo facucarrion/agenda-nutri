@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { AppointmentsBoard } from "./appointments-board";
-import { getMockAppointments } from "./mock-data";
+import { getMockAppointments } from "../_lib/mock-data";
 
 // TODO(backend): replace getMockAppointments with listAppointments() from
 // @/lib/appointments, and the board's local state changes with the actions
-// in ./actions.ts (cancel, complete, markNoShow; confirm is still missing).
+// in ../agenda/actions.ts (cancel, complete, markNoShow; confirm is still missing).
 async function Agenda() {
   await connection(); // "today" must be computed per request
   const now = new Date();

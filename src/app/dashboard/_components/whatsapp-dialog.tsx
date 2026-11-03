@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { TIMEZONE, type MockAppointment } from "./mock-data";
+import type { MockAppointment } from "../_lib/mock-data";
+import { TIMEZONE } from "../_lib/dates";
 
 export function WhatsAppIcon({ className }: { className?: string }) {
   return (

@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 
 // Pages without a screen yet are shown but not linked.
 const ITEMS = [
-  { href: "/dashboard/agenda", label: "Turnos", ready: true },
+  { href: "/dashboard/turnos", label: "Turnos", ready: true },
+  { href: "/dashboard/agenda", label: "Agenda", ready: true },
   { href: "/dashboard/patients", label: "Pacientes", ready: false },
   { href: "/dashboard/availability", label: "Disponibilidad", ready: false },
 ];

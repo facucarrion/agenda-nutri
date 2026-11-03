@@ -36,7 +36,7 @@ export default function DashboardLayout({
       <header className="border-b border-line bg-surface/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-4 py-4 sm:px-12">
           <Link
-            href="/dashboard/agenda"
+            href="/dashboard/turnos"
             className="group inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
             <FruitLogo />
