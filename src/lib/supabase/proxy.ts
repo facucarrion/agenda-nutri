@@ -22,6 +22,13 @@ function isPublic(pathname: string) {
 
 // Refreshes the Supabase session cookie and guards private routes.
 export async function updateSession(request: NextRequest) {
+  // Dev only: lets the frontend show the private screens with mock data
+  // before Supabase is set up. Needs UI_PREVIEW=1 in .env.local; never
+  // applies to a production build.
+  if (process.env.NODE_ENV === "development" && process.env.UI_PREVIEW === "1") {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
