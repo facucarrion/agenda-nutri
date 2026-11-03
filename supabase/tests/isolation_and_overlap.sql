@@ -11,12 +11,34 @@ declare
   res text := '';
   n int;
 begin
+  -- Sign-up needs an unused invitation code (consumed by the trigger).
+  insert into public.invitation_codes (code, business_name)
+  values ('TEST-A-' || upper(substr(a::text, 1, 8)), 'Consultorio A'),
+         ('TEST-B-' || upper(substr(b::text, 1, 8)), null);
+
   insert into auth.users (id, email, aud, role, raw_user_meta_data)
-  values (a, 'a-' || a || '@test.local', 'authenticated', 'authenticated', '{"full_name":"A"}'),
-         (b, 'b-' || b || '@test.local', 'authenticated', 'authenticated', '{"full_name":"B"}');
+  values (a, 'a-' || a || '@test.local', 'authenticated', 'authenticated',
+          jsonb_build_object('full_name', 'A', 'invite_code', 'TEST-A-' || upper(substr(a::text, 1, 8)))),
+         (b, 'b-' || b || '@test.local', 'authenticated', 'authenticated',
+          jsonb_build_object('full_name', 'B', 'invite_code', 'TEST-B-' || upper(substr(b::text, 1, 8))));
 
   select count(*) into n from public.nutritionists where id in (a, b);
   res := res || 'profiles created by trigger: ' || n || E' (expected 2)\n';
+
+  select count(*) into n from public.nutritionists where id = a and business_name = 'Consultorio A';
+  res := res || 'business name copied from code: ' || n || E' (expected 1)\n';
+
+  select count(*) into n from public.invitation_codes where used_by in (a, b) and used_at is not null;
+  res := res || 'invitation codes consumed: ' || n || E' (expected 2)\n';
+
+  begin
+    insert into auth.users (id, email, aud, role, raw_user_meta_data)
+    values (gen_random_uuid(), 'c@test.local', 'authenticated', 'authenticated',
+            jsonb_build_object('full_name', 'C', 'invite_code', 'TEST-A-' || upper(substr(a::text, 1, 8))));
+    res := res || E'reused invitation code: FAIL (was accepted)\n';
+  exception when others then
+    res := res || E'reused invitation code rejected: ok\n';
+  end;
 
   insert into public.patients (nutritionist_id, first_name, last_name, email) values (a, 'Pa', 'A', 'x@x.com') returning id into pa;
   insert into public.patients (nutritionist_id, first_name, last_name, email) values (b, 'Pb', 'B', 'x@x.com') returning id into pb;

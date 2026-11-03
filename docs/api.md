@@ -25,17 +25,32 @@ Con esas dos podés hacer toda la UI con login. Las claves secretas (`SUPABASE_S
 
 ## 2. Autenticación
 
-Archivo: `src/app/(auth)/actions.ts`. Las pantallas `/login` y `/register` ya existen como base (`src/app/(auth)/login|register/page.tsx`); se pueden rediseñar.
+Archivo: `src/app/(auth)/actions.ts`. Pantallas en `src/app/(auth)/`: `/login`, `/register`, `/recuperar` (pedir enlace y "Revisá tu email") y `/restablecer` (nueva contraseña, se llega desde el email).
 
 | Action | Entrada (FormData) | Resultado |
 |---|---|---|
-| `login` | `email`, `password` | redirige a `/dashboard` o `{ error }` |
-| `register` | `full_name`, `email`, `password` (mín. 8) | `{ message }` (hay que confirmar email), redirige a `/dashboard`, o `{ error }` |
+| `login` | `email`, `password`, `remember` (checkbox) | redirige a `/dashboard` o `{ error, email }` |
+| `register` | `full_name`, `email`, `password`, `password_confirm`, `invite_code` | `{ message: "confirm-email", email }`, redirige a `/dashboard`, o `{ error, email }` |
+| `requestPasswordReset` | `email` | `{ sentTo, sentAt }` (siempre igual, exista o no la cuenta) o `{ error }` |
+| `updatePassword` | `password`, `password_confirm` | redirige a `/dashboard`, `{ error }`, o `{ error: "expired" }` si no hay sesión de recuperación |
 | `logout` | – | redirige a `/login` |
+
+Contraseña: 8 a 72 caracteres, con al menos una letra y un número (`src/lib/password.ts`, se usa en el cliente y en el servidor).
+
+**Registro con código de invitación**: el trigger `handle_new_user` consume un código de `invitation_codes` (sin usar) y copia su `business_name` al perfil; sin código válido el alta falla. Los códigos se crean desde el SQL editor:
+
+```sql
+insert into public.invitation_codes (code, business_name)
+values ('NS-AB12-CD34', 'Consultorio Ejemplo'); -- business_name es opcional
+```
+
+**Nombre en el dashboard**: arriba a la izquierda se ve `nutritionists.business_name` y, si está vacío, `full_name` (`src/lib/nutritionist.ts`).
+
+**Mantener sesión iniciada**: si no se tilda, las cookies de sesión se guardan sin vencimiento y el navegador las borra al cerrarse.
 
 Se usan con `useActionState` (ver las pantallas existentes).
 
-**Protección de rutas**: `src/proxy.ts` redirige a `/login` si no hay sesión. Son públicas: `/`, `/login`, `/register`, `/auth/*`, `/reservar/*`, `/privacidad`, `/terminos`, `/api/public/*`, `/api/cron/*`. Cualquier otra ruta nueva queda protegida automáticamente.
+**Protección de rutas**: `src/proxy.ts` redirige a `/login` si no hay sesión. Son públicas: `/`, `/login`, `/register`, `/recuperar`, `/restablecer`, `/auth/*`, `/reservar/*`, `/privacidad`, `/terminos`, `/api/public/*`, `/api/cron/*`. Cualquier otra ruta nueva queda protegida automáticamente.
 
 **Usuario y perfil en una pantalla (Server Component)**:
 
@@ -46,7 +61,7 @@ const supabase = await createClient();
 const { data: { user } } = await supabase.auth.getUser();
 const { data: me } = await supabase
   .from("nutritionists")
-  .select("full_name, slug, slot_minutes, min_notice_hours, timezone")
+  .select("full_name, business_name, slug, slot_minutes, min_notice_hours, timezone")
   .eq("id", user!.id)
   .single();
 ```

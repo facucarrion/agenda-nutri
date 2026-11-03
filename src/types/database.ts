@@ -183,8 +183,44 @@ export type Database = {
           },
         ]
       }
+      invitation_codes: {
+        Row: {
+          business_name: string | null
+          code: string
+          created_at: string
+          note: string | null
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          code: string
+          created_at?: string
+          note?: string | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          code?: string
+          created_at?: string
+          note?: string | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitation_codes_used_by_fkey"
+            columns: ["used_by"]
+            isOneToOne: false
+            referencedRelation: "nutritionists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nutritionists: {
         Row: {
+          business_name: string | null
           created_at: string
           full_name: string
           id: string
@@ -194,6 +230,7 @@ export type Database = {
           timezone: string
         }
         Insert: {
+          business_name?: string | null
           created_at?: string
           full_name?: string
           id: string
@@ -203,6 +240,7 @@ export type Database = {
           timezone?: string
         }
         Update: {
+          business_name?: string | null
           created_at?: string
           full_name?: string
           id?: string
