@@ -230,4 +230,4 @@ Mostrá el link público del profesional (`/reservar/<slug>`) en el dashboard pa
 - **Textos legales**: `/privacidad` y `/terminos` son borradores pendientes de revisión de un abogado.
 - **Secretos**: nunca con prefijo `NEXT_PUBLIC_`. La `service_role` solo vive en el servidor (`src/lib/supabase/admin.ts`).
 - **Lógica nueva**: preferir Server Components y Server Actions; `"use client"` solo si hay interactividad.
-- **Git**: ramas `feature/*`, PR a `main` con revisión; mirar que la base del PR sea `main` antes de mergear.
+- **Git**: ramas `feature/*`, PR a `main` (la revisión es recomendada, no obligatoria); mirar que la base del PR sea `main` antes de mergear.

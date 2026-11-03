@@ -9,7 +9,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | Estado | Tarea | Responsable |
 |---|---|---|
 | [x] | Proyecto Next.js + repo remoto privado | Facu |
-| [~] | Proteger `main` (PR + 1 revisión) en GitHub. En repos privados gratuitos GitHub no lo hace cumplir: queda como acuerdo | Facu |
+| [x] | Proteger `main`: ruleset `protect-main` (PR obligatorio, sin borrar ni forzar; sin aprobación obligatoria) | Facu |
 | [x] | Proyecto Supabase y variables de entorno (`.env.local`, Vercel) | Facu |
 | [x] | Deploy inicial en Vercel (agenda-turnos-nutri.vercel.app) | Facu |
 | [~] | Layout base, componentes UI y tema Tailwind (paleta de la reserva pública lista) | Bruno |

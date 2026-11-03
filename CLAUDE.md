@@ -39,9 +39,9 @@ npm run lint    # ESLint
 
 ## Flujo de trabajo (git)
 
-- `main` está protegida: no se pushea directo.
+- `main` está protegida: no se pushea directo ni se puede borrar o forzar.
 - Una rama por feature: `feature/<nombre-corto>` (también `fix/...`, `chore/...`).
-- PR hacia `main` con al menos **1 revisión** del otro integrante; merge con squash.
+- PR hacia `main`; la revisión del otro integrante es recomendada pero no obligatoria. Merge con squash.
 - Commits chicos y en inglés, en imperativo (`add availability form`).
 - Antes de abrir el PR: `npm run lint` y `npm run build` sin errores.
 
