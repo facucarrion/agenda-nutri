@@ -46,7 +46,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | Estado | Tarea | Responsable |
 |---|---|---|
 | [x] | Cálculo de slots libres y endpoint público de reserva (sin exponer datos) | Facu |
-| [~] | Página pública `/reservar/[slug]`, `confirmado` y `error`: maqueta lista con datos de prueba; falta conectar a la API real | Bruno |
+| [x] | Página pública `/reservar/[slug]`, `confirmado` y `error`, conectada a la API real | Bruno |
 | [x] | Emails de confirmación y recordatorio con Resend | Facu |
 | [x] | Plantillas de email (hechas en el backend; Bruno puede rediseñarlas) | Facu |
 | [x] | Job programado para recordatorios (Vercel Cron) | Facu |

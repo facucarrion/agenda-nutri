@@ -1,13 +1,11 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { getPublicProfile } from "@/lib/public-booking";
 import { BookingForm } from "./booking-form";
-import { getMockProfile } from "./mock-data";
 
-// TODO(backend): replace getMockProfile with getPublicProfile from
-// @/lib/public-booking once the booking flow is ready end to end.
 async function Booking({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const profile = getMockProfile(slug);
+  const profile = await getPublicProfile(slug);
   if (!profile) notFound();
 
   if (profile.types.length === 0) {
@@ -18,7 +16,15 @@ async function Booking({ params }: { params: Promise<{ slug: string }> }) {
     );
   }
 
-  return <BookingForm profile={profile} />;
+  return (
+    <BookingForm
+      profile={{
+        ...profile,
+        // New accounts start with an empty name.
+        fullName: profile.fullName || "tu nutricionista",
+      }}
+    />
+  );
 }
 
 export default function BookingPage({ params }: PageProps<"/reservar/[slug]">) {

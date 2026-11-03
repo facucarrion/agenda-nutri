@@ -9,7 +9,7 @@ Todo lo que hay del lado servidor y cómo usarlo desde las pantallas. El backend
 ## 1. Cómo correrlo en local
 
 1. `npm install`
-2. Crear `.env.local` en la raíz (no se commitea) con:
+2. Copiar `env.template` a `.env.local` en la raíz (`Copy-Item env.template .env.local` en PowerShell; no se commitea). Ya trae las dos variables públicas de Supabase:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://ilqkwirxltvljitajcxx.supabase.co
