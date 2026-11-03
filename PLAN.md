@@ -9,10 +9,10 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | Estado | Tarea | Responsable |
 |---|---|---|
 | [x] | Proyecto Next.js + repo remoto privado | Facu |
-| [ ] | Proteger `main` (PR + 1 revisión) en GitHub | Facu |
-| [~] | Proyecto Supabase y variables de entorno (`.env.local`, Vercel) | Facu |
-| [ ] | Deploy inicial en Vercel | Facu |
-| [ ] | Layout base, componentes UI y tema Tailwind | Bruno |
+| [~] | Proteger `main` (PR + 1 revisión) en GitHub. En repos privados gratuitos GitHub no lo hace cumplir: queda como acuerdo | Facu |
+| [x] | Proyecto Supabase y variables de entorno (`.env.local`, Vercel) | Facu |
+| [x] | Deploy inicial en Vercel (agenda-turnos-nutri.vercel.app) | Facu |
+| [~] | Layout base, componentes UI y tema Tailwind (paleta de la reserva pública lista) | Bruno |
 
 ## Fase 1 – Esquema de datos
 
@@ -46,16 +46,16 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | Estado | Tarea | Responsable |
 |---|---|---|
 | [x] | Cálculo de slots libres y endpoint público de reserva (sin exponer datos) | Facu |
-| [ ] | Página pública `/reservar/[slug]` para que el paciente reserve solo | Bruno |
+| [~] | Página pública `/reservar/[slug]`, `confirmado` y `error`: maqueta lista con datos de prueba; falta conectar a la API real | Bruno |
 | [x] | Emails de confirmación y recordatorio con Resend | Facu |
-| [ ] | Plantillas de email | Bruno |
+| [x] | Plantillas de email (hechas en el backend; Bruno puede rediseñarlas) | Facu |
 | [x] | Job programado para recordatorios (Vercel Cron) | Facu |
 
 ## Fase 5 – Piloto
 
 | Estado | Tarea | Responsable |
 |---|---|---|
-| [ ] | Revisión de privacidad (Ley 25.326): aviso, consentimiento, retención | Facu + Bruno |
+| [~] | Revisión de privacidad (Ley 25.326): consentimiento, textos y retención hechos; falta revisión de un abogado, casilla de consentimiento en el formulario y dominio de Resend | Facu + Bruno |
 | [ ] | Prueba con la nutricionista piloto y sus pacientes | Facu + Bruno |
 | [ ] | Ajustes según feedback | Facu + Bruno |
 
