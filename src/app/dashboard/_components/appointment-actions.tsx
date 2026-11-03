@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { AppointmentStatus, MockAppointment } from "../_lib/mock-data";
+import type { AppointmentStatus, DashboardAppointment } from "../_lib/types";
 import { WhatsAppIcon } from "./whatsapp-dialog";
 import {
   btnBadSolid,
@@ -20,10 +20,10 @@ export function AppointmentActions({
   onNotify,
   block = false,
 }: {
-  appointment: MockAppointment;
+  appointment: DashboardAppointment;
   now: string;
   onStatus: (id: string, status: AppointmentStatus) => void;
-  onNotify: (appointment: MockAppointment) => void;
+  onNotify: (appointment: DashboardAppointment) => void;
   block?: boolean;
 }) {
   const [rejecting, setRejecting] = useState(false);

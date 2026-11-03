@@ -5,7 +5,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@/app/(paciente)/_components/icons";
-import type { MockAppointment } from "../_lib/mock-data";
+import type { DashboardAppointment } from "../_lib/types";
 import { dayKey, monthTitle, shortDay, timeOf } from "../_lib/dates";
 import { AppointmentActions } from "../_components/appointment-actions";
 import { useAppointments } from "../_components/use-appointments";
@@ -30,10 +30,11 @@ export function AppointmentsBoard({
   initialAppointments,
   now,
 }: {
-  initialAppointments: MockAppointment[];
+  initialAppointments: DashboardAppointment[];
   now: string;
 }) {
-  const { appointments, setStatus, notify, setNotify } = useAppointments(initialAppointments);
+  const { appointments, setStatus, notify, setNotify, error } =
+    useAppointments(initialAppointments);
   const [month, setMonth] = useState(() => dayKey(now).slice(0, 7));
   const [tab, setTab] = useState<Tab>("all");
 
@@ -78,6 +79,12 @@ export function AppointmentsBoard({
           </button>
         </div>
       </div>
+
+      {error && (
+        <p role="alert" className="mt-4 rounded-xl bg-bad-soft px-4 py-3 text-sm text-bad">
+          {error}
+        </p>
+      )}
 
       <div role="tablist" aria-label="Filtrar turnos" className="mt-6 flex flex-wrap gap-2">
         {TABS.map((t) => {

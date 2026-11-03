@@ -8,7 +8,11 @@ export type AppointmentResult =
   | { ok: true; id: string }
   | { ok: false; error: string };
 
-const PATH = "/dashboard/agenda";
+// Both screens list appointments, so both are refreshed after a change.
+function refresh() {
+  revalidatePath("/dashboard/agenda");
+  revalidatePath("/dashboard/turnos");
+}
 const OVERLAP = "23P01"; // exclusion_violation
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -109,7 +113,7 @@ export async function createAppointment(
 
   if (error) return failure(error);
 
-  revalidatePath(PATH);
+  refresh();
   return { ok: true, id: data.id };
 }
 
@@ -145,7 +149,7 @@ export async function updateAppointment(
     return { ok: false, error: "No encontramos un turno activo para editar." };
   }
 
-  revalidatePath(PATH);
+  refresh();
   return { ok: true, id: data.id };
 }
 
@@ -174,7 +178,7 @@ async function setStatus(
     return { ok: false, error: "El turno ya no está activo." };
   }
 
-  revalidatePath(PATH);
+  refresh();
   return { ok: true, id: data.id };
 }
 
@@ -189,4 +193,33 @@ export async function completeAppointment(id: string) {
 
 export async function markNoShow(id: string) {
   return setStatus(id, "no_show");
+}
+
+// A pending booking is waiting for the patient's email link. The nutritionist
+// can confirm it by hand (for example after a phone call) while it has not
+// expired; expired ones already released the slot.
+export async function confirmAppointment(id: string): Promise<AppointmentResult> {
+  const { supabase, userId } = await context();
+  if (!userId) return unauthenticated;
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .update({
+      status: "confirmed",
+      confirmation_token_hash: null,
+      pending_expires_at: null,
+    })
+    .eq("id", id)
+    .eq("status", "pending")
+    .or(`pending_expires_at.is.null,pending_expires_at.gt.${new Date().toISOString()}`)
+    .select("id")
+    .maybeSingle();
+
+  if (error) return failure(error);
+  if (!data) {
+    return { ok: false, error: "El pedido ya no está pendiente o venció." };
+  }
+
+  refresh();
+  return { ok: true, id: data.id };
 }

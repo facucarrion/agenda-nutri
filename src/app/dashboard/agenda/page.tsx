@@ -1,17 +1,20 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { getMockAppointments, getMockSchedule } from "../_lib/mock-data";
+import { getAppointments, getSchedule } from "../_lib/data";
 import { AgendaView } from "./agenda-view";
 
-// TODO(backend): replace the mocks with listAppointments() from
-// @/lib/appointments and the availability_rules / availability_blocks rows.
 async function Agenda() {
   await connection(); // "today" must be computed per request
   const now = new Date();
+  const [appointments, schedule] = await Promise.all([
+    getAppointments(now),
+    getSchedule(now),
+  ]);
+
   return (
     <AgendaView
-      initialAppointments={getMockAppointments(now)}
-      schedule={getMockSchedule(now)}
+      initialAppointments={appointments}
+      schedule={schedule}
       now={now.toISOString()}
     />
   );

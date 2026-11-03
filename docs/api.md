@@ -137,6 +137,7 @@ Actions en `src/app/dashboard/agenda/actions.ts`. Resultado: `{ ok: true, id } |
 |---|---|
 | `createAppointment(formData)` | `patient_id`, `appointment_type_id`, `starts_at` (ISO con offset), `notes` (opcional) |
 | `updateAppointment(id, formData)` | mismos campos; solo turnos activos (pendientes o confirmados) |
+| `confirmAppointment(id)` | confirma a mano un pedido pendiente que todavía no venció (por ejemplo tras un llamado); el paciente también puede confirmarlo con el link del email |
 | `cancelAppointment(id)` | libera el horario |
 | `completeAppointment(id)` | marca como atendido |
 | `markNoShow(id)` | marca como ausente |

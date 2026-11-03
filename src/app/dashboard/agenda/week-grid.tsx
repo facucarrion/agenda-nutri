@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import type { MockSchedule } from "../_lib/mock-data";
+import type { Schedule } from "../_lib/types";
 import { addDays, longDay, timeOf } from "../_lib/dates";
 import { STATUS, focus, shortName, shortType } from "../_components/ui";
 import type { DayInfo } from "./agenda-view";
@@ -23,7 +23,7 @@ export function WeekGrid({
 }: {
   monday: string;
   info: (key: string) => DayInfo;
-  schedule: MockSchedule;
+  schedule: Schedule;
   selected: string;
   onSelect: (key: string) => void;
 }) {
