@@ -10,7 +10,7 @@ const timeFmt = new Intl.DateTimeFormat("es-AR", {
   timeZone: TIMEZONE,
   hour: "2-digit",
   minute: "2-digit",
-  hour12: false,
+  hourCycle: "h23",
 });
 
 export const dayKey = (iso: string | Date) => dayKeyFmt.format(new Date(iso));

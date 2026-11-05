@@ -5,12 +5,13 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@/app/(paciente)/_components/icons";
-import type { DashboardAppointment } from "../_lib/types";
+import type { DashboardAppointment, TypeOption } from "../_lib/types";
 import { dayKey, monthTitle, shortDay, timeOf } from "../_lib/dates";
 import { AppointmentActions } from "../_components/appointment-actions";
+import { AppointmentDialog, type DialogState } from "../_components/appointment-dialog";
 import { useAppointments } from "../_components/use-appointments";
 import { WhatsAppDialog } from "../_components/whatsapp-dialog";
-import { STATUS, focus, fullName, initials } from "../_components/ui";
+import { STATUS, btnPrimary, focus, fullName, initials } from "../_components/ui";
 
 type Tab = "all" | "pending" | "confirmed";
 
@@ -28,15 +29,18 @@ function shiftMonth(month: string, delta: number) {
 
 export function AppointmentsBoard({
   initialAppointments,
+  types,
   now,
 }: {
   initialAppointments: DashboardAppointment[];
+  types: TypeOption[];
   now: string;
 }) {
   const { appointments, setStatus, notify, setNotify, error } =
     useAppointments(initialAppointments);
   const [month, setMonth] = useState(() => dayKey(now).slice(0, 7));
   const [tab, setTab] = useState<Tab>("all");
+  const [dialog, setDialog] = useState<DialogState>(null);
 
   const inMonth = appointments.filter((a) => dayKey(a.starts_at).startsWith(month));
   const counts: Record<Tab, number> = {
@@ -57,6 +61,14 @@ export function AppointmentsBoard({
             Confirmá los pedidos y avisá a cada paciente por WhatsApp.
           </p>
         </div>
+        <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setDialog({ mode: "create", day: dayKey(now) })}
+            className={btnPrimary}
+          >
+            + Nuevo turno
+          </button>
         <div className="flex items-center gap-1 self-start rounded-full border border-line bg-surface p-1 sm:self-auto">
           <button
             type="button"
@@ -77,6 +89,7 @@ export function AppointmentsBoard({
           >
             <ChevronRightIcon className="h-4 w-4" />
           </button>
+        </div>
         </div>
       </div>
 
@@ -170,6 +183,7 @@ export function AppointmentsBoard({
                   now={now}
                   onStatus={setStatus}
                   onNotify={setNotify}
+                  onEdit={(appointment) => setDialog({ mode: "edit", appointment })}
                 />
               </div>
             </li>
@@ -183,6 +197,9 @@ export function AppointmentsBoard({
       </p>
 
       {notify && <WhatsAppDialog appointment={notify} onClose={() => setNotify(null)} />}
+      {dialog && (
+        <AppointmentDialog state={dialog} types={types} onClose={() => setDialog(null)} />
+      )}
     </>
   );
 }

@@ -8,7 +8,8 @@ const ITEMS = [
   { href: "/dashboard/turnos", label: "Turnos", ready: true },
   { href: "/dashboard/agenda", label: "Agenda", ready: true },
   { href: "/dashboard/patients", label: "Pacientes", ready: false },
-  { href: "/dashboard/availability", label: "Disponibilidad", ready: false },
+  { href: "/dashboard/availability", label: "Disponibilidad", ready: true },
+  { href: "/dashboard/cuenta", label: "Mi cuenta", ready: true },
 ];
 
 export function DashboardNav() {

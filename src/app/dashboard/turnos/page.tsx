@@ -1,15 +1,17 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { getAppointments } from "../_lib/data";
+import { getActiveTypes, getAppointments } from "../_lib/data";
 import { AppointmentsBoard } from "./appointments-board";
 
 async function Appointments() {
   await connection(); // "today" must be computed per request
   const now = new Date();
+  const [appointments, types] = await Promise.all([getAppointments(now), getActiveTypes()]);
 
   return (
     <AppointmentsBoard
-      initialAppointments={await getAppointments(now)}
+      initialAppointments={appointments}
+      types={types}
       now={now.toISOString()}
     />
   );

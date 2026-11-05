@@ -3,7 +3,12 @@ import "server-only";
 import { parseDate, zonedToUtc } from "@/lib/slots";
 import { createClient } from "@/lib/supabase/server";
 import { addDays, dayKey, instant } from "./dates";
-import type { DashboardAppointment, Schedule } from "./types";
+import type {
+  AvailabilityData,
+  DashboardAppointment,
+  Schedule,
+  TypeOption,
+} from "./types";
 
 // The screens navigate month by month, so one window around today is loaded.
 const DAYS_BACK = 60;
@@ -144,5 +149,67 @@ export async function getSchedule(now: Date): Promise<Schedule> {
     breakAfter,
     breakLabel,
     blockedDays: [...blockedDays].sort(),
+  };
+}
+
+// Active consultation types, for the "new turno" dialog.
+export async function getActiveTypes(): Promise<TypeOption[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("appointment_types")
+    .select("id, name, duration_minutes")
+    .eq("is_active", true)
+    .order("duration_minutes")
+    .order("name");
+
+  if (error) throw new Error("Could not load consultation types");
+  return data;
+}
+
+const hhmm = (time: string) => time.slice(0, 5);
+
+// Everything the availability screen edits. Past days off are left out.
+export async function getAvailability(now: Date): Promise<AvailabilityData> {
+  const supabase = await createClient();
+
+  const [profile, rules, blocks, types] = await Promise.all([
+    supabase.from("nutritionists").select("slug, slot_minutes, min_notice_hours").single(),
+    supabase
+      .from("availability_rules")
+      .select("id, weekday, start_time, end_time")
+      .order("weekday")
+      .order("start_time"),
+    supabase
+      .from("availability_blocks")
+      .select("id, starts_at, ends_at, reason")
+      .gte("ends_at", now.toISOString())
+      .order("starts_at"),
+    supabase
+      .from("appointment_types")
+      .select("id, name, duration_minutes, is_active")
+      .order("created_at"),
+  ]);
+
+  if (profile.error || rules.error || blocks.error || types.error) {
+    throw new Error("Could not load the availability");
+  }
+
+  return {
+    slug: profile.data.slug,
+    slotMinutes: profile.data.slot_minutes,
+    minNoticeHours: profile.data.min_notice_hours,
+    rules: rules.data.map((r) => ({
+      id: r.id,
+      weekday: r.weekday,
+      start_time: hhmm(r.start_time),
+      end_time: hhmm(r.end_time),
+    })),
+    blocks: blocks.data.map((b) => ({
+      id: b.id,
+      starts_at: new Date(b.starts_at).toISOString(),
+      ends_at: new Date(b.ends_at).toISOString(),
+      reason: b.reason,
+    })),
+    types: types.data,
   };
 }

@@ -5,7 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-const PATH = "/dashboard/availability";
+// The agenda draws the weekly hours and days off, so it is refreshed too.
+function refresh() {
+  revalidatePath("/dashboard/availability");
+  revalidatePath("/dashboard/agenda");
+}
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const OVERLAP_CODE = "23P01"; // exclusion_violation
 
@@ -39,7 +43,7 @@ function done(error: { code?: string } | null, overlapMessage?: string): ActionR
     }
     return { ok: false, error: "No pudimos guardar los cambios." };
   }
-  revalidatePath(PATH);
+  refresh();
   return { ok: true };
 }
 
@@ -219,5 +223,36 @@ export async function updateBookingSettings(
     .update({ slot_minutes: slotMinutes, min_notice_hours: minNoticeHours })
     .eq("id", userId);
 
+  return done(error);
+}
+
+// ------------------------------------------------------------ booking link
+
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const UNIQUE_VIOLATION = "23505";
+
+// The public link is /reservar/<slug>. Changing it breaks the old link.
+export async function updateBookingSlug(formData: FormData): Promise<ActionResult> {
+  const slug = text(formData, "slug").toLowerCase();
+
+  if (slug.length < 3 || slug.length > 40 || !SLUG_RE.test(slug)) {
+    return {
+      ok: false,
+      error:
+        "Usá entre 3 y 40 letras minúsculas, números o guiones, sin espacios ni tildes.",
+    };
+  }
+
+  const { supabase, userId } = await context();
+  if (!userId) return unauthenticated;
+
+  const { error } = await supabase
+    .from("nutritionists")
+    .update({ slug })
+    .eq("id", userId);
+
+  if (error?.code === UNIQUE_VIOLATION) {
+    return { ok: false, error: "Ese link ya está en uso. Probá con otro." };
+  }
   return done(error);
 }

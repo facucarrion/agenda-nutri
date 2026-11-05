@@ -84,6 +84,37 @@ async function endsAtFor(
   };
 }
 
+type Supabase = Awaited<ReturnType<typeof createClient>>;
+
+async function insertManualAppointment(
+  supabase: Supabase,
+  userId: string,
+  input: { patientId: string; typeId: string; startsAt: Date; notes: string | null },
+): Promise<AppointmentResult> {
+  const end = await endsAtFor(supabase, input.typeId, input.startsAt);
+  if ("error" in end) return { ok: false, error: end.error };
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .insert({
+      nutritionist_id: userId,
+      patient_id: input.patientId,
+      appointment_type_id: input.typeId,
+      starts_at: input.startsAt.toISOString(),
+      ends_at: end.endsAt.toISOString(),
+      status: "confirmed",
+      source: "manual",
+      notes: input.notes,
+    })
+    .select("id")
+    .single();
+
+  if (error) return failure(error);
+
+  refresh();
+  return { ok: true, id: data.id };
+}
+
 export async function createAppointment(
   formData: FormData,
 ): Promise<AppointmentResult> {
@@ -93,28 +124,79 @@ export async function createAppointment(
   const { supabase, userId } = await context();
   if (!userId) return unauthenticated;
 
-  const end = await endsAtFor(supabase, parsed.typeId, parsed.startsAt);
-  if ("error" in end) return { ok: false, error: end.error };
+  return insertManualAppointment(supabase, userId, parsed);
+}
 
-  const { data, error } = await supabase
-    .from("appointments")
-    .insert({
-      nutritionist_id: userId,
-      patient_id: parsed.patientId,
-      appointment_type_id: parsed.typeId,
-      starts_at: parsed.startsAt.toISOString(),
-      ends_at: end.endsAt.toISOString(),
-      status: "confirmed",
-      source: "manual",
-      notes: parsed.notes,
-    })
-    .select("id")
-    .single();
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^\+?[\d\s().-]{6,30}$/;
 
-  if (error) return failure(error);
+// Books a turno for someone who is not loaded yet (a phone call, a walk-in).
+// Only the basic contact data is stored, the same as the public form:
+// name, last name, phone and an optional email. An existing patient is
+// reused (same email, or same name and phone) and never overwritten.
+export async function createAppointmentWithPatient(
+  formData: FormData,
+): Promise<AppointmentResult> {
+  const firstName = text(formData, "first_name", 80);
+  const lastName = text(formData, "last_name", 80);
+  const phone = text(formData, "phone", 40);
+  const email = text(formData, "email", 200).toLowerCase();
+  const typeId = text(formData, "appointment_type_id");
+  const startsAt = new Date(text(formData, "starts_at"));
 
-  refresh();
-  return { ok: true, id: data.id };
+  if (!firstName || !lastName) return { ok: false, error: "Completá nombre y apellido." };
+  if (!PHONE_RE.test(phone)) return { ok: false, error: "Completá un teléfono válido." };
+  if (email && !EMAIL_RE.test(email)) return { ok: false, error: "El email no es válido." };
+  if (!UUID_RE.test(typeId)) return { ok: false, error: "Elegí un tipo de consulta." };
+  if (Number.isNaN(startsAt.getTime())) return { ok: false, error: "Fecha u hora inválida." };
+
+  const { supabase, userId } = await context();
+  if (!userId) return unauthenticated;
+
+  let patientId: string | null = null;
+  let created = false;
+
+  const existing = email
+    ? await supabase.from("patients").select("id").eq("email", email).maybeSingle()
+    : await supabase
+        .from("patients")
+        .select("id")
+        .eq("first_name", firstName)
+        .eq("last_name", lastName)
+        .eq("phone", phone)
+        .limit(1)
+        .maybeSingle();
+  patientId = existing.data?.id ?? null;
+
+  if (!patientId) {
+    const { data, error } = await supabase
+      .from("patients")
+      .insert({
+        nutritionist_id: userId,
+        first_name: firstName,
+        last_name: lastName,
+        phone,
+        email: email || null,
+      })
+      .select("id")
+      .single();
+    if (error) return { ok: false, error: "No pudimos guardar los datos del paciente." };
+    patientId = data.id;
+    created = true;
+  }
+
+  const result = await insertManualAppointment(supabase, userId, {
+    patientId,
+    typeId,
+    startsAt,
+    notes: null,
+  });
+
+  // Do not leave a contact without turno behind when the booking fails.
+  if (!result.ok && created) {
+    await supabase.from("patients").delete().eq("id", patientId);
+  }
+  return result;
 }
 
 export async function updateAppointment(
