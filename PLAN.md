@@ -39,7 +39,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | [x] | CRUD de pacientes (ficha mínima) – Server Actions | Facu |
 | [ ] | Pantallas de listado y ficha de paciente | Bruno |
 | [x] | CRUD de turnos con validación de solapamientos – Server Actions | Facu |
-| [ ] | Agenda semanal: alta, edición y cancelación de turnos | Bruno |
+| [~] | Agenda y turnos: vistas de mes y semana, confirmar, rechazar, atendido y ausente conectados a la API real; falta alta y edición de turnos desde la pantalla | Bruno |
 
 ## Fase 4 – Reserva pública y recordatorios
 

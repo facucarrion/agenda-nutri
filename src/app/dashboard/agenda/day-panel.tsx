@@ -1,4 +1,4 @@
-import type { AppointmentStatus, MockAppointment } from "../_lib/mock-data";
+import type { AppointmentStatus, DashboardAppointment } from "../_lib/types";
 import { longDay, timeOf } from "../_lib/dates";
 import { AppointmentActions } from "../_components/appointment-actions";
 import { STATUS } from "../_components/ui";
@@ -13,7 +13,7 @@ export function DayPanel({
   day: DayInfo;
   now: string;
   onStatus: (id: string, status: AppointmentStatus) => void;
-  onNotify: (appointment: MockAppointment) => void;
+  onNotify: (appointment: DashboardAppointment) => void;
 }) {
   const total = day.appointments.length;
   const pending = day.appointments.filter((a) => a.status === "pending").length;

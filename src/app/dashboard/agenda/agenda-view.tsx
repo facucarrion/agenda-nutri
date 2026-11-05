@@ -5,7 +5,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@/app/(paciente)/_components/icons";
-import type { MockAppointment, MockSchedule } from "../_lib/mock-data";
+import type { DashboardAppointment, Schedule } from "../_lib/types";
 import { addDays, dayKey, mondayOf, monthTitle, weekTitle } from "../_lib/dates";
 import { useAppointments } from "../_components/use-appointments";
 import { WhatsAppDialog } from "../_components/whatsapp-dialog";
@@ -18,7 +18,7 @@ type View = "month" | "week";
 
 export type DayInfo = {
   key: string;
-  appointments: MockAppointment[]; // active ones, sorted
+  appointments: DashboardAppointment[]; // active ones, sorted
   works: boolean; // a workday by the weekly schedule
   blocked: boolean;
   full: boolean;
@@ -51,17 +51,18 @@ export function AgendaView({
   schedule,
   now,
 }: {
-  initialAppointments: MockAppointment[];
-  schedule: MockSchedule;
+  initialAppointments: DashboardAppointment[];
+  schedule: Schedule;
   now: string;
 }) {
   const today = dayKey(now);
-  const { appointments, setStatus, notify, setNotify } = useAppointments(initialAppointments);
+  const { appointments, setStatus, notify, setNotify, error } =
+    useAppointments(initialAppointments);
   const [view, setView] = useState<View>("month");
   const [anchor, setAnchor] = useState(today); // any day inside the visible period
   const [selected, setSelected] = useState(today);
 
-  const byDay = new Map<string, MockAppointment[]>();
+  const byDay = new Map<string, DashboardAppointment[]>();
   for (const a of appointments) {
     if (!isActive(a)) continue;
     const key = dayKey(a.starts_at);
@@ -105,6 +106,11 @@ export function AgendaView({
         Agenda
       </h1>
       <p className="mt-1 text-muted">{subtitle}</p>
+      {error && (
+        <p role="alert" className="mt-4 rounded-xl bg-bad-soft px-4 py-3 text-sm text-bad">
+          {error}
+        </p>
+      )}
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_270px]">
         <section className="min-w-0 rounded-[24px] border border-line bg-surface p-4 sm:p-6">

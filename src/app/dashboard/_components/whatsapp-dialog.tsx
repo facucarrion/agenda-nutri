@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { MockAppointment } from "../_lib/mock-data";
+import type { DashboardAppointment } from "../_lib/types";
 import { TIMEZONE } from "../_lib/dates";
 
 export function WhatsAppIcon({ className }: { className?: string }) {
@@ -25,7 +25,7 @@ const time = new Intl.DateTimeFormat("es-AR", {
   hour12: false,
 });
 
-function defaultMessage(a: MockAppointment) {
+function defaultMessage(a: DashboardAppointment) {
   const when = `el ${longDate.format(new Date(a.starts_at)).replace(",", "")} a las ${time.format(new Date(a.starts_at))} hs`;
   const virtual = /telemedicina|virtual|online/i.test(a.appointment_types.name);
   return [
@@ -48,7 +48,7 @@ export function WhatsAppDialog({
   appointment,
   onClose,
 }: {
-  appointment: MockAppointment;
+  appointment: DashboardAppointment;
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);

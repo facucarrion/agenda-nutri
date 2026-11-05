@@ -1,4 +1,4 @@
-import type { AppointmentStatus, MockAppointment } from "../_lib/mock-data";
+import type { AppointmentStatus, DashboardAppointment } from "../_lib/types";
 
 // Shared look for the nutritionist's screens (palette from globals.css).
 
@@ -23,14 +23,14 @@ export const btnSecondary = `${btn} border border-line bg-surface text-ink hover
 export const btnWhatsApp = `${btn} bg-ok text-white hover:bg-ok/90`;
 export const iconButton = `flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface text-muted hover:border-primary hover:text-primary ${focus}`;
 
-export const fullName = (a: MockAppointment) =>
+export const fullName = (a: DashboardAppointment) =>
   `${a.patients.first_name} ${a.patients.last_name}`;
 
 // "Agustina R."
-export const shortName = (a: MockAppointment) =>
+export const shortName = (a: DashboardAppointment) =>
   `${a.patients.first_name} ${a.patients.last_name[0] ?? ""}.`;
 
-export const initials = (a: MockAppointment) =>
+export const initials = (a: DashboardAppointment) =>
   `${a.patients.first_name[0] ?? ""}${a.patients.last_name[0] ?? ""}`;
 
 // "Primera asesoría · Presencial" -> "Primera vez"
@@ -42,4 +42,4 @@ export function shortType(name: string) {
 }
 
 // Appointments that hold the slot (cancelled ones free it).
-export const isActive = (a: MockAppointment) => a.status !== "cancelled";
+export const isActive = (a: DashboardAppointment) => a.status !== "cancelled";
