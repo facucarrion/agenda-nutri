@@ -26,14 +26,31 @@ export function AppointmentDialog({
   const ref = useRef<HTMLDialogElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, startTransition] = useTransition();
+  // The email typed belongs to a patient with another name: the data sent is
+  // kept so the choice can be sent with it.
+  const [conflict, setConflict] = useState<{ patientName: string; data: FormData } | null>(null);
   const editing = state.mode === "edit" ? state.appointment : null;
 
   useEffect(() => {
     ref.current?.showModal();
   }, []);
 
-  const defaultType =
-    types.find((t) => t.id === editing?.appointment_type_id)?.id ?? types[0]?.id ?? "";
+  // A turno keeps its service even if that type was paused later: it stays in
+  // the list (marked) so saving a new time does not switch it to another one.
+  const currentTypeId = editing?.appointment_type_id ?? null;
+  const pausedCurrent =
+    currentTypeId && editing?.appointment_types && !types.some((t) => t.id === currentTypeId)
+      ? {
+          id: currentTypeId,
+          name: `${editing.appointment_types.name} (pausado)`,
+          duration_minutes: editing.appointment_types.duration_minutes,
+        }
+      : null;
+  const options = pausedCurrent ? [pausedCurrent, ...types] : types;
+
+  // Editing a turno whose type was deleted: no default, the service must be
+  // chosen on purpose instead of silently taking the first one.
+  const defaultType = editing ? (currentTypeId ?? "") : (types[0]?.id ?? "");
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,14 +76,29 @@ export function AppointmentDialog({
       data.set("email", field("email"));
     }
 
+    send(data);
+  }
+
+  function send(data: FormData) {
     setError(null);
+    setConflict(null);
     startTransition(async () => {
       const result = editing
         ? await updateAppointment(editing.id, data)
         : await createAppointmentWithPatient(data);
       if (result.ok) ref.current?.close();
+      else if (result.conflict) setConflict({ patientName: result.conflict.patientName, data });
       else setError(result.error);
     });
+  }
+
+  // The nutritionist's answer to "that email is someone else's".
+  function resolve(choice: "existing" | "new") {
+    if (!conflict) return;
+    const data = new FormData();
+    conflict.data.forEach((value, key) => data.set(key, value));
+    data.set("patient_choice", choice);
+    send(data);
   }
 
   return (
@@ -79,7 +111,11 @@ export function AppointmentDialog({
       aria-labelledby="appt-title"
       className="m-auto w-[min(560px,calc(100vw-32px))] rounded-[24px] bg-surface p-0 text-ink shadow-[0_24px_60px_rgba(0,0,0,0.18)] backdrop:bg-ink/40 backdrop:backdrop-blur-[2px]"
     >
-      <form onSubmit={submit} className="flex flex-col gap-5 p-6 sm:p-8">
+      <form
+        onSubmit={submit}
+        onChange={() => setConflict(null)} // changed data: ask again on submit
+        className="flex flex-col gap-5 p-6 sm:p-8"
+      >
         <div>
           <h2 id="appt-title" className="text-2xl font-bold">
             {editing ? "Editar turno" : "Nuevo turno"}
@@ -91,7 +127,7 @@ export function AppointmentDialog({
           </p>
         </div>
 
-        {types.length === 0 ? (
+        {options.length === 0 ? (
           <p role="status" className="rounded-xl bg-warn-soft px-4 py-3 text-sm">
             Primero creá un tipo de consulta en{" "}
             <Link href="/dashboard/availability" className="font-semibold text-primary underline">
@@ -140,7 +176,12 @@ export function AppointmentDialog({
             <label className="flex flex-col gap-1.5">
               <span className={labelClass}>Servicio</span>
               <select name="type" defaultValue={defaultType} required className={inputClass}>
-                {types.map((t) => (
+                {defaultType === "" && (
+                  <option value="" disabled>
+                    Elegí un servicio (el anterior se eliminó)
+                  </option>
+                )}
+                {options.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name} · {t.duration_minutes} min
                   </option>
@@ -185,11 +226,45 @@ export function AppointmentDialog({
           </p>
         )}
 
+        {conflict && (
+          <div role="alert" className="flex flex-col gap-3 rounded-xl bg-warn-soft px-4 py-3 text-sm">
+            <p>
+              Ese email ya es de <strong>{conflict.patientName}</strong>. ¿Es la misma persona?
+            </p>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => resolve("existing")}
+                className={btnSecondary}
+              >
+                Sí, agendar a {conflict.patientName}
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => resolve("new")}
+                className={btnSecondary}
+              >
+                No, es otra persona
+              </button>
+            </div>
+            <p className="text-xs text-muted">
+              Si es la misma, el turno va a su ficha con sus datos de contacto. Si es otra, se
+              guarda como paciente nuevo sin email (cada email puede ser de un solo paciente).
+            </p>
+          </div>
+        )}
+
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button type="button" onClick={() => ref.current?.close()} className={btnSecondary}>
             Cancelar
           </button>
-          <button type="submit" disabled={saving || types.length === 0} className={btnPrimary}>
+          <button
+            type="submit"
+            disabled={saving || options.length === 0 || conflict !== null}
+            className={btnPrimary}
+          >
             {saving ? "Guardando..." : editing ? "Guardar cambios" : "Crear turno"}
           </button>
         </div>

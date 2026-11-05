@@ -15,7 +15,7 @@ export const STATUS: Record<
 
 export const focus =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
-const btn = `inline-flex h-9 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors ${focus}`;
+const btn = `inline-flex h-9 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${focus}`;
 export const btnPrimary = `${btn} bg-primary text-white hover:bg-primary/90`;
 export const btnDanger = `${btn} border border-bad text-bad hover:bg-bad-soft`;
 export const btnBadSolid = `${btn} bg-bad text-white hover:bg-bad/90`;

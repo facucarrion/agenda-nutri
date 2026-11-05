@@ -137,8 +137,8 @@ Actions en `src/app/dashboard/agenda/actions.ts`. Resultado: `{ ok: true, id } |
 | Action | Campos |
 |---|---|
 | `createAppointment(formData)` | `patient_id`, `appointment_type_id`, `starts_at` (ISO con offset), `notes` (opcional) |
-| `createAppointmentWithPatient(formData)` | turno a mano cargando al paciente en el momento: `first_name`, `last_name`, `phone` (obligatorios), `email` (opcional), `appointment_type_id`, `starts_at`. Guarda solo esos datos de contacto; reutiliza al paciente si coincide el email (o nombre y teléfono) y no pisa su ficha |
-| `updateAppointment(id, formData)` | mismos campos; solo turnos activos (pendientes o confirmados) |
+| `createAppointmentWithPatient(formData)` | turno a mano cargando al paciente en el momento: `first_name`, `last_name`, `phone` (obligatorios), `email` (opcional), `appointment_type_id`, `starts_at`. Guarda solo esos datos de contacto y nunca pisa una ficha. Reutiliza al paciente si coinciden email y nombre (sin distinguir mayúsculas ni tildes), o, sin email, teléfono y nombre. Si el email es de un paciente con otro nombre, no guarda nada y devuelve `{ ok: false, error, conflict: { patientName } }`; se vuelve a mandar con `patient_choice`: `"existing"` (el turno va a ese paciente) o `"new"` (paciente nuevo sin email) |
+| `updateAppointment(id, formData)` | mismos campos; solo turnos activos (pendientes o confirmados). Si no se manda `notes`, se conservan las actuales. Acepta el tipo de consulta actual del turno aunque esté pausado |
 | `confirmAppointment(id)` | confirma a mano un pedido pendiente que todavía no venció (por ejemplo tras un llamado); el paciente también puede confirmarlo con el link del email |
 | `cancelAppointment(id)` | libera el horario |
 | `completeAppointment(id)` | marca como atendido |

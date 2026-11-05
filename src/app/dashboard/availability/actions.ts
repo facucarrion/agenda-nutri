@@ -230,6 +230,10 @@ export async function updateBookingSettings(
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const UNIQUE_VIOLATION = "23505";
+// Fixed pages under /reservar/ win over /reservar/[slug], so these slugs would
+// open those pages instead of the booking form. Keep in sync with the folders
+// in src/app/(paciente)/reservar/.
+const RESERVED_SLUGS = new Set(["confirmado", "error"]);
 
 // The public link is /reservar/<slug>. Changing it breaks the old link.
 export async function updateBookingSlug(formData: FormData): Promise<ActionResult> {
@@ -241,6 +245,9 @@ export async function updateBookingSlug(formData: FormData): Promise<ActionResul
       error:
         "Usá entre 3 y 40 letras minúsculas, números o guiones, sin espacios ni tildes.",
     };
+  }
+  if (RESERVED_SLUGS.has(slug)) {
+    return { ok: false, error: "Ese link está reservado. Probá con otro." };
   }
 
   const { supabase, userId } = await context();
