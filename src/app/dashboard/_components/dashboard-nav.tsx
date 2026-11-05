@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// Pages without a screen yet are shown but not linked.
+// Pages without a screen yet are shown but not linked. Pacientes is left out
+// for the pilot, which covers turnos only (see PLAN.md).
 const ITEMS = [
   { href: "/dashboard/turnos", label: "Turnos", ready: true },
   { href: "/dashboard/agenda", label: "Agenda", ready: true },
-  { href: "/dashboard/patients", label: "Pacientes", ready: false },
   { href: "/dashboard/availability", label: "Disponibilidad", ready: true },
   { href: "/dashboard/cuenta", label: "Mi cuenta", ready: true },
 ];
