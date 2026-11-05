@@ -99,7 +99,7 @@ Actions en `src/app/dashboard/patients/actions.ts`. Resultado: `{ ok: true, id }
 
 ## 4. Disponibilidad y tipos de consulta
 
-Actions en `src/app/dashboard/availability/actions.ts`. Resultado: `{ ok: true } | { ok: false, error }`. Cada una revalida `/dashboard/availability`.
+Actions en `src/app/dashboard/availability/actions.ts`. Resultado: `{ ok: true } | { ok: false, error }`. Cada una revalida `/dashboard/availability` y `/dashboard/agenda`.
 
 | Action | Campos |
 |---|---|
@@ -111,6 +111,7 @@ Actions en `src/app/dashboard/availability/actions.ts`. Resultado: `{ ok: true }
 | `updateAppointmentType(id, formData)` | `name`, `duration_minutes`, `is_active` (`"false"` para desactivar) |
 | `deleteAppointmentType(id)` | los turnos viejos conservan el turno; solo pierden la referencia al tipo |
 | `updateBookingSettings(formData)` | `slot_minutes` (10 a 240, intervalo de la grilla), `min_notice_hours` (0 a 720) |
+| `updateBookingSlug(formData)` | `slug`: el link público `/reservar/<slug>`. 3 a 40 caracteres (minúsculas, números y guiones); único; el link anterior deja de funcionar |
 
 **Reglas de negocio**
 
@@ -136,7 +137,8 @@ Actions en `src/app/dashboard/agenda/actions.ts`. Resultado: `{ ok: true, id } |
 | Action | Campos |
 |---|---|
 | `createAppointment(formData)` | `patient_id`, `appointment_type_id`, `starts_at` (ISO con offset), `notes` (opcional) |
-| `updateAppointment(id, formData)` | mismos campos; solo turnos activos (pendientes o confirmados) |
+| `createAppointmentWithPatient(formData)` | turno a mano cargando al paciente en el momento: `first_name`, `last_name`, `phone` (obligatorios), `email` (opcional), `appointment_type_id`, `starts_at`. Guarda solo esos datos de contacto y nunca pisa una ficha. Reutiliza al paciente si coinciden email y nombre (sin distinguir mayúsculas ni tildes), o, sin email, teléfono y nombre. Si el email es de un paciente con otro nombre, no guarda nada y devuelve `{ ok: false, error, conflict: { patientName } }`; se vuelve a mandar con `patient_choice`: `"existing"` (el turno va a ese paciente) o `"new"` (paciente nuevo sin email) |
+| `updateAppointment(id, formData)` | mismos campos; solo turnos activos (pendientes o confirmados). Si no se manda `notes`, se conservan las actuales. Acepta el tipo de consulta actual del turno aunque esté pausado |
 | `confirmAppointment(id)` | confirma a mano un pedido pendiente que todavía no venció (por ejemplo tras un llamado); el paciente también puede confirmarlo con el link del email |
 | `cancelAppointment(id)` | libera el horario |
 | `completeAppointment(id)` | marca como atendido |
@@ -230,10 +232,11 @@ El email lleva un link a `GET /api/public/confirm?token=...`, que confirma y red
 | Ruta | Qué muestra | Usa |
 |---|---|---|
 | `/dashboard` | Resumen del día / próximos turnos | `listAppointments` |
-| `/dashboard/agenda` | Vista semanal con alta, edición y cancelación | `listAppointments`, actions de agenda |
+| `/dashboard/agenda` | Vista mensual y semanal con alta, edición y cancelación (hecha) | `getAppointments`, actions de agenda |
 | `/dashboard/patients` | Listado con búsqueda | `listPatients`, `createPatient` |
 | `/dashboard/patients/[id]` | Ficha, historial, exportar y borrar | `getPatient`, `updatePatient`, `exportPatientData`, `deletePatient` |
-| `/dashboard/availability` | Horarios semanales, bloqueos, tipos de consulta y ajustes | actions de disponibilidad |
+| `/dashboard/availability` | Horarios semanales, bloqueos, tipos de consulta, link de reserva y ajustes (hecha) | actions de disponibilidad |
+| `/dashboard/cuenta` | Cambio de contraseña, pide la actual (hecha) | `changePassword` en `dashboard/cuenta/actions.ts` |
 | `/reservar/[slug]` | Elegir tipo, fecha y horario; datos; consentimiento | `getPublicProfile`, `/slots`, `/book` |
 | `/reservar/confirmado`, `/reservar/error` | Resultado de la confirmación | – |
 

@@ -1,7 +1,7 @@
 import type { AppointmentStatus, DashboardAppointment } from "../_lib/types";
 import { longDay, timeOf } from "../_lib/dates";
 import { AppointmentActions } from "../_components/appointment-actions";
-import { STATUS } from "../_components/ui";
+import { STATUS, btnPrimary } from "../_components/ui";
 import type { DayInfo } from "./agenda-view";
 
 export function DayPanel({
@@ -9,11 +9,15 @@ export function DayPanel({
   now,
   onStatus,
   onNotify,
+  onNew,
+  onEdit,
 }: {
   day: DayInfo;
   now: string;
   onStatus: (id: string, status: AppointmentStatus) => void;
   onNotify: (appointment: DashboardAppointment) => void;
+  onNew: (day: string) => void;
+  onEdit: (appointment: DashboardAppointment) => void;
 }) {
   const total = day.appointments.length;
   const pending = day.appointments.filter((a) => a.status === "pending").length;
@@ -32,6 +36,9 @@ export function DayPanel({
     >
       <h2 className="text-lg font-bold">{longDay(day.key)}</h2>
       <p className="mt-0.5 text-sm text-muted">{total ? summary : day.today ? "Hoy" : "Sin turnos"}</p>
+      <button type="button" onClick={() => onNew(day.key)} className={`${btnPrimary} mt-3 w-full`}>
+        + Nuevo turno
+      </button>
 
       {total === 0 ? (
         <p className="mt-4 rounded-2xl border border-dashed border-line px-4 py-8 text-center text-sm text-muted">
@@ -62,6 +69,7 @@ export function DayPanel({
                     now={now}
                     onStatus={onStatus}
                     onNotify={onNotify}
+                    onEdit={onEdit}
                     block
                   />
                 </div>

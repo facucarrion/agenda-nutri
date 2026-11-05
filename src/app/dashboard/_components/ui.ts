@@ -15,7 +15,7 @@ export const STATUS: Record<
 
 export const focus =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
-const btn = `inline-flex h-9 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors ${focus}`;
+const btn = `inline-flex h-9 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${focus}`;
 export const btnPrimary = `${btn} bg-primary text-white hover:bg-primary/90`;
 export const btnDanger = `${btn} border border-bad text-bad hover:bg-bad-soft`;
 export const btnBadSolid = `${btn} bg-bad text-white hover:bg-bad/90`;
@@ -43,3 +43,10 @@ export function shortType(name: string) {
 
 // Appointments that hold the slot (cancelled ones free it).
 export const isActive = (a: DashboardAppointment) => a.status !== "cancelled";
+
+// Form pieces for the settings screens and dialogs.
+export const card = "rounded-[24px] border border-line bg-surface p-5 sm:p-7";
+export const labelClass = "text-[13px] font-medium text-muted";
+export const inputClass =
+  "h-10 w-full rounded-xl border border-line bg-surface px-3 text-[15px] text-ink placeholder:text-faint focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60";
+export const errorClass = "rounded-xl bg-bad-soft px-4 py-3 text-sm text-bad";

@@ -5,8 +5,9 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@/app/(paciente)/_components/icons";
-import type { DashboardAppointment, Schedule } from "../_lib/types";
+import type { DashboardAppointment, Schedule, TypeOption } from "../_lib/types";
 import { addDays, dayKey, mondayOf, monthTitle, weekTitle } from "../_lib/dates";
+import { AppointmentDialog, type DialogState } from "../_components/appointment-dialog";
 import { useAppointments } from "../_components/use-appointments";
 import { WhatsAppDialog } from "../_components/whatsapp-dialog";
 import { focus, iconButton, isActive } from "../_components/ui";
@@ -49,10 +50,12 @@ function shiftMonth(key: string, delta: number) {
 export function AgendaView({
   initialAppointments,
   schedule,
+  types,
   now,
 }: {
   initialAppointments: DashboardAppointment[];
   schedule: Schedule;
+  types: TypeOption[];
   now: string;
 }) {
   const today = dayKey(now);
@@ -61,6 +64,7 @@ export function AgendaView({
   const [view, setView] = useState<View>("month");
   const [anchor, setAnchor] = useState(today); // any day inside the visible period
   const [selected, setSelected] = useState(today);
+  const [dialog, setDialog] = useState<DialogState>(null);
 
   const byDay = new Map<string, DashboardAppointment[]>();
   for (const a of appointments) {
@@ -184,10 +188,24 @@ export function AgendaView({
           </div>
         </section>
 
-        <DayPanel day={info(selected)} now={now} onStatus={setStatus} onNotify={setNotify} />
+        <DayPanel
+          day={info(selected)}
+          now={now}
+          onStatus={setStatus}
+          onNotify={setNotify}
+          onNew={(day) => setDialog({ mode: "create", day })}
+          onEdit={(appointment) => setDialog({ mode: "edit", appointment })}
+        />
       </div>
 
       {notify && <WhatsAppDialog appointment={notify} onClose={() => setNotify(null)} />}
+      {dialog && (
+        <AppointmentDialog
+          state={dialog}
+          types={types}
+          onClose={() => setDialog(null)}
+        />
+      )}
     </>
   );
 }

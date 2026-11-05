@@ -30,7 +30,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | [x] | Registro y login de nutricionistas (Supabase Auth) | Facu |
 | [~] | Pantallas de registro/login y protección de rutas | Bruno |
 | [x] | Disponibilidad configurable: días, horarios, duración del turno (API) | Facu |
-| [ ] | Pantalla de configuración de disponibilidad | Bruno |
+| [x] | Pantalla de configuración de disponibilidad: horarios, bloqueos, tipos de consulta, link de reserva y reglas; más cambio de contraseña en Mi cuenta | Facu |
 
 ## Fase 3 – Agenda y pacientes
 
@@ -39,7 +39,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | [x] | CRUD de pacientes (ficha mínima) – Server Actions | Facu |
 | [ ] | Pantallas de listado y ficha de paciente | Bruno |
 | [x] | CRUD de turnos con validación de solapamientos – Server Actions | Facu |
-| [~] | Agenda y turnos: vistas de mes y semana, confirmar, rechazar, atendido y ausente conectados a la API real; falta alta y edición de turnos desde la pantalla | Bruno |
+| [x] | Agenda y turnos: vistas de mes y semana, confirmar, rechazar, atendido, ausente, alta y edición de turnos a mano, conectados a la API real | Bruno + Facu |
 
 ## Fase 4 – Reserva pública y recordatorios
 

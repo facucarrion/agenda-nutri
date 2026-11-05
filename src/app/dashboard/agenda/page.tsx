@@ -1,20 +1,22 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { getAppointments, getSchedule } from "../_lib/data";
+import { getActiveTypes, getAppointments, getSchedule } from "../_lib/data";
 import { AgendaView } from "./agenda-view";
 
 async function Agenda() {
   await connection(); // "today" must be computed per request
   const now = new Date();
-  const [appointments, schedule] = await Promise.all([
+  const [appointments, schedule, types] = await Promise.all([
     getAppointments(now),
     getSchedule(now),
+    getActiveTypes(),
   ]);
 
   return (
     <AgendaView
       initialAppointments={appointments}
       schedule={schedule}
+      types={types}
       now={now.toISOString()}
     />
   );

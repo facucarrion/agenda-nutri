@@ -29,3 +29,35 @@ export type Schedule = {
   breakLabel: string;
   blockedDays: string[]; // YYYY-MM-DD (vacations, days off)
 };
+
+// A consultation type as the booking dialog and the availability screen use it.
+export type TypeOption = {
+  id: string;
+  name: string;
+  duration_minutes: number;
+};
+
+export type ConsultationType = TypeOption & { is_active: boolean };
+
+export type WeeklyRule = {
+  id: string;
+  weekday: number; // 0 = Sunday ... 6 = Saturday (as stored)
+  start_time: string; // HH:MM
+  end_time: string; // HH:MM
+};
+
+export type DayOff = {
+  id: string;
+  starts_at: string; // UTC ISO
+  ends_at: string; // UTC ISO
+  reason: string | null;
+};
+
+export type AvailabilityData = {
+  slug: string;
+  slotMinutes: number;
+  minNoticeHours: number;
+  rules: WeeklyRule[];
+  blocks: DayOff[];
+  types: ConsultationType[];
+};

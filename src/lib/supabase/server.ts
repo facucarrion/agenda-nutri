@@ -1,9 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import type { Database } from "@/types/database";
 import { asSessionCookie, SESSION_ONLY_COOKIE } from "./session-cookie";
 
 export async function createClient(opts: { sessionOnly?: boolean } = {}) {
+  // supabase-js reads the clock (Date.now()) to check whether the session
+  // expired. Under Cache Components, cookies() alone does not allow that
+  // while prerendering; connection() marks the render as per-request.
+  await connection();
   const cookieStore = await cookies();
   const sessionOnly =
     opts.sessionOnly ?? cookieStore.get(SESSION_ONLY_COOKIE)?.value === "1";

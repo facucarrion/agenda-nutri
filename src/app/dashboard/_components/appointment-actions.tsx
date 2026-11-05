@@ -13,7 +13,7 @@ import {
 
 // The buttons each appointment offers, by status. Used by the Turnos list
 // and the Agenda day panel. `block` stretches them to the full width.
-export function AppointmentActions({
+function StatusActions({
   appointment: a,
   now,
   onStatus,
@@ -94,4 +94,44 @@ export function AppointmentActions({
   }
 
   return null;
+}
+
+// Status buttons plus "Editar" for turnos that can still change.
+export function AppointmentActions({
+  appointment: a,
+  now,
+  onStatus,
+  onNotify,
+  onEdit,
+  block = false,
+}: {
+  appointment: DashboardAppointment;
+  now: string;
+  onStatus: (id: string, status: AppointmentStatus) => void;
+  onNotify: (appointment: DashboardAppointment) => void;
+  onEdit?: (appointment: DashboardAppointment) => void;
+  block?: boolean;
+}) {
+  const editable = onEdit && (a.status === "pending" || a.status === "confirmed");
+
+  return (
+    <>
+      <StatusActions
+        appointment={a}
+        now={now}
+        onStatus={onStatus}
+        onNotify={onNotify}
+        block={block}
+      />
+      {editable && (
+        <button
+          type="button"
+          className={`${btnSecondary} ${block ? "flex-1" : ""}`}
+          onClick={() => onEdit(a)}
+        >
+          Editar
+        </button>
+      )}
+    </>
+  );
 }
