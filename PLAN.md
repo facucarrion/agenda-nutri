@@ -4,6 +4,8 @@ Reparto por área: **Facu** = backend y datos, **Bruno** = frontend y UI. Bruno 
 
 Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 
+> **Alcance del piloto: solo turnos.** Reserva pública, agenda, turnos a mano, confirmación y recordatorios. La pantalla de Pacientes queda fuera del MVP por ahora (ver al final).
+
 ## Fase 0 – Base
 
 | Estado | Tarea | Responsable |
@@ -12,7 +14,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | [x] | Proteger `main`: ruleset `protect-main` (PR obligatorio, sin borrar ni forzar; sin aprobación obligatoria) | Facu |
 | [x] | Proyecto Supabase y variables de entorno (`.env.local`, Vercel) | Facu |
 | [x] | Deploy inicial en Vercel (agenda-turnos-nutri.vercel.app) | Facu |
-| [~] | Layout base, componentes UI y tema Tailwind (paleta de la reserva pública lista) | Bruno |
+| [~] | Layout base, componentes UI y tema Tailwind. Hecho: paleta y layouts de reserva, login y gestión. Falta: portada `/` (sigue la plantilla de Next), layout raíz (título "Create Next App", `lang="en"`, fuentes Geist sin usar), favicon y estilo de Privacidad y Términos | Bruno |
 
 ## Fase 1 – Esquema de datos
 
@@ -28,7 +30,8 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | Estado | Tarea | Responsable |
 |---|---|---|
 | [x] | Registro y login de nutricionistas (Supabase Auth) | Facu |
-| [~] | Pantallas de registro/login y protección de rutas | Bruno |
+| [x] | Pantallas de registro/login, recuperación de contraseña y protección de rutas | Bruno |
+| [ ] | Configurar Auth en Supabase: SMTP propio con Resend (sin eso los emails de recuperación solo llegan al equipo del proyecto), link de recuperación a 1800 s, plantillas de email en español, protección de contraseñas filtradas; correr `supabase/tests/isolation_and_overlap.sql` | Facu |
 | [x] | Disponibilidad configurable: días, horarios, duración del turno (API) | Facu |
 | [x] | Pantalla de configuración de disponibilidad: horarios, bloqueos, tipos de consulta, link de reserva y reglas; más cambio de contraseña en Mi cuenta | Facu |
 
@@ -37,7 +40,6 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | Estado | Tarea | Responsable |
 |---|---|---|
 | [x] | CRUD de pacientes (ficha mínima) – Server Actions | Facu |
-| [ ] | Pantallas de listado y ficha de paciente | Bruno |
 | [x] | CRUD de turnos con validación de solapamientos – Server Actions | Facu |
 | [x] | Agenda y turnos: vistas de mes y semana, confirmar, rechazar, atendido, ausente, alta y edición de turnos a mano, conectados a la API real | Bruno + Facu |
 
@@ -56,7 +58,8 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | Estado | Tarea | Responsable |
 |---|---|---|
 | [~] | Revisión de privacidad (Ley 25.326): consentimiento, textos y retención hechos; falta revisión de un abogado, casilla de consentimiento en el formulario y dominio de Resend | Facu + Bruno |
-| [ ] | Prueba con la nutricionista piloto y sus pacientes | Facu + Bruno |
+| [ ] | Prueba con la nutricionista piloto y sus pacientes, solo turnos | Facu + Bruno |
+| [ ] | Durante el piloto: los pedidos de acceso, corrección o borrado de datos de un paciente (Ley 25.326) se resuelven a mano en la base con las actions existentes, dentro de los plazos de la ley | Facu |
 | [ ] | Ajustes según feedback | Facu + Bruno |
 
 ## Fuera del MVP (fase 2)
@@ -64,3 +67,4 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 - Recordatorios por WhatsApp (requiere WhatsApp Business API y plantillas aprobadas).
 - Pagos y facturación.
 - Múltiples profesionales por cuenta.
+- Pantallas de listado y ficha de paciente (Bruno). Las Server Actions ya están (`listPatients`, `getPatient`, `updatePatient`, `exportPatientData`, `deletePatient`); falta la UI. Mientras tanto el menú no muestra la sección.
