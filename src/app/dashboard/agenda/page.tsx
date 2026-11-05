@@ -1,15 +1,17 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { displayName, getCurrentProfile } from "@/lib/nutritionist";
 import { getActiveTypes, getAppointments, getSchedule } from "../_lib/data";
 import { AgendaView } from "./agenda-view";
 
 async function Agenda() {
   await connection(); // "today" must be computed per request
   const now = new Date();
-  const [appointments, schedule, types] = await Promise.all([
+  const [appointments, schedule, types, profile] = await Promise.all([
     getAppointments(now),
     getSchedule(now),
     getActiveTypes(),
+    getCurrentProfile(),
   ]);
 
   return (
@@ -17,6 +19,7 @@ async function Agenda() {
       initialAppointments={appointments}
       schedule={schedule}
       types={types}
+      senderName={displayName(profile)}
       now={now.toISOString()}
     />
   );

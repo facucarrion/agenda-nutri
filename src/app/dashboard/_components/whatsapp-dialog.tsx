@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { displayWhatsappNumber, whatsappNumber } from "@/lib/phone";
 import type { DashboardAppointment } from "../_lib/types";
-import { TIMEZONE } from "../_lib/dates";
+import { TIMEZONE, addDays, dayKey } from "../_lib/dates";
 
 export function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -22,42 +23,70 @@ const time = new Intl.DateTimeFormat("es-AR", {
   timeZone: TIMEZONE,
   hour: "2-digit",
   minute: "2-digit",
-  hour12: false,
+  hourCycle: "h23",
 });
 
-function defaultMessage(a: DashboardAppointment) {
-  const when = `el ${longDate.format(new Date(a.starts_at)).replace(",", "")} a las ${time.format(new Date(a.starts_at))} hs`;
+export type MessageKind = "confirm" | "reminder";
+
+// "hoy", "mañana" or "el jueves 12 de noviembre".
+function whenLabel(startsAt: string) {
+  const day = dayKey(startsAt);
+  const today = dayKey(new Date());
+  if (day === today) return "hoy";
+  if (day === addDays(today, 1)) return "mañana";
+  return `el ${longDate.format(new Date(startsAt)).replace(",", "")}`;
+}
+
+function defaultMessage(a: DashboardAppointment, sender: string, kind: MessageKind) {
+  const when = `${whenLabel(a.starts_at)} a las ${time.format(new Date(a.starts_at))} hs`;
   const virtual = /telemedicina|virtual|online/i.test(a.appointment_types.name);
-  return [
-    `Hola ${a.patients.first_name}, te escribo de NutriSol.`,
-    `Te confirmo tu turno de ${a.appointment_types.name} ${when}.`,
-    virtual
-      ? "Un rato antes te paso el link de la videollamada."
-      : "Si no podés venir, avisame por acá así libero el horario.",
-    "¡Nos vemos!",
-  ].join(" ");
+  const hello = `Hola ${a.patients.first_name}, te escribo de ${sender}.`;
+  const rule = virtual
+    ? "Un rato antes te paso el link de la videollamada."
+    : "Si no podés venir, avisame por acá así libero el horario.";
+
+  if (kind === "reminder") {
+    return [
+      hello,
+      `Te recuerdo tu turno de ${a.appointment_types.name} ${when}.`,
+      rule,
+      "¿Me confirmás que venís?",
+    ].join(" ");
+  }
+  return [hello, `Te confirmo tu turno de ${a.appointment_types.name} ${when}.`, rule, "¡Nos vemos!"].join(" ");
 }
 
 // wa.me only accepts digits, with the country code and no "+".
-function waLink(phone: string, text: string) {
-  return `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`;
+function waLink(digits: string, text: string) {
+  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
 }
 
 // Native <dialog>: Esc closes it and focus stays inside while open.
 export function WhatsAppDialog({
   appointment,
+  senderName,
+  kind = "confirm",
+  onSent,
   onClose,
 }: {
   appointment: DashboardAppointment;
+  senderName: string;
+  kind?: MessageKind;
+  /** Called when the nutritionist opens WhatsApp with the message. */
+  onSent?: (appointment: DashboardAppointment) => void;
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const [message, setMessage] = useState(() => defaultMessage(appointment));
+  const [message, setMessage] = useState(() => defaultMessage(appointment, senderName, kind));
   const phone = appointment.patients.phone ?? "";
+  const digits = whatsappNumber(phone);
 
   useEffect(() => {
     ref.current?.showModal();
   }, []);
+
+  const buttonClass =
+    "inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ok px-5 text-sm font-semibold text-white hover:bg-ok/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ok/40";
 
   return (
     <dialog
@@ -72,17 +101,30 @@ export function WhatsAppDialog({
       <div className="flex flex-col gap-5 p-6 sm:p-8">
         <div>
           <h2 id="wa-title" className="text-2xl font-bold">
-            Avisar a {appointment.patients.first_name} {appointment.patients.last_name}
+            {kind === "reminder" ? "Recordar a" : "Avisar a"} {appointment.patients.first_name}{" "}
+            {appointment.patients.last_name}
           </h2>
           <p className="mt-1 text-sm text-muted">
             Se abre WhatsApp con este mensaje. Podés editarlo antes de enviarlo.
           </p>
         </div>
 
-        <p className="flex items-center gap-2 rounded-xl bg-canvas px-3.5 py-2.5 text-sm">
-          <span className="text-muted">Para</span>
-          <span className="font-semibold">{phone}</span>
-        </p>
+        <div className="flex flex-col gap-1.5 rounded-xl bg-canvas px-3.5 py-2.5 text-sm">
+          <p className="flex items-center gap-2">
+            <span className="text-muted">Para</span>
+            <span className="font-semibold">{phone || "Sin teléfono"}</span>
+          </p>
+          {digits && displayWhatsappNumber(digits) !== phone.trim() && (
+            <p className="text-xs text-muted">Se envía a {displayWhatsappNumber(digits)}</p>
+          )}
+          {!digits && (
+            <p role="alert" className="text-xs font-medium text-bad">
+              {phone
+                ? "El número está incompleto: falta el código de área. Editá el turno o pedile el número completo al paciente."
+                : "Este paciente no tiene teléfono cargado."}
+            </p>
+          )}
+        </div>
 
         <label className="flex flex-col gap-2">
           <span className="sr-only">Mensaje</span>
@@ -106,16 +148,26 @@ export function WhatsAppDialog({
           >
             Ahora no
           </button>
-          <a
-            href={waLink(phone, message)}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => ref.current?.close()}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ok px-5 text-sm font-semibold text-white hover:bg-ok/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ok/40"
-          >
-            <WhatsAppIcon className="h-4 w-4" />
-            Abrir WhatsApp
-          </a>
+          {digits ? (
+            <a
+              href={waLink(digits, message)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                onSent?.(appointment);
+                ref.current?.close();
+              }}
+              className={buttonClass}
+            >
+              <WhatsAppIcon className="h-4 w-4" />
+              Abrir WhatsApp
+            </a>
+          ) : (
+            <button type="button" disabled className={`${buttonClass} opacity-50`}>
+              <WhatsAppIcon className="h-4 w-4" />
+              Abrir WhatsApp
+            </button>
+          )}
         </div>
       </div>
     </dialog>

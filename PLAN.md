@@ -64,7 +64,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 
 ## Fuera del MVP (fase 2)
 
-- Recordatorios por WhatsApp (requiere WhatsApp Business API y plantillas aprobadas).
+- Recordatorios de WhatsApp automáticos (requieren WhatsApp Business API y plantillas aprobadas). Hoy el aviso es manual: la lista de Turnos arma el mensaje y la profesional lo envía.
 - Pagos y facturación.
 - Múltiples profesionales por cuenta.
 - Pantallas de listado y ficha de paciente (Bruno). Las Server Actions ya están (`listPatients`, `getPatient`, `updatePatient`, `exportPatientData`, `deletePatient`); falta la UI. Mientras tanto el menú no muestra la sección.

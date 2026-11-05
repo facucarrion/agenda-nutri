@@ -380,3 +380,24 @@ export async function confirmAppointment(id: string): Promise<AppointmentResult>
   refresh();
   return { ok: true, id: data.id };
 }
+
+// The nutritionist opened the WhatsApp reminder for this turno. WhatsApp is
+// sent by hand, so this is only a note to avoid messaging someone twice.
+export async function markWhatsappReminded(id: string): Promise<AppointmentResult> {
+  const { supabase, userId } = await context();
+  if (!userId) return unauthenticated;
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .update({ whatsapp_reminded_at: new Date().toISOString() })
+    .eq("id", id)
+    .in("status", ["pending", "confirmed"])
+    .select("id")
+    .maybeSingle();
+
+  if (error) return failure(error);
+  if (!data) return { ok: false, error: "El turno ya no está activo." };
+
+  refresh();
+  return { ok: true, id: data.id };
+}

@@ -143,6 +143,7 @@ Actions en `src/app/dashboard/agenda/actions.ts`. Resultado: `{ ok: true, id } |
 | `cancelAppointment(id)` | libera el horario |
 | `completeAppointment(id)` | marca como atendido |
 | `markNoShow(id)` | marca como ausente |
+| `markWhatsappReminded(id)` | anota que la profesional abrió el recordatorio de WhatsApp de ese turno (`whatsapp_reminded_at`), para que la lista de recordatorios muestre quién ya fue avisado |
 
 **Reglas**
 
@@ -199,7 +200,7 @@ Los `slots` vienen en UTC: mostralos en la `timezone` devuelta, no en la del nav
   "first_name": "Ana",
   "last_name": "Pérez",
   "email": "ana@correo.com",
-  "phone": "1155550000",
+  "phone": "+54 351 555 0188",
   "consent": true,
   "website": ""
 }
@@ -250,3 +251,8 @@ Mostrá el link público del profesional (`/reservar/<slug>`) en el dashboard pa
 - **Secretos**: nunca con prefijo `NEXT_PUBLIC_`. La `service_role` solo vive en el servidor (`src/lib/supabase/admin.ts`).
 - **Lógica nueva**: preferir Server Components y Server Actions; `"use client"` solo si hay interactividad.
 - **Git**: ramas `feature/*`, PR a `main` (la revisión es recomendada, no obligatoria); mirar que la base del PR sea `main` antes de mergear.
+
+## 9. Teléfonos
+
+- Los formularios usan `PhoneField` (`src/components/phone-field.tsx`): selector de país con su código y el número. Envían un único campo `phone` con la forma `+<código> <número>` (por ejemplo `+54 351 555 0188`). El país por defecto sale de `x-vercel-ip-country` si el host lo da, si no de la zona horaria del navegador, y si no es Argentina.
+- Para armar el enlace de WhatsApp usar `whatsappNumber(phone)` (`src/lib/phone.ts`): devuelve los dígitos que pide `wa.me` (`549…` para celulares argentinos, sin 0 ni 15) o `null` si el número está incompleto. Tiene tests: `npm test`.

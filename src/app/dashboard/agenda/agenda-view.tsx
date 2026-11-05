@@ -51,11 +51,13 @@ export function AgendaView({
   initialAppointments,
   schedule,
   types,
+  senderName,
   now,
 }: {
   initialAppointments: DashboardAppointment[];
   schedule: Schedule;
   types: TypeOption[];
+  senderName: string;
   now: string;
 }) {
   const today = dayKey(now);
@@ -198,7 +200,13 @@ export function AgendaView({
         />
       </div>
 
-      {notify && <WhatsAppDialog appointment={notify} onClose={() => setNotify(null)} />}
+      {notify && (
+        <WhatsAppDialog
+          appointment={notify}
+          senderName={senderName}
+          onClose={() => setNotify(null)}
+        />
+      )}
       {dialog && (
         <AppointmentDialog
           state={dialog}

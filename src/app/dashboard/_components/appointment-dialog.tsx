@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PhoneField } from "@/components/phone-field";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { createAppointmentWithPatient, updateAppointment } from "../agenda/actions";
 import { dayKey, instant, timeOf } from "../_lib/dates";
@@ -154,18 +155,13 @@ export function AppointmentDialog({
                   <span className={labelClass}>Apellido</span>
                   <input name="last_name" required maxLength={80} autoComplete="off" className={inputClass} />
                 </label>
-                <label className="flex flex-col gap-1.5">
-                  <span className={labelClass}>Teléfono (WhatsApp)</span>
-                  <input
-                    name="phone"
-                    type="tel"
-                    required
-                    maxLength={40}
-                    placeholder="+54 9 351 555 0101"
-                    autoComplete="off"
-                    className={inputClass}
-                  />
-                </label>
+                <PhoneField
+                  label="Teléfono (WhatsApp)"
+                  className="sm:col-span-2"
+                  labelClassName={labelClass}
+                  selectClassName={inputClass}
+                  inputClassName={inputClass}
+                />
                 <label className="flex flex-col gap-1.5">
                   <span className={labelClass}>Email (opcional)</span>
                   <input name="email" type="email" maxLength={200} autoComplete="off" className={inputClass} />

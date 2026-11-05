@@ -26,6 +26,7 @@ export type Database = {
           patient_id: string
           pending_expires_at: string | null
           reminder_sent_at: string | null
+          whatsapp_reminded_at: string | null
           source: Database["public"]["Enums"]["appointment_source"]
           starts_at: string
           status: Database["public"]["Enums"]["appointment_status"]
@@ -41,6 +42,7 @@ export type Database = {
           patient_id: string
           pending_expires_at?: string | null
           reminder_sent_at?: string | null
+          whatsapp_reminded_at?: string | null
           source?: Database["public"]["Enums"]["appointment_source"]
           starts_at: string
           status?: Database["public"]["Enums"]["appointment_status"]
@@ -56,6 +58,7 @@ export type Database = {
           patient_id?: string
           pending_expires_at?: string | null
           reminder_sent_at?: string | null
+          whatsapp_reminded_at?: string | null
           source?: Database["public"]["Enums"]["appointment_source"]
           starts_at?: string
           status?: Database["public"]["Enums"]["appointment_status"]

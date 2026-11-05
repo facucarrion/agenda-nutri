@@ -18,6 +18,7 @@ export type DashboardAppointment = {
   notes: string | null;
   patient_id: string;
   appointment_type_id: string | null;
+  whatsapp_reminded_at: string | null; // when the WhatsApp reminder was opened
   patients: { first_name: string; last_name: string; phone: string | null };
   appointment_types: { name: string; duration_minutes: number };
 };

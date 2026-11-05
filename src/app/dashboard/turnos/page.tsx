@@ -1,17 +1,23 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { displayName, getCurrentProfile } from "@/lib/nutritionist";
 import { getActiveTypes, getAppointments } from "../_lib/data";
 import { AppointmentsBoard } from "./appointments-board";
 
 async function Appointments() {
   await connection(); // "today" must be computed per request
   const now = new Date();
-  const [appointments, types] = await Promise.all([getAppointments(now), getActiveTypes()]);
+  const [appointments, types, profile] = await Promise.all([
+    getAppointments(now),
+    getActiveTypes(),
+    getCurrentProfile(),
+  ]);
 
   return (
     <AppointmentsBoard
       initialAppointments={appointments}
       types={types}
+      senderName={displayName(profile)}
       now={now.toISOString()}
     />
   );
