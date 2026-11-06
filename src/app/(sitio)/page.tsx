@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { INVITE_REQUEST_HREF } from "@/lib/legal";
 
 const focus =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
@@ -48,21 +49,29 @@ export default function Home() {
           recordatorios hagan el resto.
         </p>
         <div className="flex flex-wrap items-center gap-3">
+          <a
+            href={INVITE_REQUEST_HREF}
+            className={`rounded-full bg-primary px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#265a42] ${focus}`}
+          >
+            Pedí tu código
+          </a>
           <Link
             href="/login"
-            className={`rounded-full bg-primary px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#265a42] ${focus}`}
+            className={`rounded-full border border-line bg-surface px-6 py-3 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary ${focus}`}
           >
             Ingresar
           </Link>
-          <Link
-            href="/register"
-            className={`rounded-full border border-line bg-surface px-6 py-3 text-[15px] font-semibold text-ink transition-colors hover:border-primary hover:text-primary ${focus}`}
-          >
-            Crear cuenta
-          </Link>
         </div>
         <p className="text-[13px] text-muted">
-          Durante el piloto, el registro es con código de invitación.
+          Durante el piloto, el registro es con código de invitación. ¿Ya
+          tenés uno?{" "}
+          <Link
+            href="/register"
+            className={`rounded font-semibold text-primary hover:underline ${focus}`}
+          >
+            Creá tu cuenta
+          </Link>
+          .
         </p>
       </section>
 

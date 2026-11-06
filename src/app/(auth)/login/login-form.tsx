@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
 import { CheckIcon } from "@/app/(paciente)/_components/icons";
+import { INVITE_REQUEST_HREF } from "@/lib/legal";
 import { login, type AuthState } from "../actions";
 import {
   Card,
@@ -79,8 +80,11 @@ export function LoginForm() {
         <SubmitButton pending={pending}>{pending ? "Ingresando..." : "Ingresar"}</SubmitButton>
       </form>
 
-      <FooterLink question="¿Primera vez?" href="/register">
+      <FooterLink question="¿Tenés un código de invitación?" href="/register">
         Crear cuenta
+      </FooterLink>
+      <FooterLink question="¿Todavía no tenés código?" href={INVITE_REQUEST_HREF}>
+        Pedilo acá
       </FooterLink>
     </Card>
   );
