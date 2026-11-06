@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Inter } from "next/font/google";
@@ -34,7 +35,7 @@ export default function PatientLayout({
         <Link href="/" className="group inline-flex items-center gap-2.5">
           <FruitLogo />
           <span className="bg-[linear-gradient(90deg,#2f6b4f,#47996f)] bg-clip-text text-[22px] font-bold text-transparent transition-transform duration-300 ease-out group-hover:translate-x-0.5 motion-reduce:transition-none">
-            NutriSol
+            {BRAND_NAME}
           </span>
         </Link>
       </header>

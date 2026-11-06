@@ -1,10 +1,11 @@
+import { BRAND_NAME } from "@/lib/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPage, LegalSection, legalLink } from "../_components/legal";
 import { CONTACT_EMAIL, PRODUCT_NAME } from "@/lib/legal";
 
 export const metadata: Metadata = {
-  title: "Términos de uso · Agenda Nutri",
+  title: `Términos de uso · ${BRAND_NAME}`,
 };
 
 export default function TermsPage() {

@@ -1,4 +1,4 @@
-# 🍎 Agenda Nutri
+# 🍎 Nutri Tu Agenda
 
 **La agenda de turnos pensada para nutricionistas.** La profesional configura sus horarios, comparte un link y sus pacientes reservan solos. Ella ve todo en un panel simple, confirma los pedidos y avisa por WhatsApp o email, sin planillas ni idas y vueltas de mensajes.
 
@@ -80,7 +80,7 @@ npm run dev                      # http://localhost:3000
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Sí | Clave pública (la protege RLS) |
 | `SUPABASE_SERVICE_ROLE_KEY` | **No** | Reserva pública y crons. Se saltea RLS |
 | `RESEND_API_KEY` | **No** | Envío de emails |
-| `EMAIL_FROM` | No | Remitente, ej. `Agenda Nutri <turnos@tudominio.com>` |
+| `EMAIL_FROM` | No | Remitente, ej. `Nutri Tu Agenda <turnos@nutrituagenda.com>` |
 | `CRON_SECRET` | **No** | Protege `/api/cron/*` (Vercel lo envía solo) |
 | `NEXT_PUBLIC_SITE_URL` | Sí | URL pública para los links de los emails (solo producción) |
 | `RETENTION_ENFORCE` | No | `true` activa el borrado real por retención; sin ella solo simula |
@@ -167,6 +167,8 @@ La app maneja datos personales y de salud, sujetos a la **Ley 25.326** de Protec
 - [`docs/api.md`](docs/api.md): endpoints, Server Actions, campos y errores.
 - [`PLAN.md`](PLAN.md): tareas del MVP y responsables.
 - [`CLAUDE.md`](CLAUDE.md): contexto y convenciones del proyecto.
+
+> El nombre del producto vive en `src/lib/brand.ts`: cambiarlo ahí lo cambia en toda la interfaz y en los textos legales.
 
 ## 🧭 Qué viene
 

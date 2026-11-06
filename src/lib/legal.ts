@@ -1,9 +1,11 @@
 // Single source for the values used in the legal pages and consent records.
 
+import { BRAND_NAME } from "./brand";
+
 // Bump when the privacy policy changes in a way patients must re-accept.
 export const POLICY_VERSION = "2026-10-15";
 
-export const PRODUCT_NAME = "Agenda Nutri";
+export const PRODUCT_NAME = BRAND_NAME;
 
 export const CONTACT_EMAIL = "contactobfweb@gmail.com";
 

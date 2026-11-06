@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -8,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Agenda Nutri",
+  title: BRAND_NAME,
   description:
     "Agenda de turnos para profesionales de la nutrición: reserva online, recordatorios y gestión de la consulta.",
 };
