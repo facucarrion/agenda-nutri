@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand";
 import type { Metadata } from "next";
 import { LegalList, LegalPage, LegalSection, legalLink } from "../_components/legal";
 import {
@@ -8,7 +9,7 @@ import {
 } from "@/lib/legal";
 
 export const metadata: Metadata = {
-  title: "Política de privacidad · Agenda Nutri",
+  title: `Política de privacidad · ${BRAND_NAME}`,
 };
 
 export default function PrivacyPage() {

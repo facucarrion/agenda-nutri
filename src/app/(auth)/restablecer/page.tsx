@@ -1,8 +1,9 @@
+import { BRAND_NAME } from "@/lib/brand";
 import type { Metadata } from "next";
 import { ResetForm } from "./reset-form";
 
 export const metadata: Metadata = {
-  title: "Nueva contraseña · Agenda Nutri",
+  title: `Nueva contraseña · ${BRAND_NAME}`,
 };
 
 // Reached from the recovery email: /auth/callback opens the session and

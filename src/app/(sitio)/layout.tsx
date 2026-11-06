@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand";
 import Link from "next/link";
 import { FruitLogo } from "@/app/(paciente)/_components/fruit-logo";
 
@@ -28,7 +29,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
           >
             <FruitLogo />
             <span className="bg-[linear-gradient(90deg,#2f6b4f,#47996f)] bg-clip-text text-[22px] font-bold text-transparent transition-transform duration-300 ease-out group-hover:translate-x-0.5 motion-reduce:transition-none">
-              Agenda Nutri
+              {BRAND_NAME}
             </span>
           </Link>
           <Link
@@ -44,7 +45,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
       <footer className="border-t border-line bg-surface/60">
         <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-2 px-4 py-6 text-[13px] text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p>Agenda Nutri · Turnos para profesionales de la nutrición</p>
+          <p>{BRAND_NAME} · Turnos para profesionales de la nutrición</p>
           <nav aria-label="Legal" className="flex gap-5">
             <Link href="/privacidad" className={`rounded hover:text-primary ${focus}`}>
               Privacidad

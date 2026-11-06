@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Inter } from "next/font/google";
@@ -6,7 +7,7 @@ import { FruitLogo } from "@/app/(paciente)/_components/fruit-logo";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Agenda Nutri",
+  title: BRAND_NAME,
 };
 
 // Shell for login, sign-up and password recovery. Always light, like the
@@ -33,7 +34,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           >
             <FruitLogo />
             <span className="bg-[linear-gradient(90deg,#2f6b4f,#47996f)] bg-clip-text text-[22px] font-bold text-transparent transition-transform duration-300 ease-out group-hover:translate-x-0.5 motion-reduce:transition-none">
-              Agenda Nutri
+              {BRAND_NAME}
             </span>
           </Link>
         </div>

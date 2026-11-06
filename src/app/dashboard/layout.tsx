@@ -1,3 +1,4 @@
+import { BRAND_NAME } from "@/lib/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -11,7 +12,7 @@ import { LiveFavicon } from "./_components/live-favicon";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Gestión · Agenda Nutri",
+  title: `Gestión · ${BRAND_NAME}`,
 };
 
 // Shell for the nutritionist's private pages. Same palette and warm
@@ -42,7 +43,7 @@ export default function DashboardLayout({
             <FruitLogo />
             {/* The account's business name, or the nutritionist's name. */}
             <span className="max-w-[45vw] truncate bg-[linear-gradient(90deg,#2f6b4f,#47996f)] bg-clip-text text-[22px] font-bold text-transparent sm:max-w-[420px]">
-              <Suspense fallback="Agenda Nutri">
+              <Suspense fallback={BRAND_NAME}>
                 <AccountTitle />
               </Suspense>
             </span>
