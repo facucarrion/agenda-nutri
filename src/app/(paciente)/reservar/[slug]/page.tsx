@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { headers } from "next/headers";
+import { countryFromHeader } from "@/lib/countries";
 import { notFound } from "next/navigation";
 import { getPublicProfile } from "@/lib/public-booking";
 import { BookingForm } from "./booking-form";
@@ -16,8 +18,14 @@ async function Booking({ params }: { params: Promise<{ slug: string }> }) {
     );
   }
 
+  // The visitor's country, when the host provides it (Vercel does). Otherwise
+  // the browser guesses it after the page loads.
+  const defaultCountry =
+    countryFromHeader((await headers()).get("x-vercel-ip-country")) ?? undefined;
+
   return (
     <BookingForm
+      defaultCountry={defaultCountry}
       profile={{
         ...profile,
         // New accounts start with an empty name.

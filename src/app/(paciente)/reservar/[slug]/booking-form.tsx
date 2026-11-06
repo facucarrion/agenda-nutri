@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PhoneField } from "@/components/phone-field";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   CheckIcon,
@@ -96,7 +97,13 @@ function formatMonth(year: number, month: number) {
   return `${capitalize(name)} ${year}`;
 }
 
-export function BookingForm({ profile }: { profile: PublicProfile }) {
+export function BookingForm({
+  profile,
+  defaultCountry,
+}: {
+  profile: PublicProfile;
+  defaultCountry?: string;
+}) {
   const timeFmt = new Intl.DateTimeFormat("es-AR", {
     timeZone: profile.timezone,
     hour: "2-digit",
@@ -507,12 +514,13 @@ export function BookingForm({ profile }: { profile: PublicProfile }) {
                 <Field label="Nombre" name="first_name" autoComplete="given-name" />
                 <Field label="Apellido" name="last_name" autoComplete="family-name" />
                 <Field label="Email" name="email" type="email" autoComplete="email" />
-                <Field
+                <PhoneField
                   label="Teléfono (WhatsApp)"
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder="+54 9 351 555 0101"
+                  defaultCountry={defaultCountry}
+                  className="sm:col-span-2"
+                  labelClassName="text-[13px] font-medium text-muted"
+                  selectClassName={input}
+                  inputClassName={input}
                 />
               </div>
 

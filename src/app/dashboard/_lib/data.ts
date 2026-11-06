@@ -17,7 +17,7 @@ const DAYS_AHEAD = 120;
 const PAGE = 1000;
 
 const SELECT =
-  "id, starts_at, ends_at, status, source, notes, patient_id, appointment_type_id, patients(first_name, last_name, phone), appointment_types(name, duration_minutes)";
+  "id, starts_at, ends_at, status, source, notes, patient_id, appointment_type_id, whatsapp_reminded_at, patients(first_name, last_name, phone), appointment_types(name, duration_minutes)";
 
 // RLS limits the rows to the signed-in nutritionist. Unconfirmed public
 // bookings that already expired are left out: they no longer hold the slot.
@@ -59,6 +59,7 @@ export async function getAppointments(now: Date): Promise<DashboardAppointment[]
       notes: row.notes,
       patient_id: row.patient_id,
       appointment_type_id: row.appointment_type_id,
+      whatsapp_reminded_at: row.whatsapp_reminded_at,
       patients: row.patients,
       // The type can be deleted later; the appointment keeps its time.
       appointment_types: row.appointment_types ?? {

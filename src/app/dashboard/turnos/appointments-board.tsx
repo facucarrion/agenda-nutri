@@ -11,6 +11,7 @@ import { AppointmentActions } from "../_components/appointment-actions";
 import { AppointmentDialog, type DialogState } from "../_components/appointment-dialog";
 import { useAppointments } from "../_components/use-appointments";
 import { WhatsAppDialog } from "../_components/whatsapp-dialog";
+import { ReminderList } from "./reminder-list";
 import { STATUS, btnPrimary, focus, fullName, initials } from "../_components/ui";
 
 type Tab = "all" | "pending" | "confirmed";
@@ -30,14 +31,17 @@ function shiftMonth(month: string, delta: number) {
 export function AppointmentsBoard({
   initialAppointments,
   types,
+  senderName,
   now,
 }: {
   initialAppointments: DashboardAppointment[];
   types: TypeOption[];
+  senderName: string;
   now: string;
 }) {
-  const { appointments, setStatus, notify, setNotify, error } =
+  const { appointments, setStatus, markReminded, notify, setNotify, error } =
     useAppointments(initialAppointments);
+  const [reminder, setReminder] = useState<DashboardAppointment | null>(null);
   const [month, setMonth] = useState(() => dayKey(now).slice(0, 7));
   const [tab, setTab] = useState<Tab>("all");
   const [dialog, setDialog] = useState<DialogState>(null);
@@ -98,6 +102,8 @@ export function AppointmentsBoard({
           {error}
         </p>
       )}
+
+      <ReminderList appointments={appointments} now={now} onRemind={setReminder} />
 
       <div role="tablist" aria-label="Filtrar turnos" className="mt-6 flex flex-wrap gap-2">
         {TABS.map((t) => {
@@ -196,7 +202,22 @@ export function AppointmentsBoard({
         WhatsApp&quot; abre el chat con el mensaje del turno ya escrito.
       </p>
 
-      {notify && <WhatsAppDialog appointment={notify} onClose={() => setNotify(null)} />}
+      {notify && (
+        <WhatsAppDialog
+          appointment={notify}
+          senderName={senderName}
+          onClose={() => setNotify(null)}
+        />
+      )}
+      {reminder && (
+        <WhatsAppDialog
+          appointment={reminder}
+          senderName={senderName}
+          kind="reminder"
+          onSent={(a) => markReminded(a.id)}
+          onClose={() => setReminder(null)}
+        />
+      )}
       {dialog && (
         <AppointmentDialog state={dialog} types={types} onClose={() => setDialog(null)} />
       )}
