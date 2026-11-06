@@ -70,6 +70,8 @@ cp .env.template .env.local      # en PowerShell: Copy-Item .env.template .env.l
 npm run dev                      # http://localhost:3000
 ```
 
+**Probarlo desde el celular:** con el celular en el mismo Wi-Fi, abrí `http://<IP de tu compu>:3000` (por ejemplo `http://192.168.100.20:3000`; la IP la ves con `ipconfig`). La configuración ya permite las direcciones `192.168.*.*` en desarrollo. Si tu red usa otro rango, agregalo en `allowedDevOrigins` de `next.config.ts` y reiniciá `npm run dev`. Si el firewall de Windows pregunta, permití el acceso a Node en redes privadas.
+
 `.env.template` ya trae las dos variables públicas de Supabase: con eso alcanza para trabajar en las pantallas. Las claves secretas se piden al equipo y **nunca se commitean**.
 
 ### Variables de entorno
