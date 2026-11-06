@@ -6,6 +6,7 @@ import { logout } from "@/app/(auth)/actions";
 import { FruitLogo } from "@/app/(paciente)/_components/fruit-logo";
 import { AccountPerson, AccountTitle } from "./_components/account-names";
 import { DashboardNav } from "./_components/dashboard-nav";
+import { LiveFavicon } from "./_components/live-favicon";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -68,6 +69,7 @@ export default function DashboardLayout({
         </div>
       </header>
       {children}
+      <LiveFavicon />
     </div>
   );
 }
