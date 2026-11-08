@@ -134,7 +134,8 @@ body {
   pointer-events: none;
   background-image: url("/landing/grano.png");
   background-size: 256px;
-  opacity: 0.45;
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
 }
 
 /* Entrance: the hero fades up on load, and the rest appears as it scrolls
