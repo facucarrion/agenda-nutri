@@ -32,7 +32,7 @@ function Check({ className }: { className: string }) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={`mt-px size-3.5 shrink-0 sm:size-5 ${className}`}
+      className={`mt-px size-3 shrink-0 sm:size-5 ${className}`}
       aria-hidden
     >
       <path d="m4.5 10.5 3.5 3.5 7.5-8" />
@@ -79,14 +79,14 @@ export function PlanCard({ plan }: { plan: Plan }) {
       ))}
 
       <div
-        className={`plan-card flex w-full flex-col gap-2.5 rounded-2xl px-2.5 pb-3.5 pt-3 sm:gap-[22px] sm:rounded-[28px] sm:px-9 sm:pb-10 sm:pt-9 ${
+        className={`plan-card flex w-full flex-col gap-2 rounded-2xl px-2 pb-3 pt-3 sm:gap-[22px] sm:rounded-[28px] sm:px-9 sm:pb-10 sm:pt-9 ${
           f
             ? "bg-cream text-forest shadow-[0_24px_48px_rgba(0,0,0,0.35)]"
             : "border border-cream/14 bg-forest-2 text-cream"
         }`}
       >
-        <div className="flex min-h-[40px] flex-col items-start gap-1 sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-          <h3 className="text-[15px] font-semibold leading-5 sm:text-[24px] sm:leading-8">{plan.name}</h3>
+        <div className="flex min-h-[34px] flex-col items-start gap-1 sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+          <h3 className="text-[13px] font-semibold leading-5 sm:text-[24px] sm:leading-8">{plan.name}</h3>
           {plan.badge &&
             (f ? (
               <span className="shrink-0 whitespace-nowrap rounded-full bg-tangerine px-1.5 py-0.5 text-[9px] font-bold leading-3 sm:px-3 sm:py-[5px] sm:text-[12px] sm:leading-4 text-forest">
@@ -102,16 +102,16 @@ export function PlanCard({ plan }: { plan: Plan }) {
           {plan.tagline}
         </p>
         <p className="flex flex-col items-start sm:flex-row sm:items-end sm:gap-1.5">
-          <span className="text-[20px] font-bold leading-6 tracking-[-0.02em] sm:text-[48px] sm:leading-[52px]">{plan.price}</span>
+          <span className="text-[16px] font-bold leading-5 tracking-[-0.02em] sm:text-[48px] sm:leading-[52px]">{plan.price}</span>
           {plan.period && (
-            <span className={`text-[11px] font-medium leading-4 sm:text-[16px] sm:leading-6 ${f ? "text-slate-green" : "text-sage"}`}>
+            <span className={`text-[9px] font-medium leading-3 sm:text-[16px] sm:leading-6 ${f ? "text-slate-green" : "text-sage"}`}>
               {plan.period}
             </span>
           )}
         </p>
         <CtaTag
           href={plan.cta.href}
-          className={`flex w-full items-center justify-center rounded-full px-2 py-2 text-center text-[11px] font-semibold leading-4 transition-colors sm:px-7 sm:py-3.5 sm:text-[16px] sm:leading-6 ${focusDark} ${
+          className={`flex w-full items-center justify-center rounded-full px-1.5 py-1.5 text-center text-[10px] font-semibold leading-[14px] transition-colors sm:px-7 sm:py-3.5 sm:text-[16px] sm:leading-6 ${focusDark} ${
             f
               ? "bg-tangerine text-forest hover:bg-[#f59d55]"
               : "border border-cream/50 text-cream hover:border-cream hover:bg-cream/10"
@@ -120,9 +120,9 @@ export function PlanCard({ plan }: { plan: Plan }) {
           {plan.cta.label}
         </CtaTag>
         <hr className={`border-0 border-t ${f ? "border-forest/14" : "border-cream/14"}`} />
-        <ul className="flex flex-col gap-1.5 sm:gap-3.5">
+        <ul className="flex flex-col gap-1 sm:gap-3.5">
           {plan.features.map((item) => (
-            <li key={item} className="flex items-start gap-1 break-words max-sm:nth-[n+4]:hidden text-[10.5px] leading-[14px] sm:gap-3 sm:text-[15px] sm:leading-[22px]">
+            <li key={item} className="flex items-start gap-1 break-words text-[9px] leading-[12px] sm:gap-3 sm:text-[15px] sm:leading-[22px]">
               <Check className={f ? "text-forest" : "text-tangerine"} />
               {item}
             </li>
