@@ -73,10 +73,24 @@ body {
 }
 .plan-fruit {
   opacity: 0;
-  transform: translateY(var(--hide)) scale(0.85);
+  transform: translate(var(--hide-x), var(--hide-y)) scale(0.82) rotate(var(--rot-in));
   transition-property: transform, opacity;
-  transition-duration: 750ms, 450ms;
-  transition-delay: var(--delay);
+  transition-duration: 800ms, 500ms;
+}
+.plan-fruit--top-left {
+  top: -86px;
+  left: -52px;
+  --hide-x: 64px;
+  --hide-y: 80px;
+  --rot-in: 10deg;
+}
+.plan-fruit--bottom-right {
+  right: -52px;
+  bottom: -86px;
+  --hide-x: -64px;
+  --hide-y: -80px;
+  --rot-in: -10deg;
+  transition-delay: 90ms;
 }
 @media (hover: hover) {
   .plan:hover .plan-card {
@@ -88,7 +102,7 @@ body {
   }
   .plan:hover .plan-fruit {
     opacity: 1;
-    transform: translateY(var(--peek)) rotate(var(--rot)) scale(1);
+    transform: none;
   }
 }
 .plan:focus-within .plan-card {
@@ -100,7 +114,7 @@ body {
 }
 .plan:focus-within .plan-fruit {
   opacity: 1;
-  transform: translateY(var(--peek)) rotate(var(--rot)) scale(1);
+  transform: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .plan-card,

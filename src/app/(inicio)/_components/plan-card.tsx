@@ -1,19 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
-// A fruit that hides behind the card and peeks out of one of its edges when
-// the card is hovered. `x` is the distance from the side named in `at`.
-type Fruit = {
-  src: string;
-  w: number;
-  h: number;
-  at: "top-left" | "top-right" | "bottom-left" | "bottom-right";
-  x: string;
-  // Rotation once it has peeked out, in degrees.
-  r: number;
-  // Stagger, in ms.
-  delay?: number;
-};
+// Two bunches of fruit and leaves hide behind each card and come out of its
+// top-left and bottom-right corners when the card is hovered. Each bunch is
+// one transparent image, CLUSTER_W x CLUSTER_H on screen.
+const CLUSTER_W = 192;
+const CLUSTER_H = 144;
 
 export type Plan = {
   name: string;
@@ -24,7 +16,8 @@ export type Plan = {
   featured?: boolean;
   cta: { label: string; href: string };
   features: string[];
-  fruits: Fruit[];
+  // Images of the two bunches: top-left corner and bottom-right corner.
+  fruits: { top: string; bottom: string };
 };
 
 const focusDark =
@@ -63,31 +56,24 @@ export function PlanCard({ plan }: { plan: Plan }) {
         }`}
       />
 
-      {/* Fruits behind the card */}
-      {plan.fruits.map((fruit) => {
-        const [v, h] = fruit.at.split("-") as ["top" | "bottom", "left" | "right"];
-        return (
-          <Image
-            key={fruit.src + fruit.at}
-            src={fruit.src}
-            alt=""
-            width={fruit.w}
-            height={fruit.h}
-            aria-hidden
-            className="plan-fruit pointer-events-none absolute -z-10 select-none drop-shadow-[0_10px_14px_rgba(0,0,0,0.35)]"
-            style={
-              {
-                [v]: 0,
-                [h]: fruit.x,
-                "--peek": v === "top" ? `-${Math.round(fruit.h * 0.7)}px` : `${Math.round(fruit.h * 0.7)}px`,
-                "--hide": v === "top" ? "24px" : "-24px",
-                "--rot": `${fruit.r}deg`,
-                "--delay": `${fruit.delay ?? 0}ms`,
-              } as React.CSSProperties
-            }
-          />
-        );
-      })}
+      {/* Fruit bunches behind the card corners */}
+      {(
+        [
+          { src: plan.fruits.top, corner: "top-left" },
+          { src: plan.fruits.bottom, corner: "bottom-right" },
+        ] as const
+      ).map(({ src, corner }) => (
+        <Image
+          key={corner}
+          src={src}
+          alt=""
+          width={CLUSTER_W}
+          height={CLUSTER_H}
+          quality={90}
+          aria-hidden
+          className={`plan-fruit plan-fruit--${corner} pointer-events-none absolute -z-10 select-none`}
+        />
+      ))}
 
       <div
         className={`plan-card flex w-full flex-col gap-[22px] rounded-[28px] px-9 pb-10 pt-9 ${
