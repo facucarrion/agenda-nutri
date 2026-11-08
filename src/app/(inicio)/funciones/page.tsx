@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { BRAND_NAME } from "@/lib/brand";
+import { Journey } from "../_components/journey";
 import {
   ClosingCta,
   SiteFooter,
@@ -101,17 +102,22 @@ export default function FeaturesPage() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-[1120px] flex-col gap-24 px-4 py-20 sm:gap-32 sm:px-8 sm:py-28 xl:px-0">
+      <main className="mx-auto w-full max-w-[1120px] overflow-x-clip px-4 py-20 sm:px-8 sm:py-28 xl:px-0">
+        <Journey>
         {FEATURES.map((f, i) => (
           <section
             key={f.title}
+            data-step
             aria-labelledby={`funcion-${i}`}
-            className={`reveal grid items-center gap-10 lg:gap-16 ${
+            className={`reveal relative grid items-center gap-10 lg:gap-16 ${
               i % 2
                 ? "lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
                 : "lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
             }`}
           >
+            <span className="journey-node" data-node aria-hidden>
+              {i + 1}
+            </span>
             <div className={`flex flex-col gap-4 ${i % 2 ? "lg:order-2" : ""}`}>
               <p className="text-[13px] font-bold tracking-[0.08em] text-tangerine-ink">
                 {String(i + 1).padStart(2, "0")} · {f.title.toUpperCase()}
@@ -134,7 +140,9 @@ export default function FeaturesPage() {
             </div>
 
             {/* Screenshot in a light browser frame */}
-            <figure className="overflow-hidden rounded-[20px] border border-sand bg-white shadow-[0_30px_60px_-30px_rgba(20,53,42,0.35),0_12px_24px_-16px_rgba(20,53,42,0.2)]">
+            <div className="relative">
+            <div aria-hidden className="shot-glow" />
+            <figure className="relative overflow-hidden rounded-[20px] border border-sand bg-white shadow-[0_30px_60px_-30px_rgba(20,53,42,0.35),0_12px_24px_-16px_rgba(20,53,42,0.2)]">
               <div className="flex items-center gap-1.5 border-b border-sand/70 bg-[#faf7ef] px-4 py-3" aria-hidden>
                 <span className="size-2.5 rounded-full bg-[#e8a598]" />
                 <span className="size-2.5 rounded-full bg-[#ecc98a]" />
@@ -150,9 +158,10 @@ export default function FeaturesPage() {
                 className="h-auto w-full"
               />
             </figure>
+            </div>
           </section>
         ))}
-
+        </Journey>
       </main>
 
       <ClosingCta />
