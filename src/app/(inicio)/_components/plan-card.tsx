@@ -79,13 +79,13 @@ export function PlanCard({ plan }: { plan: Plan }) {
       ))}
 
       <div
-        className={`plan-card flex w-full flex-col gap-3 rounded-2xl px-2.5 pb-4 pt-3.5 sm:gap-[22px] sm:rounded-[28px] sm:px-9 sm:pb-10 sm:pt-9 ${
+        className={`plan-card flex w-full flex-col gap-2.5 rounded-2xl px-2.5 pb-3.5 pt-3 sm:gap-[22px] sm:rounded-[28px] sm:px-9 sm:pb-10 sm:pt-9 ${
           f
             ? "bg-cream text-forest shadow-[0_24px_48px_rgba(0,0,0,0.35)]"
             : "border border-cream/14 bg-forest-2 text-cream"
         }`}
       >
-        <div className="flex min-h-[46px] flex-col items-start gap-1.5 sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <div className="flex min-h-[40px] flex-col items-start gap-1 sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <h3 className="text-[15px] font-semibold leading-5 sm:text-[24px] sm:leading-8">{plan.name}</h3>
           {plan.badge &&
             (f ? (
@@ -120,9 +120,9 @@ export function PlanCard({ plan }: { plan: Plan }) {
           {plan.cta.label}
         </CtaTag>
         <hr className={`border-0 border-t ${f ? "border-forest/14" : "border-cream/14"}`} />
-        <ul className="flex flex-col gap-2 sm:gap-3.5">
+        <ul className="flex flex-col gap-1.5 sm:gap-3.5">
           {plan.features.map((item) => (
-            <li key={item} className="flex items-start gap-1 break-words text-[10.5px] leading-[14px] sm:gap-3 sm:text-[15px] sm:leading-[22px]">
+            <li key={item} className="flex items-start gap-1 break-words max-sm:nth-[n+4]:hidden text-[10.5px] leading-[14px] sm:gap-3 sm:text-[15px] sm:leading-[22px]">
               <Check className={f ? "text-forest" : "text-tangerine"} />
               {item}
             </li>
