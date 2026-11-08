@@ -240,7 +240,7 @@ export default function Home() {
           aria-labelledby="planes-titulo"
           className="scroll-mt-0 rounded-t-[32px] bg-forest px-4 pb-[120px] pt-24 sm:rounded-t-[48px] sm:px-8 sm:pt-28"
         >
-          <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-[104px]">
+          <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-20">
             <div className="flex max-w-[980px] flex-col items-center gap-4 text-center">
               <p className="text-[13px] font-bold tracking-[0.08em] text-tangerine">PLANES</p>
               <h2
@@ -253,7 +253,7 @@ export default function Home() {
                 Empezá gratis y pasá a un plan pago cuando tu agenda lo necesite.
               </p>
             </div>
-            <ul className="grid w-full gap-[104px] lg:grid-cols-3 lg:gap-6">
+            <ul className="grid w-full gap-20 lg:grid-cols-3 lg:gap-6">
               {PLANS.map((plan) => (
                 <PlanCard key={plan.name} plan={plan} />
               ))}

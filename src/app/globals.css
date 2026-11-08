@@ -78,15 +78,15 @@ body {
   transition-duration: 800ms, 500ms;
 }
 .plan-fruit--top-left {
-  top: -86px;
-  left: -52px;
+  top: -56px;
+  left: -60px;
   --hide-x: 64px;
   --hide-y: 80px;
   --rot-in: 10deg;
 }
 .plan-fruit--bottom-right {
-  right: -52px;
-  bottom: -86px;
+  right: -60px;
+  bottom: -56px;
   --hide-x: -64px;
   --hide-y: -80px;
   --rot-in: -10deg;
