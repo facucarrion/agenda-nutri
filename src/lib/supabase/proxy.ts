@@ -5,6 +5,7 @@ import { asSessionCookie, SESSION_ONLY_COOKIE } from "./session-cookie";
 
 const PUBLIC_PATHS = [
   "/",
+  "/funciones",
   "/login",
   "/register",
   "/recuperar",

@@ -45,7 +45,10 @@ export function PlanCard({ plan }: { plan: Plan }) {
   const CtaTag = plan.cta.href.startsWith("/") ? Link : "a";
 
   return (
-    <li className="plan reveal group relative isolate flex">
+    <li
+      data-featured={f ? "" : undefined}
+      className="plan group relative isolate flex w-[86%] max-w-[360px] shrink-0 snap-center lg:w-auto lg:max-w-none"
+    >
       {/* Glow behind the card */}
       <div
         aria-hidden
@@ -76,21 +79,21 @@ export function PlanCard({ plan }: { plan: Plan }) {
       ))}
 
       <div
-        className={`plan-card flex w-full flex-col gap-[22px] rounded-[28px] px-9 pb-10 pt-9 ${
+        className={`plan-card flex w-full flex-col gap-[22px] rounded-[28px] px-6 pb-9 pt-8 sm:px-9 sm:pb-10 sm:pt-9 ${
           f
             ? "bg-cream text-forest shadow-[0_24px_48px_rgba(0,0,0,0.35)]"
             : "border border-cream/14 bg-forest-2 text-cream"
         }`}
       >
         <div className="flex items-center justify-between gap-3">
-          <h3 className="text-[24px] font-semibold leading-8">{plan.name}</h3>
+          <h3 className="text-[22px] font-semibold leading-8 sm:text-[24px]">{plan.name}</h3>
           {plan.badge &&
             (f ? (
-              <span className="rounded-full bg-tangerine px-3 py-[5px] text-[12px] font-bold leading-4 text-forest">
+              <span className="shrink-0 whitespace-nowrap rounded-full bg-tangerine px-3 py-[5px] text-[12px] font-bold leading-4 text-forest">
                 {plan.badge}
               </span>
             ) : (
-              <span className="rounded-full border border-cream/35 px-3 py-[5px] text-[12px] font-bold leading-4 text-sage-light">
+              <span className="shrink-0 whitespace-nowrap rounded-full border border-cream/35 px-3 py-[5px] text-[12px] font-bold leading-4 text-sage-light">
                 {plan.badge}
               </span>
             ))}
