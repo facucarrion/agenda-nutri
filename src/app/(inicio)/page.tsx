@@ -1,8 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Fraunces } from "next/font/google";
 import { BRAND_NAME } from "@/lib/brand";
 import { CONTACT_EMAIL, INVITE_REQUEST_HREF } from "@/lib/legal";
 import { PlanCard, type Plan } from "./_components/plan-card";
+
+// Serif italic for one accent phrase per title.
+const accentFont = Fraunces({ subsets: ["latin"], style: "italic", display: "swap" });
+
+function Accent({ children }: { children: React.ReactNode }) {
+  return (
+    <em className={`${accentFont.className} font-medium tracking-[-0.01em]`}>{children}</em>
+  );
+}
 
 const focus =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tangerine/70 focus-visible:ring-offset-2 focus-visible:ring-offset-forest";
@@ -17,14 +27,14 @@ const NOTIFY_CENTRO_HREF =
 const FEATURES: { title: string; text: string; icon: React.ReactNode }[] = [
   {
     title: "Reserva online",
-    text: "Tus pacientes eligen día y horario desde tu link, sin mensajes de ida y vuelta.",
+    text: "Tus pacientes eligen día y horario desde tu link.",
     icon: (
       <path d="M10 14a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1 1M14 10a3.5 3.5 0 0 0-5 0l-3 3a3.5 3.5 0 0 0 5 5l1-1" />
     ),
   },
   {
     title: "Tu agenda, ordenada",
-    text: "Vistas de mes y semana, turnos a mano, días bloqueados y tus propios tipos de consulta.",
+    text: "Mes y semana, días bloqueados y tus tipos de consulta.",
     icon: (
       <>
         <rect x="4" y="5" width="16" height="15" rx="2.5" />
@@ -34,7 +44,7 @@ const FEATURES: { title: string; text: string; icon: React.ReactNode }[] = [
   },
   {
     title: "Menos ausencias",
-    text: "Confirmación y recordatorio por email, y el aviso de WhatsApp listo para enviar.",
+    text: "Recordatorio por email y aviso de WhatsApp listo.",
     icon: (
       <>
         <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" />
@@ -96,6 +106,31 @@ const PLANS: Plan[] = [
   },
 ];
 
+const FOOTER_COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
+  {
+    title: "Producto",
+    links: [
+      { label: "Funciones", href: "#funciones" },
+      { label: "Planes", href: "#planes" },
+      { label: "Ingresar", href: "/login" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Términos", href: "/terminos" },
+      { label: "Privacidad", href: "/privacidad" },
+    ],
+  },
+  {
+    title: "Contacto",
+    links: [
+      { label: "Pedí tu código", href: INVITE_REQUEST_HREF },
+      { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
+    ],
+  },
+];
+
 function Logo({ size }: { size: number }) {
   return (
     <Image
@@ -112,7 +147,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-cream text-forest">
       {/* Hero */}
-      <header className="relative isolate overflow-hidden rounded-b-[32px] bg-forest sm:rounded-b-[48px]">
+      <header className="grain relative isolate overflow-hidden rounded-b-[32px] bg-forest sm:rounded-b-[48px]">
         <Image
           src="/landing/hero-frutas.webp"
           alt=""
@@ -156,11 +191,14 @@ export default function Home() {
           </div>
         </nav>
 
-        <div className="mx-auto w-full max-w-[1120px] px-4 pb-24 pt-12 sm:px-8 sm:pt-[88px] lg:min-h-[726px] lg:pb-0 xl:px-0">
-          <div className="flex max-w-[780px] flex-col gap-7">
+        <div className="mx-auto w-full max-w-[1120px] px-4 pb-20 pt-12 sm:px-8 sm:pt-[88px] lg:min-h-[726px] lg:pb-24 xl:px-0">
+          <div className="hero-in flex max-w-[780px] flex-col gap-7">
             <h1 className="text-[40px] font-bold leading-[1.1] tracking-[-0.02em] text-cream sm:text-[52px] lg:text-[60px]">
               Tus turnos en un solo lugar,
-              <br className="hidden sm:block" /> sin idas y vueltas.
+              <br className="hidden sm:block" />{" "}
+              <Accent>
+                <span className="text-tangerine">sin idas y vueltas.</span>
+              </Accent>
             </h1>
             <p className="max-w-[560px] text-[18px] leading-[30px] text-sage sm:text-[20px] sm:leading-8">
               Compartí tu link de reserva, mirá tu agenda del día y dejá que los
@@ -185,69 +223,51 @@ export default function Home() {
               </Link>
               .
             </p>
+            <ul
+              id="funciones"
+              aria-label="Funciones"
+              className="mt-5 grid max-w-[640px] scroll-mt-6 gap-6 border-t border-cream/15 pt-8 sm:grid-cols-3 sm:gap-8"
+            >
+              {FEATURES.map((f) => (
+                <li key={f.title} className="flex flex-col gap-2">
+                  <p className="flex items-center gap-2.5 text-[15px] font-semibold leading-6 text-cream">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="size-5 shrink-0 text-tangerine"
+                      aria-hidden
+                    >
+                      {f.icon}
+                    </svg>
+                    {f.title}
+                  </p>
+                  <p className="text-[14px] leading-[22px] text-moss">{f.text}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </header>
 
       <main className="flex flex-col">
-        {/* Funciones */}
-        <section
-          id="funciones"
-          aria-labelledby="funciones-titulo"
-          className="mx-auto flex w-full max-w-[1120px] scroll-mt-6 flex-col gap-12 px-4 py-20 sm:px-8 sm:py-[104px] xl:px-0"
-        >
-          <div className="flex flex-col gap-3">
-            <p className="text-[13px] font-bold tracking-[0.08em] text-tangerine-ink">
-              FUNCIONES
-            </p>
-            <h2
-              id="funciones-titulo"
-              className="text-[32px] font-bold leading-[1.2] tracking-[-0.015em] sm:text-[40px]"
-            >
-              Lo esencial para tener tu agenda en orden
-            </h2>
-          </div>
-          <ul className="grid gap-6 md:grid-cols-3">
-            {FEATURES.map((f) => (
-              <li
-                key={f.title}
-                className="flex flex-col gap-3.5 rounded-3xl border border-sand bg-white px-8 pb-9 pt-8"
-              >
-                <span className="grid size-14 place-items-center rounded-2xl bg-mint-soft text-forest">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="size-7"
-                    aria-hidden
-                  >
-                    {f.icon}
-                  </svg>
-                </span>
-                <h3 className="text-[22px] font-semibold leading-[30px]">{f.title}</h3>
-                <p className="text-[16px] leading-[26px] text-slate-green">{f.text}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
         {/* Planes */}
         <section
           id="planes"
           aria-labelledby="planes-titulo"
-          className="scroll-mt-0 rounded-t-[32px] bg-forest px-4 pb-[120px] pt-24 sm:rounded-t-[48px] sm:px-8 sm:pt-28"
+          className="grain relative isolate mt-3 scroll-mt-3 overflow-x-clip rounded-[32px] bg-forest px-4 pb-24 pt-24 sm:mt-4 sm:rounded-[48px] sm:px-8 sm:pb-28 sm:pt-28"
         >
           <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-20">
-            <div className="flex max-w-[980px] flex-col items-center gap-4 text-center">
+            <div className="reveal flex max-w-[980px] flex-col items-center gap-4 text-center">
               <p className="text-[13px] font-bold tracking-[0.08em] text-tangerine">PLANES</p>
               <h2
                 id="planes-titulo"
                 className="text-[34px] font-bold leading-[1.18] tracking-[-0.015em] text-cream sm:text-[44px]"
               >
-                Elegí el plan que acompaña tu consultorio
+                Elegí el plan que <Accent>acompaña</Accent> tu consultorio
               </h2>
               <p className="max-w-[700px] text-[18px] leading-7 text-sage">
                 Empezá gratis y pasá a un plan pago cuando tu agenda lo necesite.
@@ -258,7 +278,7 @@ export default function Home() {
                 <PlanCard key={plan.name} plan={plan} />
               ))}
             </ul>
-            <p className="max-w-[760px] text-center text-[14px] leading-[22px] text-moss">
+            <p className="reveal max-w-[760px] text-center text-[14px] leading-[22px] text-moss">
               Precios en pesos argentinos, por mes. Durante el piloto, el acceso
               es con código de invitación.
             </p>
@@ -268,7 +288,7 @@ export default function Home() {
         {/* CTA final */}
         <section
           aria-labelledby="cta-titulo"
-          className="relative isolate flex min-h-[440px] flex-col items-center gap-4 overflow-hidden bg-forest-deep px-4 pt-24 text-center sm:min-h-[520px]"
+          className="grain relative isolate mt-3 flex min-h-[440px] flex-col items-center gap-4 overflow-hidden rounded-t-[32px] bg-forest-deep px-4 pt-24 text-center sm:mt-4 sm:min-h-[520px] sm:rounded-t-[48px]"
         >
           <Image
             src="/landing/cta-citricos.webp"
@@ -281,34 +301,56 @@ export default function Home() {
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#0f2a21_0%,rgba(15,42,33,0.92)_50%,rgba(15,42,33,0)_75%)]" />
           <h2
             id="cta-titulo"
-            className="text-[34px] font-bold leading-[1.18] tracking-[-0.015em] text-cream sm:text-[44px]"
+            className="reveal text-[34px] font-bold leading-[1.18] tracking-[-0.015em] text-cream sm:text-[44px]"
           >
-            Sumate al piloto
+            Sumate <Accent>al piloto</Accent>
           </h2>
-          <p className="max-w-[560px] text-[18px] leading-7 text-sage">
+          <p className="reveal max-w-[560px] text-[18px] leading-7 text-sage">
             Pedí tu código y empezá a recibir turnos desde tu propio link.
           </p>
-          <a href={INVITE_REQUEST_HREF} className={`mt-3 ${btnPrimary} py-3.5`}>
+          <a href={INVITE_REQUEST_HREF} className={`reveal mt-3 ${btnPrimary} py-3.5`}>
             Pedí tu código
           </a>
         </section>
       </main>
 
-      <footer className="bg-forest-night">
-        <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-4 px-4 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-8 xl:px-0">
-          <div className="flex items-center gap-2.5">
-            <Logo size={28} />
-            <p className="text-[14px] text-moss">
-              © 2026 {BRAND_NAME}
+      <footer className="bg-forest-night text-moss">
+        <div className="mx-auto grid w-full max-w-[1120px] gap-10 px-4 pb-12 pt-16 sm:grid-cols-2 sm:px-8 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr] xl:px-0">
+          <div className="flex flex-col gap-4">
+            <Link href="/" className={`flex items-center gap-3 self-start rounded-lg ${focus}`}>
+              <Logo size={36} />
+              <span className="text-[19px] font-bold tracking-[-0.005em] text-cream">
+                {BRAND_NAME}
+              </span>
+            </Link>
+            <p className="max-w-[300px] text-[14px] leading-[22px]">
+              Agenda de turnos para profesionales de la nutrición: reserva
+              online, recordatorios y tu consulta en orden.
             </p>
           </div>
-          <nav aria-label="Pie de página" className="flex flex-wrap gap-x-7 gap-y-2 text-[14px] font-medium text-moss">
-            <Link href="/terminos" className={`rounded hover:text-cream ${focus}`}>Términos</Link>
-            <Link href="/privacidad" className={`rounded hover:text-cream ${focus}`}>Privacidad</Link>
-            <a href="#funciones" className={`rounded hover:text-cream ${focus}`}>Funciones</a>
-            <a href="#planes" className={`rounded hover:text-cream ${focus}`}>Planes</a>
-            <Link href="/login" className={`rounded hover:text-cream ${focus}`}>Ingresar</Link>
-          </nav>
+          {FOOTER_COLUMNS.map((col) => (
+            <nav key={col.title} aria-label={col.title} className="flex flex-col gap-3.5 text-[14px]">
+              <p className="text-[12px] font-bold tracking-[0.08em] text-sage-light">
+                {col.title.toUpperCase()}
+              </p>
+              {col.links.map((l) =>
+                l.href.startsWith("/") ? (
+                  <Link key={l.label} href={l.href} className={`self-start rounded transition-colors hover:text-cream ${focus}`}>
+                    {l.label}
+                  </Link>
+                ) : (
+                  <a key={l.label} href={l.href} className={`self-start break-all rounded transition-colors hover:text-cream ${focus}`}>
+                    {l.label}
+                  </a>
+                ),
+              )}
+            </nav>
+          ))}
+        </div>
+        <div className="border-t border-cream/10">
+          <p className="mx-auto w-full max-w-[1120px] px-4 py-6 text-[13px] sm:px-8 xl:px-0">
+            © 2026 {BRAND_NAME}
+          </p>
         </div>
       </footer>
     </div>

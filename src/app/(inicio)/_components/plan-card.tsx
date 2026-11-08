@@ -45,7 +45,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
   const CtaTag = plan.cta.href.startsWith("/") ? Link : "a";
 
   return (
-    <li className="plan group relative isolate flex">
+    <li className="plan reveal group relative isolate flex">
       {/* Glow behind the card */}
       <div
         aria-hidden

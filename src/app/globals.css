@@ -123,3 +123,47 @@ body {
     transition-property: opacity;
   }
 }
+
+/* Fine film grain over the dark green panels. It sits under the content
+   (z-index -1 inside the panel's own stacking context). */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/landing/grano.png");
+  background-size: 256px;
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
+}
+
+/* Entrance: the hero fades up on load, and the rest appears as it scrolls
+   into view (where the browser supports scroll-driven animations). */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-in > * {
+    animation: reveal-up 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-in > :nth-child(2) { animation-delay: 80ms; }
+  .hero-in > :nth-child(3) { animation-delay: 160ms; }
+  .hero-in > :nth-child(4) { animation-delay: 220ms; }
+  .hero-in > :nth-child(5) { animation-delay: 300ms; }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 80%;
+    }
+  }
+}
