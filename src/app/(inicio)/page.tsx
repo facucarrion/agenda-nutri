@@ -118,7 +118,7 @@ export default function Home() {
           alt=""
           fill
           priority
-          quality={90}
+          quality={95}
           sizes="100vw"
           className="-z-10 object-cover object-[78%_center] lg:object-right"
         />
@@ -274,7 +274,7 @@ export default function Home() {
             src="/landing/cta-citricos.webp"
             alt=""
             fill
-            quality={90}
+            quality={95}
             sizes="100vw"
             className="-z-10 object-cover object-bottom"
           />
