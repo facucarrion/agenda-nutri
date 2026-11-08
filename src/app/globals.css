@@ -36,3 +36,76 @@ body {
   --color-bad: #d64545;
   --color-bad-soft: #f9e1e1;
 }
+
+/* Home page (landing): palette from the "Landing - Planes" Figma. */
+@theme {
+  --color-forest: #14352a;
+  --color-forest-2: #1b4538;
+  --color-forest-deep: #0f2a21;
+  --color-forest-night: #0b2018;
+  --color-cream: #f6f1e4;
+  --color-sand: #e6dec8;
+  --color-sage: #b9cfc3;
+  --color-sage-light: #cfe0d6;
+  --color-moss: #8fae9f;
+  --color-slate-green: #4f6258;
+  --color-mint-soft: #e3efe8;
+  --color-tangerine: #f28c38;
+  --color-tangerine-ink: #b85a0c;
+}
+
+/* Plan cards: on hover the card lifts a little, a glow lights up behind it
+   and real fruits peek out from behind its edges. */
+.plan-card,
+.plan-glow,
+.plan-fruit {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.plan-card {
+  transition-property: transform;
+  transition-duration: 600ms;
+}
+.plan-glow {
+  opacity: 0;
+  transform: scale(0.9);
+  transition-property: opacity, transform;
+  transition-duration: 700ms;
+}
+.plan-fruit {
+  opacity: 0;
+  transform: translateY(var(--hide)) scale(0.85);
+  transition-property: transform, opacity;
+  transition-duration: 750ms, 450ms;
+  transition-delay: var(--delay);
+}
+@media (hover: hover) {
+  .plan:hover .plan-card {
+    transform: translateY(-6px) scale(1.015);
+  }
+  .plan:hover .plan-glow {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .plan:hover .plan-fruit {
+    opacity: 1;
+    transform: translateY(var(--peek)) rotate(var(--rot)) scale(1);
+  }
+}
+.plan:focus-within .plan-card {
+  transform: translateY(-6px) scale(1.015);
+}
+.plan:focus-within .plan-glow {
+  opacity: 1;
+  transform: scale(1);
+}
+.plan:focus-within .plan-fruit {
+  opacity: 1;
+  transform: translateY(var(--peek)) rotate(var(--rot)) scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan-card,
+  .plan-glow,
+  .plan-fruit {
+    transition-property: opacity;
+  }
+}
