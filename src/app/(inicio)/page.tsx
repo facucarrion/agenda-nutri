@@ -83,7 +83,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-cream text-forest">
       {/* Hero */}
-      <header className="grain relative isolate overflow-hidden rounded-b-[32px] bg-forest sm:rounded-b-[48px]">
+      <header className="grain relative isolate flex min-h-svh flex-col overflow-hidden rounded-b-[32px] bg-forest sm:rounded-b-[48px] lg:block lg:min-h-0">
         <Image
           src="/landing/hero-frutas.webp"
           alt=""
@@ -91,16 +91,16 @@ export default function Home() {
           priority
           quality={95}
           sizes="100vw"
-          className="-z-10 object-cover object-[78%_center] lg:object-right"
+          className="-z-10 object-cover object-[78%_bottom] lg:object-right"
         />
         {/* Desktop: green on the left, photo on the right. Mobile: the photo
             sits behind the text, so it gets a stronger, even veil. */}
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(20,53,42,0.82)_0%,rgba(20,53,42,0.9)_100%)] lg:bg-[linear-gradient(90deg,#14352a_0%,rgba(20,53,42,0.95)_40%,rgba(20,53,42,0)_62%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(20,53,42,0.94)_0%,rgba(20,53,42,0.82)_45%,rgba(20,53,42,0.2)_100%)] lg:bg-[linear-gradient(90deg,#14352a_0%,rgba(20,53,42,0.95)_40%,rgba(20,53,42,0)_62%)]" />
         <div className="absolute inset-x-0 top-0 -z-10 h-[240px] bg-[linear-gradient(180deg,#14352a_0%,rgba(20,53,42,0.9)_45%,rgba(20,53,42,0)_100%)]" />
 
         <SiteNav />
 
-        <div className="mx-auto w-full max-w-[1120px] px-4 pb-20 pt-12 sm:px-8 sm:pt-[88px] lg:min-h-[726px] lg:pb-0 xl:px-0">
+        <div className="mx-auto flex w-full max-w-[1120px] flex-1 flex-col justify-center px-4 pb-24 pt-8 sm:px-8 sm:pt-[88px] lg:block lg:min-h-[726px] lg:flex-none lg:pb-0 xl:px-0">
           <div className="hero-in flex max-w-[780px] flex-col gap-7">
             <h1 className="text-[40px] font-bold leading-[1.1] tracking-[-0.02em] text-cream sm:text-[52px] lg:text-[60px]">
               Tus turnos en un solo lugar,
@@ -141,9 +141,9 @@ export default function Home() {
         <section
           id="planes"
           aria-labelledby="planes-titulo"
-          className="grain relative isolate mt-3 scroll-mt-3 overflow-x-clip rounded-[32px] bg-forest px-4 pb-24 pt-24 sm:mt-4 sm:rounded-[48px] sm:px-8 sm:pb-28 sm:pt-28"
+          className="grain relative isolate mt-3 scroll-mt-3 overflow-x-clip rounded-[32px] bg-forest px-3 pb-20 pt-20 sm:mt-4 sm:rounded-[48px] sm:px-8 sm:pb-28 sm:pt-28"
         >
-          <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-4 lg:gap-20">
+          <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-4 sm:gap-20">
             <div className="reveal flex max-w-[980px] flex-col items-center gap-4 text-center">
               <p className="text-[13px] font-bold tracking-[0.08em] text-tangerine">PLANES</p>
               <h2
