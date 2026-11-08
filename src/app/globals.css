@@ -251,3 +251,15 @@ body {
     transition: none;
   }
 }
+
+/* Fine grain over the cream background (dark specks). */
+.grain-light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/landing/grano-claro.png");
+  background-size: 256px;
+  opacity: 0.35;
+}

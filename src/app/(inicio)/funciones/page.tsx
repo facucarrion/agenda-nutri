@@ -102,7 +102,8 @@ export default function FeaturesPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1120px] overflow-x-clip px-4 py-20 sm:px-8 sm:py-28 xl:px-0">
+      <main className="grain-light relative isolate overflow-x-clip bg-[radial-gradient(520px_440px_at_100%_6%,rgba(242,140,56,0.14),transparent_70%),radial-gradient(580px_480px_at_0%_46%,rgba(79,165,117,0.16),transparent_70%),linear-gradient(180deg,#f6f1e4_0%,#eef1e3_55%,#e3efe5_100%)]">
+        <div className="mx-auto w-full max-w-[1120px] px-4 py-20 sm:px-8 sm:py-28 xl:px-0">
         <Journey>
         {FEATURES.map((f, i) => (
           <section
@@ -162,6 +163,7 @@ export default function FeaturesPage() {
           </section>
         ))}
         </Journey>
+        </div>
       </main>
 
       <ClosingCta />
