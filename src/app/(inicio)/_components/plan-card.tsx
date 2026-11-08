@@ -56,10 +56,10 @@ export function PlanCard({ plan }: { plan: Plan }) {
       {/* Glow behind the card */}
       <div
         aria-hidden
-        className={`plan-glow pointer-events-none absolute -inset-x-4 -inset-y-6 -z-20 rounded-[48px] blur-3xl ${
+        className={`plan-glow pointer-events-none absolute -inset-x-12 -inset-y-10 -z-20 rounded-[64px] blur-xl ${
           f
-            ? "bg-[radial-gradient(closest-side,rgba(242,140,56,0.55),rgba(242,140,56,0.18)_60%,transparent)]"
-            : "bg-[radial-gradient(closest-side,rgba(143,214,170,0.38),rgba(242,140,56,0.14)_65%,transparent)]"
+            ? "bg-[radial-gradient(closest-side,rgba(242,140,56,0.7),rgba(242,140,56,0.32)_65%,transparent)]"
+            : "bg-[radial-gradient(closest-side,rgba(143,214,170,0.5),rgba(242,140,56,0.22)_65%,transparent)]"
         }`}
       />
 
@@ -79,7 +79,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
               {
                 [v]: 0,
                 [h]: fruit.x,
-                "--peek": v === "top" ? `-${Math.round(fruit.h * 0.55)}px` : `${Math.round(fruit.h * 0.55)}px`,
+                "--peek": v === "top" ? `-${Math.round(fruit.h * 0.7)}px` : `${Math.round(fruit.h * 0.7)}px`,
                 "--hide": v === "top" ? "24px" : "-24px",
                 "--rot": `${fruit.r}deg`,
                 "--delay": `${fruit.delay ?? 0}ms`,

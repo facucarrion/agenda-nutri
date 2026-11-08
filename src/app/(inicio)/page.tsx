@@ -62,7 +62,7 @@ const PLANS: Plan[] = [
     fruits: [
       { src: "/landing/frutas/frutilla.webp", w: 96, h: 80, at: "top-left", x: "14%", r: -14 },
       { src: "/landing/frutas/frambuesa.webp", w: 58, h: 60, at: "top-right", x: "22%", r: 10, delay: 90 },
-      { src: "/landing/frutas/kiwi.webp", w: 112, h: 116, at: "bottom-right", x: "10%", r: 16, delay: 160 },
+      { src: "/landing/frutas/kiwi.webp", w: 97, h: 100, at: "bottom-right", x: "10%", r: 16, delay: 160 },
     ],
   },
   {
@@ -82,9 +82,9 @@ const PLANS: Plan[] = [
       "Aviso de WhatsApp listo para enviar",
     ],
     fruits: [
-      { src: "/landing/frutas/menta.webp", w: 104, h: 74, at: "top-left", x: "10%", r: -10 },
-      { src: "/landing/frutas/naranja.webp", w: 128, h: 130, at: "top-right", x: "8%", r: 12, delay: 90 },
-      { src: "/landing/frutas/manzana.webp", w: 116, h: 110, at: "bottom-left", x: "14%", r: -8, delay: 160 },
+      { src: "/landing/frutas/menta.webp", w: 100, h: 71, at: "top-left", x: "10%", r: -10 },
+      { src: "/landing/frutas/naranja.webp", w: 98, h: 100, at: "top-right", x: "8%", r: 12, delay: 90 },
+      { src: "/landing/frutas/manzana.webp", w: 100, h: 95, at: "bottom-left", x: "14%", r: -8, delay: 160 },
     ],
   },
   {
@@ -101,9 +101,9 @@ const PLANS: Plan[] = [
       "Soporte prioritario",
     ],
     fruits: [
-      { src: "/landing/frutas/limon.webp", w: 116, h: 114, at: "top-right", x: "12%", r: 14 },
+      { src: "/landing/frutas/limon.webp", w: 100, h: 98, at: "top-right", x: "12%", r: 14 },
       { src: "/landing/frutas/frambuesa.webp", w: 56, h: 58, at: "top-left", x: "20%", r: -12, delay: 90 },
-      { src: "/landing/frutas/lima.webp", w: 108, h: 110, at: "bottom-left", x: "12%", r: -14, delay: 160 },
+      { src: "/landing/frutas/lima.webp", w: 98, h: 100, at: "bottom-left", x: "12%", r: -14, delay: 160 },
     ],
   },
 ];
@@ -251,7 +251,7 @@ export default function Home() {
           aria-labelledby="planes-titulo"
           className="scroll-mt-0 rounded-t-[32px] bg-forest px-4 pb-[120px] pt-24 sm:rounded-t-[48px] sm:px-8 sm:pt-28"
         >
-          <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-14">
+          <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-[88px]">
             <div className="flex max-w-[980px] flex-col items-center gap-4 text-center">
               <p className="text-[13px] font-bold tracking-[0.08em] text-tangerine">PLANES</p>
               <h2
@@ -264,7 +264,7 @@ export default function Home() {
                 Empezá gratis y pasá a un plan pago cuando tu agenda lo necesite.
               </p>
             </div>
-            <ul className="grid w-full gap-14 md:gap-6 lg:grid-cols-3">
+            <ul className="grid w-full gap-[88px] lg:grid-cols-3 lg:gap-6">
               {PLANS.map((plan) => (
                 <PlanCard key={plan.name} plan={plan} />
               ))}
