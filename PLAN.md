@@ -14,7 +14,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 | [x] | Proteger `main`: ruleset `protect-main` (PR obligatorio, sin borrar ni forzar; sin aprobación obligatoria) | Facu |
 | [x] | Proyecto Supabase y variables de entorno (`.env.local`, Vercel) | Facu |
 | [x] | Deploy inicial en Vercel (agenda-turnos-nutri.vercel.app) | Facu |
-| [~] | Layout base, componentes UI y tema Tailwind. Hecho: paleta y layouts de reserva, login y gestión. Falta: portada `/` (sigue la plantilla de Next), layout raíz (título "Create Next App", `lang="en"`, fuentes Geist sin usar), favicon y estilo de Privacidad y Términos | Bruno |
+| [x] | Layout base, componentes UI y tema Tailwind: paleta, layouts de reserva, login y gestión, portada y página de funciones (Figma), layout raíz en español con la marca, favicon y páginas de Privacidad y Términos | Bruno |
 
 ## Fase 1 – Esquema de datos
 
@@ -31,7 +31,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 |---|---|---|
 | [x] | Registro y login de nutricionistas (Supabase Auth) | Facu |
 | [x] | Pantallas de registro/login, recuperación de contraseña y protección de rutas | Bruno |
-| [ ] | Configurar Auth en Supabase: SMTP propio con Resend (sin eso los emails de recuperación solo llegan al equipo del proyecto), link de recuperación a 1800 s, plantillas de email en español, protección de contraseñas filtradas; correr `supabase/tests/isolation_and_overlap.sql` | Facu |
+| [ ] | Configurar Auth en Supabase: SMTP propio con Resend (sin eso los emails de recuperación solo llegan al equipo del proyecto), link de recuperación a 1800 s, plantillas de email en español y protección de contraseñas filtradas (el linter de Supabase la marca apagada). El test `supabase/tests/isolation_and_overlap.sql` ya se corrió | Facu |
 | [x] | Disponibilidad configurable: días, horarios, duración del turno (API) | Facu |
 | [x] | Pantalla de configuración de disponibilidad: horarios, bloqueos, tipos de consulta, link de reserva y reglas; más cambio de contraseña en Mi cuenta | Facu |
 
@@ -57,9 +57,25 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 
 | Estado | Tarea | Responsable |
 |---|---|---|
-| [~] | Revisión de privacidad (Ley 25.326): consentimiento, textos y retención hechos; falta revisión de un abogado, casilla de consentimiento en el formulario y dominio de Resend | Facu + Bruno |
-| [x] | Prueba gratuita (14 días, configurable por código): modo lectura al vencer, link público en pausa, activación manual | Facu |
+| [~] | Revisión de privacidad (Ley 25.326): consentimiento (con casilla en la reserva), textos y retención hechos; falta revisión de un abogado (hasta entonces queda el aviso de borrador, `LEGAL_DRAFT`) | Facu + Bruno |
+| [x] | Prueba gratuita (14 días, configurable por código): modo lectura al vencer, también aplicado por RLS (`has_write_access()`), link público en pausa, activación manual | Facu |
 | [x] | Panel de administración `/admin` (códigos, cuentas, activar o extender, historial) con verificación en dos pasos; solo metadatos, nunca datos de pacientes | Facu |
+
+### Antes de mostrárselo a la piloto
+
+| Estado | Tarea | Responsable |
+|---|---|---|
+| [ ] | **Bloqueante.** Dominio propio verificado en Resend y `EMAIL_FROM` con ese dominio en Vercel (Production). Con `onboarding@resend.dev` los pacientes no reciben la confirmación ni el recordatorio, y las reservas online no se confirman | Facu |
+| [ ] | **Bloqueante.** SMTP propio de Supabase Auth con Resend (ver Fase 2), para que la recuperación de contraseña le llegue a la piloto | Facu |
+| [ ] | `ADMIN_EMAILS` en Vercel (solo Production), redeploy y alta de la verificación en dos pasos de cada admin en `/admin` | Facu |
+| [ ] | Código de invitación para la piloto con **0 días de prueba** (cuenta activa sin vencimiento), así no pasa a solo lectura en pleno piloto | Facu |
+| [ ] | Prueba completa en producción con un email propio: registro con código, horarios y tipos de consulta, reserva desde el link público, confirmación por email, turno en la agenda y marcarlo como atendido | Facu + Bruno |
+| [ ] | Contarle a la piloto que los textos legales están en revisión y qué queda fuera del piloto (pacientes, WhatsApp automático, pagos) | Facu + Bruno |
+
+### Piloto
+
+| Estado | Tarea | Responsable |
+|---|---|---|
 | [ ] | Prueba con la nutricionista piloto y sus pacientes, solo turnos | Facu + Bruno |
 | [ ] | Durante el piloto: los pedidos de acceso, corrección o borrado de datos de un paciente (Ley 25.326) se resuelven a mano en la base con las actions existentes, dentro de los plazos de la ley | Facu |
 | [ ] | Ajustes según feedback | Facu + Bruno |
