@@ -49,7 +49,7 @@ export function RegisterForm() {
     <Card>
       <Heading title="Crear cuenta">
         Acceso exclusivo para el consultorio. Necesitás el código de invitación que
-        te pasó tu equipo.
+        te pasó tu equipo. Tu prueba gratuita empieza al crear la cuenta.
       </Heading>
 
       {state.error && <ErrorBox>{state.error}</ErrorBox>}

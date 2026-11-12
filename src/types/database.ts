@@ -194,6 +194,7 @@ export type Database = {
           note: string | null
           used_at: string | null
           used_by: string | null
+          trial_days: number
         }
         Insert: {
           business_name?: string | null
@@ -201,6 +202,7 @@ export type Database = {
           created_at?: string
           note?: string | null
           used_at?: string | null
+          trial_days?: number
           used_by?: string | null
         }
         Update: {
@@ -209,6 +211,7 @@ export type Database = {
           created_at?: string
           note?: string | null
           used_at?: string | null
+          trial_days?: number
           used_by?: string | null
         }
         Relationships: [
@@ -231,6 +234,9 @@ export type Database = {
           slot_minutes: number
           slug: string
           timezone: string
+          plan: string
+          trial_ends_at: string | null
+          active_until: string | null
         }
         Insert: {
           business_name?: string | null
@@ -241,6 +247,9 @@ export type Database = {
           slot_minutes?: number
           slug: string
           timezone?: string
+          plan?: string
+          trial_ends_at?: string | null
+          active_until?: string | null
         }
         Update: {
           business_name?: string | null
@@ -251,6 +260,9 @@ export type Database = {
           slot_minutes?: number
           slug?: string
           timezone?: string
+          plan?: string
+          trial_ends_at?: string | null
+          active_until?: string | null
         }
         Relationships: []
       }

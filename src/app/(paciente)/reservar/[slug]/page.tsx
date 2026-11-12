@@ -10,6 +10,15 @@ async function Booking({ params }: { params: Promise<{ slug: string }> }) {
   const profile = await getPublicProfile(slug);
   if (!profile) notFound();
 
+  if (profile.paused) {
+    return (
+      <p className="rounded-[20px] border border-line bg-surface p-7 text-muted">
+        {profile.fullName || "Este profesional"} no está recibiendo reservas
+        online por ahora. Comunicate con el consultorio para pedir tu turno.
+      </p>
+    );
+  }
+
   if (profile.types.length === 0) {
     return (
       <p className="rounded-[20px] border border-line bg-surface p-7 text-muted">

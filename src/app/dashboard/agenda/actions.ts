@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { denied, writeContext } from "@/lib/access-server";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums } from "@/types/database";
 
@@ -28,11 +29,6 @@ function text(formData: FormData, name: string, max = 200) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
-const unauthenticated: AppointmentResult = {
-  ok: false,
-  error: "Tu sesión expiró. Volvé a ingresar.",
-};
-
 function failure(error: { code?: string; message?: string }): AppointmentResult {
   if (error.code === OVERLAP) {
     return { ok: false, error: "Ya hay un turno en ese horario." };
@@ -40,12 +36,9 @@ function failure(error: { code?: string; message?: string }): AppointmentResult 
   return { ok: false, error: "No pudimos guardar el turno." };
 }
 
+// Creating or changing data needs an account whose trial or plan has not ended.
 async function context() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return { supabase, userId: user?.id ?? null };
+  return writeContext();
 }
 
 type Parsed =
@@ -129,8 +122,8 @@ export async function createAppointment(
   const parsed = parse(formData);
   if ("error" in parsed) return { ok: false, error: parsed.error };
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   return insertManualAppointment(supabase, userId, parsed);
 }
@@ -178,8 +171,8 @@ export async function createAppointmentWithPatient(
     return { ok: false, error: "Opción inválida." };
   }
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const lookupFailed: AppointmentResult = {
     ok: false,
@@ -264,8 +257,8 @@ export async function updateAppointment(
   const parsed = parse(formData);
   if ("error" in parsed) return { ok: false, error: parsed.error };
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { data: current } = await supabase
     .from("appointments")
@@ -319,8 +312,8 @@ async function setStatus(
   id: string,
   status: FinalStatus,
 ): Promise<AppointmentResult> {
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { data, error } = await supabase
     .from("appointments")
@@ -356,8 +349,8 @@ export async function markNoShow(id: string) {
 // can confirm it by hand (for example after a phone call) while it has not
 // expired; expired ones already released the slot.
 export async function confirmAppointment(id: string): Promise<AppointmentResult> {
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { data, error } = await supabase
     .from("appointments")
@@ -384,8 +377,8 @@ export async function confirmAppointment(id: string): Promise<AppointmentResult>
 // The nutritionist opened the WhatsApp reminder for this turno. WhatsApp is
 // sent by hand, so this is only a note to avoid messaging someone twice.
 export async function markWhatsappReminded(id: string): Promise<AppointmentResult> {
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { data, error } = await supabase
     .from("appointments")

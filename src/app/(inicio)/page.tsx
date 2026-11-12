@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Fraunces } from "next/font/google";
+import { DEFAULT_TRIAL_DAYS } from "@/lib/access";
 import { BRAND_NAME } from "@/lib/brand";
 import { CONTACT_EMAIL, INVITE_REQUEST_HREF } from "@/lib/legal";
 import {
@@ -31,30 +32,20 @@ const NOTIFY_CENTRO_HREF =
 // analisis/precios-competencia.md): change them here.
 const PLANS: Plan[] = [
   {
-    name: "Semilla",
-    tagline: "Para empezar a ordenar tus turnos.",
-    price: "Gratis",
-    cta: { label: "Empezar gratis", href: "/register" },
-    features: [
-      "1 profesional",
-      "Hasta 20 turnos por mes",
-      "Link de reserva online",
-      "Agenda de mes y semana",
-      "Confirmación por email",
-    ],
-    fruits: { top: "/landing/frutas/semilla-arriba.webp", bottom: "/landing/frutas/semilla-abajo.webp" },
-  },
-  {
     name: "Consultorio",
     tagline: "Para atender todas las semanas.",
     price: "$9.900",
     period: "/mes",
-    badge: "Más elegido",
+    badge: `${DEFAULT_TRIAL_DAYS} días gratis`,
     featured: true,
-    cta: { label: "Pedí tu código", href: INVITE_REQUEST_HREF },
+    cta: { label: `Probalo ${DEFAULT_TRIAL_DAYS} días gratis`, href: INVITE_REQUEST_HREF },
     features: [
-      "Todo lo de Semilla",
+      `Probalo ${DEFAULT_TRIAL_DAYS} días gratis, sin tarjeta`,
+      "1 profesional",
       "Turnos ilimitados",
+      "Link de reserva online",
+      "Agenda de mes y semana",
+      "Confirmación por email",
       "Tipos de consulta propios",
       "Días y horarios bloqueados",
       "Recordatorios automáticos por email",
@@ -153,7 +144,7 @@ export default function Home() {
                 Elegí el plan que acompaña tu consultorio
               </h2>
               <p className="max-w-[700px] text-[18px] leading-7 text-sage">
-                Empezá gratis y pasá a un plan pago cuando tu agenda lo necesite.
+                Probá Consultorio {DEFAULT_TRIAL_DAYS} días gratis, sin tarjeta. Si te sirve, lo activás; si no, no pasa nada.
               </p>
             </div>
             <PlansCarousel>
@@ -162,8 +153,9 @@ export default function Home() {
               ))}
             </PlansCarousel>
             <p className="reveal max-w-[760px] text-center text-[14px] leading-[22px] text-moss">
-              Precios en pesos argentinos, por mes. Durante el piloto, el acceso
-              es con código de invitación.
+              Precios en pesos argentinos, por mes. Al terminar la prueba tu agenda queda
+              en modo lectura hasta que actives tu cuenta; tus datos no se borran.
+              Durante el piloto, el acceso es con código de invitación.
             </p>
           </div>
         </section>
