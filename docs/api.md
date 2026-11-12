@@ -44,6 +44,8 @@ insert into public.invitation_codes (code, business_name)
 values ('NS-AB12-CD34', 'Consultorio Ejemplo'); -- business_name es opcional
 ```
 
+**Prueba gratuita**: el código define los días (`invitation_codes.trial_days`, 14 por defecto). El perfil guarda `plan` (`trial` o `active`), `trial_ends_at` y `active_until`; el cliente no puede modificarlos. Con la prueba vencida, toda action que crea o modifica datos (turnos, pacientes, disponibilidad, tipos de consulta) devuelve `{ ok: false, error }` con el mensaje de `TRIAL_ENDED_MESSAGE`; leer, `exportPatientData` y `deletePatient` siguen funcionando. El link público de reserva muestra “no está recibiendo reservas” y `slots` y `book` devuelven error. En la UI, `getCurrentAccess()` (`src/lib/access-server.ts`) dice el estado (`trial`, `active` o `expired`) y los días que quedan.
+
 **Nombre en el dashboard**: arriba a la izquierda se ve `nutritionists.business_name` y, si está vacío, `full_name` (`src/lib/nutritionist.ts`).
 
 **Mantener sesión iniciada**: si no se tilda, las cookies de sesión se guardan sin vencimiento y el navegador las borra al cerrarse.

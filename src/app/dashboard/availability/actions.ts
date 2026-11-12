@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { denied, writeContext } from "@/lib/access-server";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -23,18 +23,10 @@ function int(formData: FormData, name: string) {
   return Number.isInteger(value) ? value : NaN;
 }
 
+// Creating or changing data needs an account whose trial or plan has not ended.
 async function context() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return { supabase, userId: user?.id ?? null };
+  return writeContext();
 }
-
-const unauthenticated: ActionResult = {
-  ok: false,
-  error: "Tu sesión expiró. Volvé a ingresar.",
-};
 
 function done(error: { code?: string } | null, overlapMessage?: string): ActionResult {
   if (error) {
@@ -66,8 +58,8 @@ export async function addAvailabilityRule(
     return { ok: false, error: "La hora de fin debe ser posterior al inicio." };
   }
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase.from("availability_rules").insert({
     nutritionist_id: userId,
@@ -80,8 +72,8 @@ export async function addAvailabilityRule(
 }
 
 export async function deleteAvailabilityRule(id: string): Promise<ActionResult> {
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase
     .from("availability_rules")
@@ -98,7 +90,7 @@ export async function addAvailabilityBlock(
 ): Promise<ActionResult> {
   const startsAt = new Date(text(formData, "starts_at"));
   const endsAt = new Date(text(formData, "ends_at"));
-  const reason = text(formData, "reason").slice(0, 200);
+  const blockReason = text(formData, "reason").slice(0, 200);
 
   if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime())) {
     return { ok: false, error: "Fechas inválidas." };
@@ -107,22 +99,22 @@ export async function addAvailabilityBlock(
     return { ok: false, error: "El fin debe ser posterior al inicio." };
   }
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase.from("availability_blocks").insert({
     nutritionist_id: userId,
     starts_at: startsAt.toISOString(),
     ends_at: endsAt.toISOString(),
-    reason: reason || null,
+    reason: blockReason || null,
   });
 
   return done(error);
 }
 
 export async function deleteAvailabilityBlock(id: string): Promise<ActionResult> {
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase
     .from("availability_blocks")
@@ -153,8 +145,8 @@ export async function createAppointmentType(
   const parsed = parseType(formData);
   if ("error" in parsed) return { ok: false, error: parsed.error };
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase.from("appointment_types").insert({
     nutritionist_id: userId,
@@ -172,8 +164,8 @@ export async function updateAppointmentType(
   const parsed = parseType(formData);
   if ("error" in parsed) return { ok: false, error: parsed.error };
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase
     .from("appointment_types")
@@ -189,8 +181,8 @@ export async function updateAppointmentType(
 
 // Deleting keeps past appointments: their type reference is set to null.
 export async function deleteAppointmentType(id: string): Promise<ActionResult> {
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase
     .from("appointment_types")
@@ -215,8 +207,8 @@ export async function updateBookingSettings(
     return { ok: false, error: "La anticipación debe estar entre 0 y 720 horas." };
   }
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase
     .from("nutritionists")
@@ -250,8 +242,8 @@ export async function updateBookingSlug(formData: FormData): Promise<ActionResul
     return { ok: false, error: "Ese link está reservado. Probá con otro." };
   }
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { error } = await supabase
     .from("nutritionists")

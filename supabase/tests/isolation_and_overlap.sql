@@ -31,6 +31,11 @@ begin
   select count(*) into n from public.invitation_codes where used_by in (a, b) and used_at is not null;
   res := res || 'invitation codes consumed: ' || n || E' (expected 2)\n';
 
+  -- Free trial: the code decides the days, the plan starts as a trial.
+  select count(*) into n from public.nutritionists
+   where id = a and plan = 'trial' and trial_ends_at > now() + interval '13 days' and trial_ends_at < now() + interval '15 days';
+  res := res || 'default trial is 14 days: ' || n || E' (expected 1)\n';
+
   begin
     insert into auth.users (id, email, aud, role, raw_user_meta_data)
     values (gen_random_uuid(), 'c@test.local', 'authenticated', 'authenticated',
@@ -102,6 +107,22 @@ begin
   exception when others then
     res := res || E'A inserts as B blocked: ok\n';
   end;
+  -- The plan and its dates are not editable from the client (billing is manual).
+  begin
+    update public.nutritionists set plan = 'active' where id = a;
+    res := res || E'A sets own plan: NOT BLOCKED (bad)\n';
+  exception when others then
+    res := res || E'A sets own plan blocked: ok\n';
+  end;
+  begin
+    update public.nutritionists set trial_ends_at = now() + interval '1 year' where id = a;
+    res := res || E'A extends own trial: NOT BLOCKED (bad)\n';
+  exception when others then
+    res := res || E'A extends own trial blocked: ok\n';
+  end;
+  update public.nutritionists set full_name = 'A2' where id = a;
+  get diagnostics n = row_count;
+  res := res || 'A edits own name rows: ' || n || E' (expected 1)\n';
   reset role;
 
   raise exception E'TEST RESULTS (rolled back)\n%', res;

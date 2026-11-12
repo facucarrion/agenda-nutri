@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node scripts/slots.test.ts && node scripts/phone.test.ts && node scripts/countries.test.ts"
+    "test": "node scripts/slots.test.ts && node scripts/phone.test.ts && node scripts/countries.test.ts && node scripts/access.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

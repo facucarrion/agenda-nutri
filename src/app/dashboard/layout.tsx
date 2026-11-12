@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import { logout } from "@/app/(auth)/actions";
 import { FruitLogo } from "@/app/(paciente)/_components/fruit-logo";
+import { AccessBanner } from "./_components/access-banner";
 import { AccountPerson, AccountTitle } from "./_components/account-names";
 import { DashboardNav } from "./_components/dashboard-nav";
 import { LiveFavicon } from "./_components/live-favicon";
@@ -69,6 +70,9 @@ export default function DashboardLayout({
           <DashboardNav />
         </div>
       </header>
+      <Suspense>
+        <AccessBanner />
+      </Suspense>
       {children}
       <LiveFavicon />
     </div>

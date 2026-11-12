@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { denied, sessionContext, writeContext } from "@/lib/access-server";
 import type { TablesInsert } from "@/types/database";
 
 export type PatientResult =
@@ -77,18 +77,10 @@ function parse(
   };
 }
 
+// Creating or changing data needs an account whose trial or plan has not ended.
 async function context() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return { supabase, userId: user?.id ?? null };
+  return writeContext();
 }
-
-const unauthenticated: PatientResult = {
-  ok: false,
-  error: "Tu sesión expiró. Volvé a ingresar.",
-};
 
 function failure(code?: string): PatientResult {
   if (code === UNIQUE_VIOLATION) {
@@ -101,8 +93,8 @@ export async function createPatient(formData: FormData): Promise<PatientResult> 
   const parsed = parse(formData);
   if ("error" in parsed) return { ok: false, error: parsed.error };
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { data, error } = await supabase
     .from("patients")
@@ -123,8 +115,8 @@ export async function updatePatient(
   const parsed = parse(formData);
   if ("error" in parsed) return { ok: false, error: parsed.error };
 
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  const { supabase, userId, reason } = await context();
+  if (!userId) return denied(reason);
 
   const { data, error } = await supabase
     .from("patients")
@@ -144,8 +136,9 @@ export async function updatePatient(
 // Right of access: everything stored about a patient, as plain data the UI
 // can offer as a download. RLS limits it to the signed-in nutritionist.
 export async function exportPatientData(id: string) {
-  const { supabase, userId } = await context();
-  if (!userId) return { ok: false, error: "Tu sesión expiró. Volvé a ingresar." } as const;
+  // Still allowed after the trial ends: the patient's data is theirs.
+  const { supabase, userId, reason } = await sessionContext();
+  if (!userId) return { ...denied(reason), ok: false } as const;
 
   const [patient, appointments] = await Promise.all([
     supabase.from("patients").select("*").eq("id", id).maybeSingle(),
@@ -173,8 +166,9 @@ export async function exportPatientData(id: string) {
 // Also deletes the patient's appointments (on delete cascade): the UI must
 // ask for confirmation first.
 export async function deletePatient(id: string): Promise<PatientResult> {
-  const { supabase, userId } = await context();
-  if (!userId) return unauthenticated;
+  // Still allowed after the trial ends: erasure is a right (Ley 25.326).
+  const { supabase, userId, reason } = await sessionContext();
+  if (!userId) return denied(reason);
 
   const { data, error } = await supabase
     .from("patients")

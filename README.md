@@ -143,6 +143,21 @@ values ('NS-AB12-CD34', 'Consultorio Ejemplo');  -- el nombre del consultorio es
 
 Se lo pasás a la profesional por un canal privado; sirve **una sola vez**.
 
+### Prueba gratuita y activación
+
+Cada cuenta nueva empieza con **14 días de prueba** (cada código puede traer otros: `invitation_codes.trial_days`, y `0` crea la cuenta ya activa). Al vencer la prueba la cuenta queda en **modo lectura**: la profesional ve su agenda y puede descargar o borrar los datos de un paciente, pero no carga ni edita nada, y su link de reserva se pausa. Nada se borra.
+
+Por ahora el cobro es manual. Para activar una cuenta, desde el editor SQL:
+
+```sql
+-- activa sin fecha de fin
+update public.nutritionists set plan = 'active' where id = '<uuid>';
+-- o por un período, por ejemplo un mes
+update public.nutritionists set plan = 'active', active_until = now() + interval '1 month' where id = '<uuid>';
+```
+
+La lógica está en `src/lib/access.ts` (con tests: `npm test`) y se aplica en el servidor, en `src/lib/access-server.ts`.
+
 ## ☁️ Deploy
 
 Cada merge a `main` se despliega solo en Vercel. Para un entorno nuevo:

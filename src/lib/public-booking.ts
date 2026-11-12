@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHash, randomBytes } from "node:crypto";
+import { accessState } from "@/lib/access";
 import { POLICY_VERSION } from "@/lib/legal";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { computeSlots, parseDate } from "@/lib/slots";
@@ -20,11 +21,18 @@ async function loadProfile(slug: string) {
   const admin = createAdminClient();
   const { data } = await admin
     .from("nutritionists")
-    .select("id, full_name, slug, slot_minutes, min_notice_hours, timezone")
+    .select(
+      "id, full_name, slug, slot_minutes, min_notice_hours, timezone, plan, trial_ends_at, active_until",
+    )
     .eq("slug", slug)
     .maybeSingle();
-  return data;
+  if (!data) return null;
+  // An account whose trial or plan ended keeps its data but takes no new
+  // bookings: the public link is paused until it is activated.
+  return { ...data, paused: accessState(data).status === "expired" };
 }
+
+const PAUSED_ERROR = "Este profesional no está recibiendo reservas online por ahora.";
 
 // Unconfirmed bookings that expired must not keep blocking the slot.
 async function releaseExpired(nutritionistId: string) {
@@ -53,7 +61,8 @@ export async function getPublicProfile(slug: string) {
     fullName: profile.full_name,
     slug: profile.slug,
     timezone: profile.timezone,
-    types: types ?? [],
+    paused: profile.paused,
+    types: profile.paused ? [] : (types ?? []),
   };
 }
 
@@ -79,6 +88,7 @@ export async function getPublicSlots(
 
   const profile = await loadProfile(slug);
   if (!profile) return { ok: false, error: "No encontramos al profesional." };
+  if (profile.paused) return { ok: false, error: PAUSED_ERROR };
 
   const admin = createAdminClient();
   const { data: type } = await admin
@@ -197,6 +207,7 @@ export async function createPublicBooking(
 
   const profile = await loadProfile(input.slug);
   if (!profile) return { ok: false, error: "No encontramos al profesional." };
+  if (profile.paused) return { ok: false, error: PAUSED_ERROR };
 
   const admin = createAdminClient();
   const { data: type } = await admin
