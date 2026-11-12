@@ -59,6 +59,7 @@ Estados: `[ ]` pendiente, `[~]` en curso, `[x]` hecho.
 |---|---|---|
 | [~] | Revisión de privacidad (Ley 25.326): consentimiento, textos y retención hechos; falta revisión de un abogado, casilla de consentimiento en el formulario y dominio de Resend | Facu + Bruno |
 | [x] | Prueba gratuita (14 días, configurable por código): modo lectura al vencer, link público en pausa, activación manual | Facu |
+| [x] | Panel de administración `/admin` (códigos, cuentas, activar o extender, historial) con verificación en dos pasos; solo metadatos, nunca datos de pacientes | Facu |
 | [ ] | Prueba con la nutricionista piloto y sus pacientes, solo turnos | Facu + Bruno |
 | [ ] | Durante el piloto: los pedidos de acceso, corrección o borrado de datos de un paciente (Ley 25.326) se resuelven a mano en la base con las actions existentes, dentro de los plazos de la ley | Facu |
 | [ ] | Ajustes según feedback | Facu + Bruno |

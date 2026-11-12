@@ -84,6 +84,7 @@ npm run dev                      # http://localhost:3000
 | `RESEND_API_KEY` | **No** | Envío de emails |
 | `EMAIL_FROM` | No | Remitente, ej. `Nutri Tu Agenda <turnos@nutrituagenda.com>` |
 | `CRON_SECRET` | **No** | Protege `/api/cron/*` (Vercel lo envía solo) |
+| `ADMIN_EMAILS` | **No** | Emails con acceso a `/admin`, separados por coma. Vacía = nadie. En Vercel, solo en Production |
 | `NEXT_PUBLIC_SITE_URL` | Sí | URL pública para los links de los emails (solo producción) |
 | `RETENTION_ENFORCE` | No | `true` activa el borrado real por retención; sin ella solo simula |
 
@@ -132,9 +133,18 @@ El esquema vive en `supabase/migrations`. Tablas principales: `nutritionists`, `
 - Una **restricción de exclusión** en `appointments` impide dos turnos activos solapados, aunque lleguen a la vez.
 - `supabase/tests/isolation_and_overlap.sql` verifica el aislamiento entre profesionales y los solapamientos. Se corre en el editor SQL de Supabase y no deja datos.
 
+### Panel de administración (`/admin`)
+
+Para el equipo, no para las profesionales. Desde ahí se crean códigos de invitación (con el mensaje listo para copiar), se ven las cuentas con su estado y cantidad de pacientes y turnos, y se activa una cuenta, se extiende una prueba o se pasa a solo lectura. Cada movimiento queda en `admin_log` (solo inserción).
+
+- **Quién entra**: los emails de `ADMIN_EMAILS` (variable de servidor, separados por coma). Vacía = nadie. Cualquier otra persona ve un 404.
+- **Verificación en dos pasos obligatoria**: la primera vez pide escanear un QR con una app de autenticación; después, un código de 6 dígitos por sesión.
+- **Solo metadatos**: muestra nombre, email, plan y cantidades. Nunca datos de pacientes ni turnos individuales.
+- **Seguridad**: usa la `service_role` solo en el servidor y cada acción vuelve a verificar que quien llama sea admin. En Vercel, definir `ADMIN_EMAILS` **solo en Production**: en Preview el panel quedaría expuesto con acceso a la base real.
+
 ### Dar de alta a una profesional
 
-El registro es **solo con código de invitación**. Se crea uno por persona desde el editor SQL de Supabase:
+El registro es **solo con código de invitación**. Lo más cómodo es crearlo desde el panel `/admin`. También se puede por SQL, en el editor de Supabase:
 
 ```sql
 insert into public.invitation_codes (code, business_name)
@@ -147,7 +157,7 @@ Se lo pasás a la profesional por un canal privado; sirve **una sola vez**.
 
 Cada cuenta nueva empieza con **14 días de prueba** (cada código puede traer otros: `invitation_codes.trial_days`, y `0` crea la cuenta ya activa). Al vencer la prueba la cuenta queda en **modo lectura**: la profesional ve su agenda y puede descargar o borrar los datos de un paciente, pero no carga ni edita nada, y su link de reserva se pausa. Nada se borra.
 
-Por ahora el cobro es manual. Para activar una cuenta, desde el editor SQL:
+Por ahora el cobro es manual. Una cuenta se activa desde el panel `/admin` o, si hace falta, desde el editor SQL:
 
 ```sql
 -- activa sin fecha de fin

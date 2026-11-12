@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAdminEmail } from "@/lib/admin-emails";
 import type { Database } from "@/types/database";
 import { asSessionCookie, SESSION_ONLY_COOKIE } from "./session-cookie";
 
@@ -71,6 +72,17 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // /admin does not exist for anyone who is not on the admin list: a real 404
+  // before anything is rendered. This is only a first filter; the page and
+  // every action check again, and ask for the second factor.
+  if (
+    user &&
+    (pathname === "/admin" || pathname.startsWith("/admin/")) &&
+    !(user.email_confirmed_at && isAdminEmail(user.email))
+  ) {
+    return NextResponse.rewrite(new URL("/__not-found", request.url), { status: 404 });
   }
 
   if (

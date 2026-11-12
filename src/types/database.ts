@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_log: {
+        Row: {
+          action: string
+          admin_email: string
+          created_at: string
+          detail: Json | null
+          id: number
+          target: string | null
+        }
+        Insert: {
+          action: string
+          admin_email: string
+          created_at?: string
+          detail?: Json | null
+          id?: number
+          target?: string | null
+        }
+        Update: {
+          action?: string
+          admin_email?: string
+          created_at?: string
+          detail?: Json | null
+          id?: number
+          target?: string | null
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           appointment_type_id: string | null
@@ -330,6 +357,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_account_stats: {
+        Args: never
+        Returns: {
+          appointments_count: number
+          last_appointment_at: string
+          nutritionist_id: string
+          patients_count: number
+        }[]
+      }
       rate_limit_hit: {
         Args: { p_key: string; p_max: number; p_window_seconds: number }
         Returns: boolean
