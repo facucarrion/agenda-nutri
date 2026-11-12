@@ -366,6 +366,7 @@ export type Database = {
           patients_count: number
         }[]
       }
+      has_write_access: { Args: never; Returns: boolean }
       rate_limit_hit: {
         Args: { p_key: string; p_max: number; p_window_seconds: number }
         Returns: boolean
