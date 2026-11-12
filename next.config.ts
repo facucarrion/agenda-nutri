@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   // for any host other than localhost and the page never becomes interactive.
   // Development only: it has no effect in production.
   allowedDevOrigins: ["192.168.*.*"],
+  // The home page photos use 90-95 for sharper fruit; everything else keeps 75.
+  images: { qualities: [75, 90, 95] },
   turbopack: {
     rules: {
       "*.css": {

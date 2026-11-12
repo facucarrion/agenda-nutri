@@ -36,3 +36,231 @@ body {
   --color-bad: #d64545;
   --color-bad-soft: #f9e1e1;
 }
+
+/* Home page (landing): palette from the "Landing - Planes" Figma. */
+@theme {
+  --color-forest: #14352a;
+  --color-forest-2: #1b4538;
+  --color-forest-deep: #0f2a21;
+  --color-forest-night: #0b2018;
+  --color-cream: #f6f1e4;
+  --color-sand: #e6dec8;
+  --color-sage: #b9cfc3;
+  --color-sage-light: #cfe0d6;
+  --color-moss: #8fae9f;
+  --color-slate-green: #4f6258;
+  --color-mint-soft: #e3efe8;
+  --color-tangerine: #f28c38;
+  --color-tangerine-ink: #b85a0c;
+}
+
+/* Plan cards: on hover the card lifts a little, a glow lights up behind it
+   and real fruits peek out from behind its edges. */
+.plan-card,
+.plan-glow,
+.plan-fruit {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.plan-card {
+  transition-property: transform;
+  transition-duration: 600ms;
+}
+.plan-glow {
+  opacity: 0;
+  transform: scale(0.9);
+  transition-property: opacity, transform;
+  transition-duration: 700ms;
+}
+.plan-fruit {
+  opacity: 0;
+  transform: translate(var(--hide-x), var(--hide-y)) scale(0.82) rotate(var(--rot-in));
+  transition-property: transform, opacity;
+  transition-duration: 800ms, 500ms;
+}
+.plan-fruit--top-left {
+  top: -56px;
+  left: -60px;
+  --hide-x: 64px;
+  --hide-y: 80px;
+  --rot-in: 10deg;
+}
+.plan-fruit--bottom-right {
+  right: -60px;
+  bottom: -56px;
+  --hide-x: -64px;
+  --hide-y: -80px;
+  --rot-in: -10deg;
+  transition-delay: 90ms;
+}
+@media (hover: hover) {
+  .plan:hover .plan-card {
+    transform: translateY(-6px) scale(1.015);
+  }
+  .plan:hover .plan-glow {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .plan:hover .plan-fruit {
+    opacity: 1;
+    transform: none;
+  }
+}
+.plan:focus-within .plan-card {
+  transform: translateY(-6px) scale(1.015);
+}
+.plan:focus-within .plan-glow {
+  opacity: 1;
+  transform: scale(1);
+}
+.plan:focus-within .plan-fruit {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan-card,
+  .plan-glow,
+  .plan-fruit {
+    transition-property: opacity;
+  }
+}
+
+/* Fine film grain over the dark green panels. It sits under the content
+   (z-index -1 inside the panel's own stacking context). */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/landing/grano.png");
+  background-size: 256px;
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
+}
+
+/* Entrance: the hero fades up on load, and the rest appears as it scrolls
+   into view (where the browser supports scroll-driven animations). */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-in > * {
+    animation: reveal-up 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-in > :nth-child(2) { animation-delay: 80ms; }
+  .hero-in > :nth-child(3) { animation-delay: 160ms; }
+  .hero-in > :nth-child(4) { animation-delay: 220ms; }
+  .hero-in > :nth-child(5) { animation-delay: 300ms; }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 80%;
+    }
+  }
+}
+
+/* /funciones: a thread that fills with color while scrolling, one numbered
+   node per feature, and a glow behind each screenshot. The fill height and
+   the data-lit / data-glow flags come from the Journey component. */
+.journey-track,
+.journey-fill {
+  position: absolute;
+  left: 13px;
+  top: 14px;
+  bottom: 0;
+  width: 2px;
+  border-radius: 2px;
+}
+.journey-track {
+  background: var(--color-sand);
+  mask-image: linear-gradient(180deg, #000 85%, transparent);
+}
+.journey-fill {
+  background: linear-gradient(180deg, #2f6b4f 0%, #4fa575 40%, #f28c38 100%);
+  background-size: 100% 100%;
+  clip-path: inset(0 0 calc(100% - var(--fill, 0px)) 0);
+  mask-image: linear-gradient(180deg, #000 85%, transparent);
+}
+.journey-node {
+  position: absolute;
+  left: -44px;
+  top: 50%;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  translate: 0 -50%;
+  place-items: center;
+  border: 2px solid var(--color-sand);
+  border-radius: 9999px;
+  background: var(--color-cream);
+  color: rgba(20, 53, 42, 0.45);
+  font-size: 13px;
+  font-weight: 700;
+  transition-property: background-color, border-color, color, box-shadow, scale;
+  transition-duration: 500ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-step][data-lit] .journey-node {
+  border-color: var(--color-tangerine);
+  background: var(--color-tangerine);
+  color: var(--color-forest);
+  scale: 1.1;
+  box-shadow:
+    0 0 0 6px rgba(242, 140, 56, 0.18),
+    0 0 24px rgba(242, 140, 56, 0.5);
+}
+.shot-glow {
+  position: absolute;
+  inset: -44px;
+  z-index: 0;
+  border-radius: 48px;
+  background:
+    radial-gradient(closest-side at 70% 60%, rgba(242, 140, 56, 0.75), transparent 70%),
+    radial-gradient(closest-side at 25% 35%, rgba(79, 165, 117, 0.65), transparent 72%);
+  filter: blur(28px);
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-step][data-glow] .shot-glow {
+  opacity: 1;
+}
+@media (min-width: 640px) {
+  .journey-track,
+  .journey-fill {
+    left: 17px;
+    top: 18px;
+  }
+  .journey-node {
+    left: -64px;
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-node,
+  .shot-glow {
+    transition: none;
+  }
+}
+
+/* Fine grain over the cream background (dark specks). */
+.grain-light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/landing/grano-claro.png");
+  background-size: 256px;
+  opacity: 0.35;
+}
