@@ -125,5 +125,38 @@ begin
   res := res || 'A edits own name rows: ' || n || E' (expected 1)\n';
   reset role;
 
+  -- Expired trial: read-only in the database too, except deleting a patient.
+  update public.nutritionists set trial_ends_at = now() - interval '1 minute' where id = a;
+  set local role authenticated;
+
+  select count(*) into n from public.patients;
+  res := res || 'expired A sees patients: ' || n || E' (expected 1)\n';
+  begin
+    insert into public.appointments (nutritionist_id, patient_id, starts_at, ends_at)
+    values (a, pa, '2030-03-01 10:00+00', '2030-03-01 10:30+00');
+    res := res || E'expired A inserts appointment: NOT BLOCKED (bad)\n';
+  exception when others then
+    res := res || E'expired A inserts appointment blocked: ok\n';
+  end;
+  begin
+    insert into public.patients (nutritionist_id, first_name, last_name) values (a, 'x', 'y');
+    res := res || E'expired A inserts patient: NOT BLOCKED (bad)\n';
+  exception when others then
+    res := res || E'expired A inserts patient blocked: ok\n';
+  end;
+  update public.appointments set status = 'cancelled' where nutritionist_id = a;
+  get diagnostics n = row_count;
+  res := res || 'expired A updates appointments rows: ' || n || E' (expected 0)\n';
+  delete from public.appointment_types where nutritionist_id = a;
+  get diagnostics n = row_count;
+  res := res || 'expired A deletes types rows: ' || n || E' (expected 0)\n';
+  update public.nutritionists set slot_minutes = slot_minutes where id = a;
+  get diagnostics n = row_count;
+  res := res || 'expired A edits own profile rows: ' || n || E' (expected 0)\n';
+  delete from public.patients where id = pa;
+  get diagnostics n = row_count;
+  res := res || 'expired A deletes own patient rows: ' || n || E' (expected 1)\n';
+  reset role;
+
   raise exception E'TEST RESULTS (rolled back)\n%', res;
 end $$;
