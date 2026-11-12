@@ -78,7 +78,7 @@ body {
   transition-duration: 800ms, 500ms;
 }
 .plan-fruit--top-left {
-  top: -56px;
+  top: -32px;
   left: -60px;
   --hide-x: 64px;
   --hide-y: 80px;
@@ -130,6 +130,8 @@ body {
   content: "";
   position: absolute;
   inset: 0;
+  /* Follow the panel's rounded corners even without overflow: hidden. */
+  border-radius: inherit;
   z-index: -1;
   pointer-events: none;
   background-image: url("/landing/grano.png");

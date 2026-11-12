@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND_NAME } from "@/lib/brand";
-import { CONTACT_EMAIL, INVITE_REQUEST_HREF } from "@/lib/legal";
+import { CONTACT_EMAIL, PILOT_WHATSAPP_HREF } from "@/lib/legal";
+import { PilotWhatsappLink } from "./pilot-whatsapp-link";
 
 // Pieces shared by the home page and /funciones: nav, closing call to
 // action and footer.
@@ -53,11 +54,18 @@ export function SiteNav() {
   );
 }
 
-export function ClosingCta() {
+// `joined`: the section continues the green panel above it (home page), so it
+// has no gap or rounded top and fades in from bg-forest. Otherwise it has a
+// rounded top that overlaps the section above by the corner radius, so that
+// section's background shows around the corners: give it matching bottom
+// padding (pb-8 sm:pb-12).
+export function ClosingCta({ joined = false }: { joined?: boolean }) {
   return (
     <section
       aria-labelledby="cta-titulo"
-      className="grain relative isolate mt-3 flex min-h-[440px] flex-col items-center gap-4 overflow-hidden rounded-t-[32px] bg-forest-deep px-4 pt-24 text-center sm:mt-4 sm:min-h-[520px] sm:rounded-t-[48px]"
+      className={`grain relative isolate flex min-h-[440px] flex-col items-center gap-4 overflow-hidden bg-forest-deep px-4 pt-24 text-center sm:min-h-[520px] ${
+        joined ? "" : "-mt-8 rounded-t-[32px] sm:-mt-12 sm:rounded-t-[48px]"
+      }`}
     >
       <Image
         src="/landing/cta-citricos.webp"
@@ -68,6 +76,9 @@ export function ClosingCta() {
         className="-z-10 object-cover object-bottom"
       />
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#0f2a21_0%,rgba(15,42,33,0.92)_50%,rgba(15,42,33,0)_75%)]" />
+      {joined && (
+        <div className="absolute inset-x-0 top-0 -z-10 h-[160px] bg-[linear-gradient(180deg,#14352a_0%,rgba(20,53,42,0)_100%)]" />
+      )}
       <h2
         id="cta-titulo"
         className="reveal text-[34px] font-bold leading-[1.18] tracking-[-0.015em] text-cream sm:text-[44px]"
@@ -77,9 +88,9 @@ export function ClosingCta() {
       <p className="reveal max-w-[560px] text-[18px] leading-7 text-sage">
         Pedí tu código y empezá a recibir turnos desde tu propio link.
       </p>
-      <a href={INVITE_REQUEST_HREF} className={`reveal mt-3 ${btnPrimary} py-3.5`}>
+      <PilotWhatsappLink className={`reveal mt-3 ${btnPrimary} py-3.5`}>
         Pedí tu código
-      </a>
+      </PilotWhatsappLink>
     </section>
   );
 }
@@ -103,7 +114,7 @@ const FOOTER_COLUMNS: { title: string; links: { label: string; href: string }[] 
   {
     title: "Contacto",
     links: [
-      { label: "Pedí tu código", href: INVITE_REQUEST_HREF },
+      { label: "Pedí tu código", href: PILOT_WHATSAPP_HREF },
       { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
     ],
   },
@@ -135,6 +146,10 @@ export function SiteFooter() {
                 <Link key={l.label} href={l.href} className={`self-start rounded transition-colors hover:text-cream ${focus}`}>
                   {l.label}
                 </Link>
+              ) : l.href === PILOT_WHATSAPP_HREF ? (
+                <PilotWhatsappLink key={l.label} className={`self-start rounded transition-colors hover:text-cream ${focus}`}>
+                  {l.label}
+                </PilotWhatsappLink>
               ) : (
                 <a key={l.label} href={l.href} className={`self-start break-all rounded transition-colors hover:text-cream ${focus}`}>
                   {l.label}

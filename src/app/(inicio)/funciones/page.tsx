@@ -87,7 +87,9 @@ function Check() {
 export default function FeaturesPage() {
   return (
     <div className="flex min-h-screen flex-col bg-cream text-forest">
-      <header className="grain relative isolate overflow-hidden rounded-b-[32px] bg-forest sm:rounded-b-[48px]">
+      {/* The header and the closing CTA overlap the main panel, so its
+          background (not the page cream) shows around their rounded corners. */}
+      <header className="grain relative isolate z-10 overflow-hidden rounded-b-[32px] bg-forest sm:rounded-b-[48px]">
         <div className="absolute inset-x-0 bottom-0 -z-10 h-full bg-[radial-gradient(60%_80%_at_85%_120%,rgba(242,140,56,0.18),transparent_70%)]" />
         <SiteNav />
         <div className="hero-in mx-auto flex w-full max-w-[1120px] flex-col gap-5 px-4 pb-20 pt-10 sm:px-8 sm:pb-24 sm:pt-16 xl:px-0">
@@ -102,7 +104,7 @@ export default function FeaturesPage() {
         </div>
       </header>
 
-      <main className="grain-light relative isolate overflow-x-clip bg-[radial-gradient(520px_440px_at_100%_6%,rgba(242,140,56,0.14),transparent_70%),radial-gradient(580px_480px_at_0%_46%,rgba(79,165,117,0.16),transparent_70%),linear-gradient(180deg,#f6f1e4_0%,#eef1e3_55%,#e3efe5_100%)]">
+      <main className="grain-light relative isolate -mt-8 overflow-x-clip pb-8 pt-8 sm:-mt-12 sm:pb-12 sm:pt-12 bg-[radial-gradient(520px_440px_at_100%_6%,rgba(242,140,56,0.14),transparent_70%),radial-gradient(580px_480px_at_0%_46%,rgba(79,165,117,0.16),transparent_70%),linear-gradient(180deg,#f6f1e4_0%,#eef1e3_55%,#e3efe5_100%)]">
         <div className="mx-auto w-full max-w-[1120px] px-4 py-20 sm:px-8 sm:py-28 xl:px-0">
         <Journey>
         {FEATURES.map((f, i) => (
