@@ -78,13 +78,17 @@ export default function Home() {
       {/* Hero */}
       {/* Hero, Planes and the closing CTA read as one continuous green panel:
           square edges, no gaps, and gradients where the photos darken it. */}
-      <header className="grain relative isolate z-10 flex min-h-svh flex-col overflow-x-clip bg-forest lg:block lg:min-h-0">
+      <header className="grain relative isolate z-10 flex min-h-svh flex-col overflow-x-clip bg-forest lg:block lg:min-h-[min(calc(56.25vw-80px),100svh)]">
         {/* The photo runs 80px past the bottom of the hero, over the top of
-            Planes, and fades out there: there is no hard edge where the two
-            sections meet, and the fruits above it stay untouched. */}
+            Planes, and fades out in its last 32px: there is no hard edge
+            where the two sections meet. Below the fruits the photo has a
+            plain green band at least ~35px tall at every screen size, so the
+            fade only touches that band and the fruits stay sharp. The photo
+            sits on the bottom edge, and on wide screens the hero grows (up to
+            the screen height) so the photo is not cropped at the top. */}
         <div
           aria-hidden
-          className="absolute inset-x-0 top-0 -bottom-20 -z-10 [mask-image:linear-gradient(180deg,#000_calc(100%-80px),transparent_100%)]"
+          className="absolute inset-x-0 top-0 -bottom-20 -z-10 [mask-image:linear-gradient(180deg,#000_calc(100%-32px),transparent_100%)]"
         >
           <Image
             src="/landing/hero-frutas-verde-2.webp"
@@ -95,11 +99,13 @@ export default function Home() {
             // bg-forest, and re-encoding shifts those dark greens.
             unoptimized
             sizes="100vw"
-            className="object-cover object-[78%_bottom] lg:object-right"
+            className="object-cover object-[78%_bottom] lg:object-[right_bottom]"
           />
           {/* Desktop: green on the left, photo on the right. Mobile: the photo
               sits behind the text, so it gets a stronger, even veil. */}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,53,42,0.94)_0%,rgba(20,53,42,0.82)_45%,rgba(20,53,42,0.2)_100%)] lg:bg-[linear-gradient(90deg,#14352a_0%,rgba(20,53,42,0.95)_40%,rgba(20,53,42,0)_62%)]" />
+          {/* Grain for the 80px that hang below the hero. */}
+          <div className="grain-fill absolute inset-x-0 bottom-0 h-20" />
         </div>
         <div className="absolute inset-x-0 top-0 -z-10 h-[240px] bg-[linear-gradient(180deg,#14352a_0%,rgba(20,53,42,0.9)_45%,rgba(20,53,42,0)_100%)]" />
 

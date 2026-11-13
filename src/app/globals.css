@@ -266,6 +266,17 @@ body {
   }
 }
 
+/* The same grain, as an element: for the strip of the hero photo that hangs
+   over the top of Planes, outside the hero's own grain. Without it that strip
+   is flat green and reads as a band between the two sections. */
+.grain-fill {
+  pointer-events: none;
+  background-image: url("/landing/grano.png");
+  background-size: 256px;
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
+}
+
 /* Fine grain over the cream background (dark specks). */
 .grain-light::after {
   content: "";
