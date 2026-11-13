@@ -92,6 +92,25 @@ body {
   --rot-in: -10deg;
   transition-delay: 90ms;
 }
+/* Centro: its bunches sit low inside their images and the Consultorio card
+   is right next to it, so they hid almost entirely behind the card. They come
+   out further, mostly upwards and downwards, and a little bigger. */
+.plan[data-plan="centro"] .plan-fruit--top-left {
+  top: -84px;
+  left: -64px;
+  width: 224px;
+  height: auto;
+  --hide-x: 72px;
+  --hide-y: 112px;
+}
+.plan[data-plan="centro"] .plan-fruit--bottom-right {
+  right: -80px;
+  bottom: -76px;
+  width: 224px;
+  height: auto;
+  --hide-x: -80px;
+  --hide-y: -104px;
+}
 @media (hover: hover) {
   .plan:hover .plan-card {
     transform: translateY(-6px) scale(1.015);

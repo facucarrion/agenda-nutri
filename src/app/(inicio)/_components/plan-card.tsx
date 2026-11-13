@@ -54,6 +54,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
   return (
     <li
       data-featured={f ? "" : undefined}
+      data-plan={plan.name.toLowerCase()}
       className="plan group relative isolate flex min-w-0"
     >
       {/* Glow behind the card */}
