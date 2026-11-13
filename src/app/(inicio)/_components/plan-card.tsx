@@ -36,7 +36,7 @@ function Check({ className }: { className: string }) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={`mt-px size-3 shrink-0 sm:size-5 ${className}`}
+      className={`mt-px size-5 shrink-0 ${className}`}
       aria-hidden
     >
       <path d="m4.5 10.5 3.5 3.5 7.5-8" />
@@ -44,10 +44,33 @@ function Check({ className }: { className: string }) {
   );
 }
 
+// How many features a phone shows before the "Ver todo" toggle.
+const FEATURES_FOLDED = 4;
+
+function Feature({
+  item,
+  featured,
+  className = "flex",
+}: {
+  item: string;
+  featured?: boolean;
+  className?: string;
+}) {
+  return (
+    <li className={`${className} items-start gap-3 break-words text-[15px] leading-[22px]`}>
+      <Check className={featured ? "text-forest" : "text-tangerine"} />
+      {item}
+    </li>
+  );
+}
+
 export function PlanCard({ plan }: { plan: Plan }) {
   const f = plan.featured;
+  // On phones, long feature lists show the first few and fold the rest.
+  const shown = plan.features.slice(0, FEATURES_FOLDED);
+  const rest = plan.features.slice(FEATURES_FOLDED);
   const CtaTag = plan.cta.href.startsWith("/") ? Link : "a";
-  const ctaClass = `flex w-full items-center justify-center rounded-full px-1.5 py-1.5 text-center text-[10px] font-semibold leading-[14px] transition-colors sm:px-7 sm:py-3.5 sm:text-[16px] sm:leading-6 ${focusDark} ${
+  const ctaClass = `flex w-full items-center justify-center rounded-full px-7 py-3.5 text-center text-[16px] font-semibold leading-6 transition-colors ${focusDark} ${
             f
               ? "bg-tangerine text-forest hover:bg-[#f59d55]"
               : "border border-cream/50 text-cream hover:border-cream hover:bg-cream/10"
@@ -89,40 +112,40 @@ export function PlanCard({ plan }: { plan: Plan }) {
       ))}
 
       <div
-        className={`plan-card flex w-full flex-col gap-2 rounded-2xl px-2 pb-3 pt-3 sm:gap-[22px] sm:rounded-[28px] sm:px-9 sm:pb-10 sm:pt-9 ${
+        className={`plan-card flex w-full flex-col gap-5 rounded-3xl px-6 pb-8 pt-7 sm:gap-[22px] sm:rounded-[28px] sm:px-9 sm:pb-10 sm:pt-9 ${
           f
-            ? "bg-cream text-forest shadow-[0_24px_48px_rgba(0,0,0,0.35)]"
+            ? "bg-cream text-forest shadow-[0_24px_48px_rgba(0,0,0,0.35)] ring-2 ring-tangerine sm:ring-0"
             : "border border-cream/14 bg-forest-2 text-cream"
         }`}
       >
-        <div className="flex min-h-[34px] flex-col items-start gap-1 sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-          <h3 className="text-[13px] font-semibold leading-5 sm:text-[24px] sm:leading-8">{plan.name}</h3>
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-[22px] font-semibold leading-8 sm:text-[24px]">{plan.name}</h3>
           {plan.badge &&
             (f ? (
-              <span className="shrink-0 whitespace-nowrap rounded-full bg-tangerine px-1.5 py-0.5 text-[9px] font-bold leading-3 sm:px-3 sm:py-[5px] sm:text-[12px] sm:leading-4 text-forest">
+              <span className="shrink-0 whitespace-nowrap rounded-full bg-tangerine px-3 py-[5px] text-[12px] font-bold leading-4 text-forest">
                 {plan.badge}
               </span>
             ) : (
-              <span className="shrink-0 whitespace-nowrap rounded-full border border-cream/35 px-1.5 py-0.5 text-[9px] font-bold leading-3 sm:px-3 sm:py-[5px] sm:text-[12px] sm:leading-4 text-sage-light">
+              <span className="shrink-0 whitespace-nowrap rounded-full border border-cream/35 px-3 py-[5px] text-[12px] font-bold leading-4 text-sage-light">
                 {plan.badge}
               </span>
             ))}
         </div>
-        <p className={`hidden text-[15px] leading-[22px] sm:block ${f ? "text-slate-green" : "text-sage"}`}>
+        <p className={`text-[15px] leading-[22px] ${f ? "text-slate-green" : "text-sage"}`}>
           {plan.tagline}
         </p>
-        <p className="flex flex-col items-start sm:flex-row sm:items-end sm:gap-1.5">
+        <p className="flex flex-wrap items-end gap-x-1.5">
           {plan.listPrice && (
             <del
-              className={`text-[11px] font-semibold leading-4 decoration-2 sm:mr-1 sm:self-center sm:text-[24px] sm:leading-8 ${f ? "text-slate-green decoration-tangerine" : "text-sage decoration-tangerine"}`}
+              className={`mr-1 self-center text-[22px] font-semibold leading-8 decoration-tangerine decoration-2 sm:text-[24px] ${f ? "text-slate-green" : "text-sage"}`}
             >
               <span className="sr-only">Antes </span>
               {plan.listPrice}
             </del>
           )}
-          <span className="text-[16px] font-bold leading-5 tracking-[-0.02em] sm:text-[48px] sm:leading-[52px]">{plan.price}</span>
+          <span className="text-[44px] font-bold leading-[48px] tracking-[-0.02em] sm:text-[48px] sm:leading-[52px]">{plan.price}</span>
           {plan.period && (
-            <span className={`text-[9px] font-medium leading-3 sm:text-[16px] sm:leading-6 ${f ? "text-slate-green" : "text-sage"}`}>
+            <span className={`text-[16px] font-medium leading-6 ${f ? "text-slate-green" : "text-sage"}`}>
               {plan.period}
             </span>
           )}
@@ -135,14 +158,42 @@ export function PlanCard({ plan }: { plan: Plan }) {
           </CtaTag>
         )}
         <hr className={`border-0 border-t ${f ? "border-forest/14" : "border-cream/14"}`} />
-        <ul className="flex flex-col gap-1 sm:gap-3.5">
-          {plan.features.map((item) => (
-            <li key={item} className="flex items-start gap-1 break-words text-[9px] leading-[12px] sm:gap-3 sm:text-[15px] sm:leading-[22px]">
-              <Check className={f ? "text-forest" : "text-tangerine"} />
-              {item}
-            </li>
+        <ul className="flex flex-col gap-3 sm:gap-3.5">
+          {shown.map((item) => (
+            <Feature key={item} item={item} featured={f} />
+          ))}
+          {/* From sm up the whole list is shown. */}
+          {rest.map((item) => (
+            <Feature key={item} item={item} featured={f} className="hidden sm:flex" />
           ))}
         </ul>
+        {/* On phones a long list starts folded so the card stays short. */}
+        {rest.length > 0 && (
+          <details className="group/more -mt-2 sm:hidden">
+            <summary
+              className={`flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg py-2 text-[15px] font-semibold leading-[22px] [&::-webkit-details-marker]:hidden ${focusDark}`}
+            >
+              <span className="group-open/more:hidden">Ver todo lo que incluye</span>
+              <span className="hidden group-open/more:inline">Ver menos</span>
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                className="size-6 shrink-0 rounded-full border border-current p-1 transition-transform group-open/more:rotate-45"
+                aria-hidden
+              >
+                <path d="M10 4v12M4 10h12" />
+              </svg>
+            </summary>
+            <ul className="flex flex-col gap-3 pt-2">
+              {rest.map((item) => (
+                <Feature key={item} item={item} featured={f} />
+              ))}
+            </ul>
+          </details>
+        )}
       </div>
     </li>
   );
