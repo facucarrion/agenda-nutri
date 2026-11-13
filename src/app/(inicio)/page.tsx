@@ -35,8 +35,9 @@ const PLANS: Plan[] = [
   {
     name: "Consultorio",
     tagline: "Para atender todas las semanas.",
-    price: "$9.900",
-    period: "/mes",
+    listPrice: "$9.900",
+    price: "$0",
+    period: `por ${DEFAULT_TRIAL_DAYS} días`,
     badge: `${DEFAULT_TRIAL_DAYS} días gratis`,
     featured: true,
     cta: { label: `Probalo ${DEFAULT_TRIAL_DAYS} días gratis`, href: PILOT_WHATSAPP_HREF },

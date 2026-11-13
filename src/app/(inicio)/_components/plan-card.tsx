@@ -13,6 +13,8 @@ export type Plan = {
   name: string;
   tagline: string;
   price: string;
+  // Regular price, shown struck through before `price` (e.g. during a trial).
+  listPrice?: string;
   period?: string;
   badge?: string;
   featured?: boolean;
@@ -110,6 +112,14 @@ export function PlanCard({ plan }: { plan: Plan }) {
           {plan.tagline}
         </p>
         <p className="flex flex-col items-start sm:flex-row sm:items-end sm:gap-1.5">
+          {plan.listPrice && (
+            <del
+              className={`text-[11px] font-semibold leading-4 decoration-2 sm:mr-1 sm:self-center sm:text-[24px] sm:leading-8 ${f ? "text-slate-green decoration-tangerine" : "text-sage decoration-tangerine"}`}
+            >
+              <span className="sr-only">Antes </span>
+              {plan.listPrice}
+            </del>
+          )}
           <span className="text-[16px] font-bold leading-5 tracking-[-0.02em] sm:text-[48px] sm:leading-[52px]">{plan.price}</span>
           {plan.period && (
             <span className={`text-[9px] font-medium leading-3 sm:text-[16px] sm:leading-6 ${f ? "text-slate-green" : "text-sage"}`}>
