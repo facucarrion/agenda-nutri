@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Fraunces } from "next/font/google";
 import { DEFAULT_TRIAL_DAYS } from "@/lib/access";
 import { BRAND_NAME } from "@/lib/brand";
-import { CONTACT_EMAIL, INVITE_REQUEST_HREF } from "@/lib/legal";
+import { CONTACT_EMAIL, PILOT_WHATSAPP_HREF } from "@/lib/legal";
 import {
   ClosingCta,
   SiteFooter,
@@ -14,6 +14,7 @@ import {
 } from "./_components/landing-ui";
 import { PlanCard, type Plan } from "./_components/plan-card";
 import { PlansCarousel } from "./_components/plans-carousel";
+import { PilotWhatsappLink } from "./_components/pilot-whatsapp-link";
 
 // Serif italic for one accent phrase per title.
 const accentFont = Fraunces({ subsets: ["latin"], style: "italic", display: "swap" });
@@ -38,7 +39,7 @@ const PLANS: Plan[] = [
     period: "/mes",
     badge: `${DEFAULT_TRIAL_DAYS} días gratis`,
     featured: true,
-    cta: { label: `Probalo ${DEFAULT_TRIAL_DAYS} días gratis`, href: INVITE_REQUEST_HREF },
+    cta: { label: `Probalo ${DEFAULT_TRIAL_DAYS} días gratis`, href: PILOT_WHATSAPP_HREF },
     features: [
       `Probalo ${DEFAULT_TRIAL_DAYS} días gratis, sin tarjeta`,
       "1 profesional",
@@ -74,19 +75,31 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-cream text-forest">
       {/* Hero */}
-      <header className="grain relative isolate flex min-h-svh flex-col overflow-hidden rounded-b-[32px] bg-forest sm:rounded-b-[48px] lg:block lg:min-h-0">
-        <Image
-          src="/landing/hero-frutas.webp"
-          alt=""
-          fill
-          priority
-          quality={95}
-          sizes="100vw"
-          className="-z-10 object-cover object-[78%_bottom] lg:object-right"
-        />
-        {/* Desktop: green on the left, photo on the right. Mobile: the photo
-            sits behind the text, so it gets a stronger, even veil. */}
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(20,53,42,0.94)_0%,rgba(20,53,42,0.82)_45%,rgba(20,53,42,0.2)_100%)] lg:bg-[linear-gradient(90deg,#14352a_0%,rgba(20,53,42,0.95)_40%,rgba(20,53,42,0)_62%)]" />
+      {/* Hero, Planes and the closing CTA read as one continuous green panel:
+          square edges, no gaps, and gradients where the photos darken it. */}
+      <header className="grain relative isolate z-10 flex min-h-svh flex-col overflow-x-clip bg-forest lg:block lg:min-h-0">
+        {/* The photo runs 80px past the bottom of the hero, over the top of
+            Planes, and fades out there: there is no hard edge where the two
+            sections meet, and the fruits above it stay untouched. */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 -bottom-20 -z-10 [mask-image:linear-gradient(180deg,#000_calc(100%-80px),transparent_100%)]"
+        >
+          <Image
+            src="/landing/hero-frutas-verde-2.webp"
+            alt=""
+            fill
+            priority
+            // Served as-is: the photo's background was regraded to exactly
+            // bg-forest, and re-encoding shifts those dark greens.
+            unoptimized
+            sizes="100vw"
+            className="object-cover object-[78%_bottom] lg:object-right"
+          />
+          {/* Desktop: green on the left, photo on the right. Mobile: the photo
+              sits behind the text, so it gets a stronger, even veil. */}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,53,42,0.94)_0%,rgba(20,53,42,0.82)_45%,rgba(20,53,42,0.2)_100%)] lg:bg-[linear-gradient(90deg,#14352a_0%,rgba(20,53,42,0.95)_40%,rgba(20,53,42,0)_62%)]" />
+        </div>
         <div className="absolute inset-x-0 top-0 -z-10 h-[240px] bg-[linear-gradient(180deg,#14352a_0%,rgba(20,53,42,0.9)_45%,rgba(20,53,42,0)_100%)]" />
 
         <SiteNav />
@@ -105,9 +118,7 @@ export default function Home() {
               recordatorios hagan el resto.
             </p>
             <div className="flex flex-wrap gap-3.5">
-              <a href={INVITE_REQUEST_HREF} className={btnPrimary}>
-                Pedí tu código
-              </a>
+              <PilotWhatsappLink className={btnPrimary}>Pedí tu código</PilotWhatsappLink>
               <Link href="/login" className={btnGhost}>
                 Ingresar
               </Link>
@@ -132,7 +143,7 @@ export default function Home() {
         <section
           id="planes"
           aria-labelledby="planes-titulo"
-          className="grain relative isolate mt-3 scroll-mt-3 overflow-x-clip rounded-[32px] bg-forest px-3 pb-20 pt-20 sm:mt-4 sm:rounded-[48px] sm:px-8 sm:pb-28 sm:pt-28"
+          className="grain relative isolate overflow-x-clip bg-forest px-3 pb-20 pt-20 sm:px-8 sm:pb-28 sm:pt-28"
         >
           <div className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-4 sm:gap-20">
             <div className="reveal flex max-w-[980px] flex-col items-center gap-4 text-center">
@@ -160,7 +171,7 @@ export default function Home() {
           </div>
         </section>
 
-        <ClosingCta />
+        <ClosingCta joined />
       </main>
 
       <SiteFooter />

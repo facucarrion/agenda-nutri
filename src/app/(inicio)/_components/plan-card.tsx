@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PILOT_WHATSAPP_HREF } from "@/lib/legal";
+import { PilotWhatsappLink } from "./pilot-whatsapp-link";
 
 // Two bunches of fruit and leaves hide behind each card and come out of its
 // top-left and bottom-right corners when the card is hovered. Each bunch is
@@ -43,6 +45,11 @@ function Check({ className }: { className: string }) {
 export function PlanCard({ plan }: { plan: Plan }) {
   const f = plan.featured;
   const CtaTag = plan.cta.href.startsWith("/") ? Link : "a";
+  const ctaClass = `flex w-full items-center justify-center rounded-full px-1.5 py-1.5 text-center text-[10px] font-semibold leading-[14px] transition-colors sm:px-7 sm:py-3.5 sm:text-[16px] sm:leading-6 ${focusDark} ${
+            f
+              ? "bg-tangerine text-forest hover:bg-[#f59d55]"
+              : "border border-cream/50 text-cream hover:border-cream hover:bg-cream/10"
+          }`;
 
   return (
     <li
@@ -109,16 +116,13 @@ export function PlanCard({ plan }: { plan: Plan }) {
             </span>
           )}
         </p>
-        <CtaTag
-          href={plan.cta.href}
-          className={`flex w-full items-center justify-center rounded-full px-1.5 py-1.5 text-center text-[10px] font-semibold leading-[14px] transition-colors sm:px-7 sm:py-3.5 sm:text-[16px] sm:leading-6 ${focusDark} ${
-            f
-              ? "bg-tangerine text-forest hover:bg-[#f59d55]"
-              : "border border-cream/50 text-cream hover:border-cream hover:bg-cream/10"
-          }`}
-        >
-          {plan.cta.label}
-        </CtaTag>
+        {plan.cta.href === PILOT_WHATSAPP_HREF ? (
+          <PilotWhatsappLink className={ctaClass}>{plan.cta.label}</PilotWhatsappLink>
+        ) : (
+          <CtaTag href={plan.cta.href} className={ctaClass}>
+            {plan.cta.label}
+          </CtaTag>
+        )}
         <hr className={`border-0 border-t ${f ? "border-forest/14" : "border-cream/14"}`} />
         <ul className="flex flex-col gap-1 sm:gap-3.5">
           {plan.features.map((item) => (

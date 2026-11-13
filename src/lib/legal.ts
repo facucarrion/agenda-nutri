@@ -29,6 +29,19 @@ export const ACTIVATE_ACCOUNT_HREF =
     ].join("\n"),
   )}`;
 
+// The closing "Sumate al piloto" button opens a WhatsApp chat with the team,
+// alternating between these numbers (wa.me format: 54 + 9 + area + number).
+export const PILOT_WHATSAPP_NUMBERS = ["5493472549859", "5493571457461"];
+export const PILOT_WHATSAPP_TEXT = `Hola, quiero sumarme al piloto de ${PRODUCT_NAME}.`;
+
+export function pilotWhatsappHref(number: string) {
+  return `https://wa.me/${number}?text=${encodeURIComponent(PILOT_WHATSAPP_TEXT)}`;
+}
+
+// Default link (first number). Links set to this href render as
+// PilotWhatsappLink, which alternates between the numbers on click.
+export const PILOT_WHATSAPP_HREF = pilotWhatsappHref(PILOT_WHATSAPP_NUMBERS[0]);
+
 // "Pedí tu código" opens an email to the team with the subject and the data
 // we need to create the invitation already laid out.
 export const INVITE_REQUEST_HREF =
