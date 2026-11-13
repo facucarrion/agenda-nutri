@@ -92,6 +92,17 @@ body {
   --rot-in: -10deg;
   transition-delay: 90ms;
 }
+/* Centro: its bunches sit lower inside their images than Consultorio's, so at
+   the shared offsets they hid behind the card. These offsets make them peek
+   out about as much as Consultorio's. */
+.plan[data-plan="centro"] .plan-fruit--top-left {
+  top: -64px;
+  --hide-y: 104px;
+}
+.plan[data-plan="centro"] .plan-fruit--bottom-right {
+  bottom: -64px;
+  --hide-y: -88px;
+}
 @media (hover: hover) {
   .plan:hover .plan-card {
     transform: translateY(-6px) scale(1.015);
@@ -253,6 +264,17 @@ body {
   .shot-glow {
     transition: none;
   }
+}
+
+/* The same grain, as an element: for the strip of the hero photo that hangs
+   over the top of Planes, outside the hero's own grain. Without it that strip
+   is flat green and reads as a band between the two sections. */
+.grain-fill {
+  pointer-events: none;
+  background-image: url("/landing/grano.png");
+  background-size: 256px;
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
 }
 
 /* Fine grain over the cream background (dark specks). */
