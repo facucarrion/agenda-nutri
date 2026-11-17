@@ -27,7 +27,7 @@ export function MonthGrid({
 
   return (
     <div>
-      <div className="grid grid-cols-7 gap-1.5 pb-2 text-center text-xs font-medium text-muted sm:text-sm">
+      <div className="grid grid-cols-7 gap-1.5 pb-1.5 text-center text-xs font-medium text-muted sm:text-sm">
         {WEEKDAYS.map((w) => (
           <span key={w}>{w}</span>
         ))}
@@ -53,7 +53,7 @@ export function MonthGrid({
                 onClick={() => onSelect(key)}
                 aria-label={label}
                 aria-pressed={isSelected}
-                className={`min-h-16 rounded-xl p-1.5 text-left text-xs text-faint sm:min-h-28 sm:p-2 sm:text-sm ${focus} ${
+                className={`min-h-16 rounded-xl p-1.5 text-left text-xs text-faint sm:min-h-20 sm:p-2 sm:text-sm ${focus} ${
                   isSelected ? "bg-primary-soft/60 ring-2 ring-primary" : ""
                 }`}
               >
@@ -70,7 +70,7 @@ export function MonthGrid({
               onClick={() => onSelect(key)}
               aria-label={label}
               aria-pressed={isSelected}
-              className={`flex min-h-16 min-w-0 flex-col gap-1 rounded-xl border p-1.5 text-left transition-colors sm:min-h-28 sm:p-2 ${focus} ${
+              className={`flex min-h-16 min-w-0 flex-col gap-1 rounded-xl border p-1.5 text-left transition-colors sm:min-h-20 sm:p-2 ${focus} ${
                 isSelected
                   ? "border-2 border-primary bg-primary-soft/70"
                   : "border-line bg-surface hover:border-primary/60"

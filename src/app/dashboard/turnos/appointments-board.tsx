@@ -5,7 +5,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@/app/(paciente)/_components/icons";
-import { ModalityBadge } from "@/components/modality";
+import { MODALITY_LABEL, ModalityIcon } from "@/components/modality";
 import type { DashboardAppointment, TypeOption } from "../_lib/types";
 import { dayKey, monthTitle, shortDay, timeOf } from "../_lib/dates";
 import { AppointmentActions } from "../_components/appointment-actions";
@@ -59,10 +59,10 @@ export function AppointmentsBoard({
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-[34px] font-bold leading-tight tracking-tight sm:text-[40px]">
+          <h1 className="text-[26px] font-bold leading-tight tracking-tight sm:text-[30px]">
             Turnos
           </h1>
-          <p className="mt-1 text-muted">
+          <p className="mt-0.5 text-sm text-muted">
             Confirmá los pedidos y avisá a cada paciente por WhatsApp.
           </p>
         </div>
@@ -106,7 +106,7 @@ export function AppointmentsBoard({
 
       <ReminderList appointments={appointments} now={now} onRemind={setReminder} />
 
-      <div role="tablist" aria-label="Filtrar turnos" className="mt-6 flex flex-wrap gap-2">
+      <div role="tablist" aria-label="Filtrar turnos" className="mt-4 flex flex-wrap gap-2">
         {TABS.map((t) => {
           const active = tab === t.id;
           return (
@@ -135,7 +135,7 @@ export function AppointmentsBoard({
         })}
       </div>
 
-      <ul className="mt-5 flex flex-col gap-3">
+      <ul className="mt-3 flex flex-col gap-2.5">
         {visible.length === 0 && (
           <li className="rounded-[20px] border border-dashed border-line bg-surface/60 px-6 py-12 text-center text-muted">
             {tab === "pending"
@@ -149,7 +149,7 @@ export function AppointmentsBoard({
           return (
             <li
               key={a.id}
-              className={`grid gap-4 rounded-[20px] border bg-surface p-4 sm:p-5 lg:grid-cols-[minmax(0,1.6fr)_110px_170px_130px_minmax(0,1.4fr)] lg:items-center ${
+              className={`grid gap-4 rounded-[20px] border bg-surface p-3 sm:p-4 lg:grid-cols-[minmax(0,1.5fr)_120px_110px_160px_130px_minmax(0,1.4fr)] lg:items-center ${
                 a.status === "pending" ? "border-warn/50" : "border-line"
               } ${a.status === "cancelled" || a.status === "no_show" ? "opacity-70" : ""}`}
             >
@@ -162,14 +162,22 @@ export function AppointmentsBoard({
                 </span>
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{fullName(a)}</p>
-                  <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                    <p className="truncate text-sm text-muted">{a.appointment_types.name}</p>
-                    {a.modality && <ModalityBadge modality={a.modality} />}
-                  </div>
+                  <p className="truncate text-sm text-muted">{a.appointment_types.name}</p>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 lg:contents">
+                <div className="flex items-center lg:justify-center">
+                  {a.modality ? (
+                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink">
+                      <ModalityIcon modality={a.modality} className="h-[18px] w-[18px]" />
+                      {MODALITY_LABEL[a.modality]}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-faint">—</span>
+                  )}
+                </div>
+
                 <div className="flex gap-2 text-sm lg:block">
                   <p className="font-semibold">{shortDay(dayKey(a.starts_at))}</p>
                   <p className="text-muted">{timeOf(a.starts_at)} hs</p>

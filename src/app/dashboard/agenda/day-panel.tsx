@@ -35,9 +35,9 @@ export function DayPanel({
       aria-live="polite"
       className="rounded-[24px] border border-line bg-surface p-4 sm:p-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto"
     >
-      <h2 className="text-lg font-bold">{longDay(day.key)}</h2>
+      <h2 className="text-base font-bold">{longDay(day.key)}</h2>
       <p className="mt-0.5 text-sm text-muted">{total ? summary : day.today ? "Hoy" : "Sin turnos"}</p>
-      <button type="button" onClick={() => onNew(day.key)} className={`${btnPrimary} mt-3 w-full`}>
+      <button type="button" onClick={() => onNew(day.key)} className={`${btnPrimary} mt-2.5 w-full`}>
         + Nuevo turno
       </button>
 
@@ -46,11 +46,11 @@ export function DayPanel({
           {empty}
         </p>
       ) : (
-        <ul className="mt-4 flex flex-col gap-3">
+        <ul className="mt-3 flex flex-col gap-2.5">
           {day.appointments.map((a) => {
             const status = STATUS[a.status];
             return (
-              <li key={a.id} className="rounded-2xl bg-canvas px-3 py-4 sm:px-3.5">
+              <li key={a.id} className="rounded-2xl bg-canvas px-3 py-3 sm:px-3.5">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-bold">{timeOf(a.starts_at)} hs</span>
                   <span
@@ -60,14 +60,14 @@ export function DayPanel({
                     {status.label}
                   </span>
                 </div>
-                <p className="mt-2 font-semibold">
+                <p className="mt-1.5 font-semibold">
                   {a.patients.first_name} {a.patients.last_name}
                 </p>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <p className="text-sm text-muted">{a.appointment_types.name}</p>
                   {a.modality && <ModalityBadge modality={a.modality} />}
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2 empty:hidden">
+                <div className="mt-2.5 flex flex-wrap items-center gap-2 empty:hidden">
                   <AppointmentActions
                     appointment={a}
                     now={now}

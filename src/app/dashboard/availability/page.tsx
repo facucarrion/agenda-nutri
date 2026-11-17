@@ -46,10 +46,10 @@ async function Availability() {
 
   return (
     <>
-      <h1 className="text-[34px] font-bold leading-tight tracking-tight sm:text-[40px]">
+      <h1 className="text-[26px] font-bold leading-tight tracking-tight sm:text-[30px]">
         Disponibilidad
       </h1>
-      <p className="mt-1 text-muted">
+      <p className="mt-0.5 text-sm text-muted">
         Configurá cuándo atendés y qué pueden reservar tus pacientes.
       </p>
 
@@ -63,7 +63,7 @@ async function Availability() {
         <Check done={hasTypes}>Tenés al menos un tipo de consulta activo</Check>
       </ul>
 
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-2">
+      <div className="mt-4 grid items-start gap-5 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
           <BookingLink slug={data.slug} origin={origin} />
           <WeeklyHours rules={data.rules} />
@@ -80,7 +80,7 @@ async function Availability() {
 
 export default function AvailabilityPage() {
   return (
-    <main className="mx-auto w-full max-w-[1280px] px-4 pb-16 pt-8 sm:px-12 sm:pt-10">
+    <main className="mx-auto w-full max-w-[1280px] px-4 pb-12 pt-5 sm:px-12 sm:pt-6">
       <Suspense fallback={<p className="text-muted">Cargando disponibilidad...</p>}>
         <Availability />
       </Suspense>

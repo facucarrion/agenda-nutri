@@ -10,10 +10,10 @@ async function Account() {
 
   return (
     <>
-      <h1 className="text-[34px] font-bold leading-tight tracking-tight sm:text-[40px]">
+      <h1 className="text-[26px] font-bold leading-tight tracking-tight sm:text-[30px]">
         Mi cuenta
       </h1>
-      <p className="mt-1 text-muted">Cambiá tu contraseña cuando lo necesites.</p>
+      <p className="mt-0.5 text-sm text-muted">Cambiá tu contraseña cuando lo necesites.</p>
       <div className="mt-6">
         <ChangePasswordForm email={user?.email ?? ""} />
       </div>
@@ -23,7 +23,7 @@ async function Account() {
 
 export default function AccountPage() {
   return (
-    <main className="mx-auto w-full max-w-[1280px] px-4 pb-16 pt-8 sm:px-12 sm:pt-10">
+    <main className="mx-auto w-full max-w-[1280px] px-4 pb-12 pt-5 sm:px-12 sm:pt-6">
       <Suspense fallback={<p className="text-muted">Cargando...</p>}>
         <Account />
       </Suspense>
