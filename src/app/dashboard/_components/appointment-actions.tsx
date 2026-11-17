@@ -28,7 +28,8 @@ function StatusActions({
 }) {
   const [rejecting, setRejecting] = useState(false);
   const past = a.starts_at < now;
-  const w = block ? "flex-1" : "";
+  // In the narrow day panel the buttons share a row, so they pad less.
+  const w = block ? "flex-1 px-3" : "";
 
   if (a.status === "pending") {
     if (rejecting) {
@@ -126,7 +127,7 @@ export function AppointmentActions({
       {editable && (
         <button
           type="button"
-          className={`${btnSecondary} ${block ? "flex-1" : ""}`}
+          className={`${btnSecondary} ${block ? "flex-1 px-3" : ""}`}
           onClick={() => onEdit(a)}
         >
           Editar

@@ -5,6 +5,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@/app/(paciente)/_components/icons";
+import { ModalityBadge } from "@/components/modality";
 import type { DashboardAppointment, TypeOption } from "../_lib/types";
 import { dayKey, monthTitle, shortDay, timeOf } from "../_lib/dates";
 import { AppointmentActions } from "../_components/appointment-actions";
@@ -161,7 +162,10 @@ export function AppointmentsBoard({
                 </span>
                 <div className="min-w-0">
                   <p className="truncate font-semibold">{fullName(a)}</p>
-                  <p className="truncate text-sm text-muted">{a.appointment_types.name}</p>
+                  <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                    <p className="truncate text-sm text-muted">{a.appointment_types.name}</p>
+                    {a.modality && <ModalityBadge modality={a.modality} />}
+                  </div>
                 </div>
               </div>
 
