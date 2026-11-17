@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import {
   ErrorBox,
+  Field,
   NewPasswordGroup,
   PasswordField,
   SubmitButton,
@@ -12,8 +13,11 @@ import { changePassword, type PasswordState } from "./actions";
 
 const initial: PasswordState = {};
 
-export function ChangePasswordForm({ email }: { email: string }) {
+// `mfa`: the account has two-step verification, so the change also asks for
+// the code (Supabase requires it).
+export function ChangePasswordForm({ email, mfa }: { email: string; mfa: boolean }) {
   const [state, action, pending] = useActionState(changePassword, initial);
+  const askCode = mfa || state.needsMfa;
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const mismatch = confirm.length > 0 && confirm !== password;
@@ -72,6 +76,19 @@ export function ChangePasswordForm({ email }: { email: string }) {
             <p className="text-xs font-medium text-bad">Las contraseñas no coinciden.</p>
           )}
         </div>
+        {askCode && (
+          <Field
+            label="Código de verificación"
+            name="mfa_code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]{6}"
+            maxLength={6}
+            required
+            placeholder="123456"
+            hint="El código de 6 dígitos de tu app de autenticación."
+          />
+        )}
         <SubmitButton pending={pending}>
           {pending ? "Guardando..." : "Cambiar contraseña"}
         </SubmitButton>

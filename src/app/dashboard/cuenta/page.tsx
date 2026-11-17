@@ -7,6 +7,10 @@ async function Account() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  // Accounts with two-step verification (the admins) need their code to
+  // change the password.
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const mfa = (factors?.totp.length ?? 0) > 0;
 
   return (
     <>
@@ -15,7 +19,7 @@ async function Account() {
       </h1>
       <p className="mt-0.5 text-sm text-muted">Cambiá tu contraseña cuando lo necesites.</p>
       <div className="mt-6">
-        <ChangePasswordForm email={user?.email ?? ""} />
+        <ChangePasswordForm email={user?.email ?? ""} mfa={mfa} />
       </div>
     </>
   );

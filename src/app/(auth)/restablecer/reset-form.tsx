@@ -6,6 +6,7 @@ import { updatePassword, type AuthState } from "../actions";
 import {
   Card,
   ErrorBox,
+  Field,
   Heading,
   NewPasswordGroup,
   PasswordField,
@@ -60,6 +61,19 @@ export function ResetForm() {
             <p className="text-xs font-medium text-bad">Las contraseñas no coinciden.</p>
           )}
         </div>
+        {state.needsMfa && (
+          <Field
+            label="Código de verificación"
+            name="mfa_code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]{6}"
+            maxLength={6}
+            required
+            placeholder="123456"
+            hint="El código de 6 dígitos de tu app de autenticación."
+          />
+        )}
         <SubmitButton pending={pending}>
           {pending ? "Guardando..." : "Guardar contraseña"}
         </SubmitButton>

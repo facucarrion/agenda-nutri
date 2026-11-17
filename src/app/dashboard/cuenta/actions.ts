@@ -1,9 +1,12 @@
 "use server";
 
+import { ensureAal2 } from "@/lib/mfa";
 import { passwordError } from "@/lib/password";
 import { createClient } from "@/lib/supabase/server";
 
-export type PasswordState = { error?: string; done?: boolean };
+// `needsMfa`: the account has two-step verification and the form asks for
+// the code.
+export type PasswordState = { error?: string; done?: boolean; needsMfa?: boolean };
 
 // Changing the password from inside the session asks for the current one, so
 // someone using an unlocked screen cannot take over the account.
@@ -34,6 +37,11 @@ export async function changePassword(
     password: current,
   });
   if (check.error) return { error: "La contraseña actual no es correcta." };
+
+  // Re-checking the password leaves the session at aal1: an account with
+  // two-step verification also has to enter its code.
+  const mfa = await ensureAal2(supabase, formData);
+  if (!mfa.ok) return { error: mfa.error, needsMfa: true };
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {
