@@ -10,10 +10,16 @@ import {
   ChevronRightIcon,
 } from "../../_components/icons";
 import { Stepper } from "../../_components/stepper";
+import {
+  MODALITY_LABEL,
+  ModalityIcon,
+  type Modality,
+} from "@/components/modality";
 import type {
   BookingRequest,
   PublicAppointmentType,
   PublicProfile,
+  PublicSlot,
 } from "./types";
 
 // The API allows up to 31 days per request, so the calendar loads one month
@@ -25,8 +31,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 type Step = 1 | 2 | 3;
-type Mode = "presencial" | "virtual";
-type SlotsData = { key: string; slots: string[]; failed?: boolean };
+type SlotsData = { key: string; slots: PublicSlot[]; failed?: boolean };
 
 const card = "rounded-[20px] border border-line bg-surface p-5 sm:p-7";
 const primaryButton =
@@ -36,15 +41,10 @@ const secondaryButton =
 const input =
   "w-full rounded-xl border border-line bg-surface px-4 py-3.5 text-[15px] text-ink placeholder:text-faint focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
 
-// The API has no "modality" field: it is read from the service name, e.g.
-// "Seguimiento · Telemedicina". Services without a marker work in both modes.
-const modeOf = (name: string): Mode | null =>
-  /telemedicina|virtual|online/i.test(name)
-    ? "virtual"
-    : /presencial/i.test(name)
-      ? "presencial"
-      : null;
-const baseName = (name: string) => name.split(" · ")[0];
+// Each slot says how it is attended (from the nutritionist's weekly hours).
+const allows = (slot: PublicSlot, mode: Modality) =>
+  slot.modality === "both" || slot.modality === mode;
+const MODES: Modality[] = ["in_person", "virtual"];
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -117,11 +117,9 @@ export function BookingForm({
   const dayKey = (iso: string) => dayKeyFmt.format(new Date(iso));
 
   const [step, setStep] = useState<Step>(1);
-  const [mode, setMode] = useState<Mode>("presencial");
-  const [typeId, setTypeId] = useState(
-    (profile.types.find((t) => modeOf(t.name) !== "virtual") ?? profile.types[0])
-      .id,
-  );
+  // What the patient picked; the day may only allow the other one.
+  const [preferred, setPreferred] = useState<Modality>("in_person");
+  const [typeId, setTypeId] = useState(profile.types[0].id);
   const [offset, setOffset] = useState(0);
   const [data, setData] = useState<SlotsData | null>(null);
   const [day, setDay] = useState<string | null>(null);
@@ -131,18 +129,6 @@ export function BookingForm({
   const [email, setEmail] = useState("");
 
   const type = profile.types.find((t) => t.id === typeId) ?? profile.types[0];
-  const hasModes =
-    profile.types.some((t) => modeOf(t.name) === "virtual") &&
-    profile.types.some((t) => modeOf(t.name) === "presencial");
-  const typesFor = (next: Mode) =>
-    hasModes
-      ? profile.types.filter((t) => {
-          const m = modeOf(t.name);
-          return m === null || m === next;
-        })
-      : profile.types;
-  const visibleTypes = typesFor(mode);
-  const typeMode = modeOf(type.name);
   const today = todayIn(profile.timezone);
   const month = monthInfo(today, offset);
   const dataKey = `${typeId}:${month.key}`;
@@ -162,7 +148,7 @@ export function BookingForm({
     })
       .then(async (response) => {
         if (!response.ok) throw new Error("slots request failed");
-        const body: { slots: string[] } = await response.json();
+        const body: { slots: PublicSlot[] } = await response.json();
         setData({ key: dataKey, slots: body.slots });
       })
       .catch(() => {
@@ -174,14 +160,20 @@ export function BookingForm({
     return () => controller.abort();
   }, [dataKey, typeId, month.from, month.to, profile.slug]);
 
-  const slotsByDay = new Map<string, string[]>();
+  const slotsByDay = new Map<string, PublicSlot[]>();
   if (ready) {
     for (const s of ready.slots) {
-      const key = dayKey(s);
+      const key = dayKey(s.starts_at);
       slotsByDay.set(key, [...(slotsByDay.get(key) ?? []), s]);
     }
   }
-  const daySlots = day ? (slotsByDay.get(day) ?? []) : [];
+  const allDaySlots = day ? (slotsByDay.get(day) ?? []) : [];
+  // Modalities offered on the chosen day. If the preferred one is not, the
+  // day's only modality is used, so the patient can only book what is offered.
+  const dayModes = MODES.filter((m) => allDaySlots.some((s) => allows(s, m)));
+  const mode: Modality =
+    dayModes.length === 0 || dayModes.includes(preferred) ? preferred : dayModes[0];
+  const daySlots = allDaySlots.filter((s) => allows(s, mode));
 
   function chooseType(id: string) {
     setTypeId(id);
@@ -189,15 +181,11 @@ export function BookingForm({
     setSlot(null);
   }
 
-  // Swaps presencial/virtual, keeping the same service when it has both.
-  function switchMode(next: Mode) {
-    const options = typesFor(next);
-    const target =
-      options.find((t) => t.id === typeId) ??
-      options.find((t) => baseName(t.name) === baseName(type.name)) ??
-      options[0];
-    setMode(next);
-    if (target && target.id !== typeId) chooseType(target.id);
+  // Swaps presencial/virtual; a chosen time that does not allow it is cleared.
+  function switchMode(next: Modality) {
+    setPreferred(next);
+    const current = allDaySlots.find((s) => s.starts_at === slot);
+    if (current && !allows(current, next)) setSlot(null);
   }
 
   function goToMonth(next: number) {
@@ -223,6 +211,7 @@ export function BookingForm({
     const body: BookingRequest = {
       type: type.id,
       starts_at: slot,
+      modality: mode,
       first_name: field("first_name"),
       last_name: field("last_name"),
       email: field("email").toLowerCase(),
@@ -286,12 +275,7 @@ export function BookingForm({
     <section className={`${card} flex flex-1 flex-col gap-3.5 !p-6`}>
       <h2 className="text-lg font-semibold">Tu turno</h2>
       <SummaryRow label="Servicio" value={type.name} />
-      {typeMode && (
-        <SummaryRow
-          label="Modalidad"
-          value={typeMode === "virtual" ? "Virtual" : "Presencial"}
-        />
-      )}
+      <SummaryRow label="Modalidad" value={day ? MODALITY_LABEL[mode] : "—"} />
       <SummaryRow label="Día" value={day ? formatDay(day) : "—"} />
       <SummaryRow label="Hora" value={slot ? `${time(slot)} hs` : "—"} />
       <div className="h-px bg-line" />
@@ -373,6 +357,7 @@ export function BookingForm({
           </p>
           <div className="flex w-full flex-col gap-3 rounded-[14px] bg-canvas p-5 text-sm">
             <SummaryRow label="Servicio" value={type.name} />
+            <SummaryRow label="Modalidad" value={MODALITY_LABEL[mode]} />
             <SummaryRow
               label="Día y hora"
               value={`${formatDay(dayKey(slot))} · ${time(slot)} hs`}
@@ -390,7 +375,7 @@ export function BookingForm({
               <section className={`${card} flex flex-col gap-4`}>
                 <h2 className="text-lg font-semibold">1 · Elegí el servicio</h2>
                 <ServiceSelect
-                  types={visibleTypes}
+                  types={profile.types}
                   value={type.id}
                   onChange={chooseType}
                 />
@@ -587,17 +572,17 @@ export function BookingForm({
                   <div className="grid max-h-56 grid-cols-2 gap-3 overflow-y-auto pr-1">
                     {daySlots.map((s) => (
                       <button
-                        key={s}
+                        key={s.starts_at}
                         type="button"
-                        aria-pressed={slot === s}
-                        onClick={() => setSlot(s)}
+                        aria-pressed={slot === s.starts_at}
+                        onClick={() => setSlot(s.starts_at)}
                         className={`h-11 rounded-xl text-[15px] font-medium transition-colors ${
-                          slot === s
+                          slot === s.starts_at
                             ? "bg-primary text-white"
                             : "border-[1.5px] border-line bg-surface hover:border-primary"
                         }`}
                       >
-                        {time(s)}
+                        {time(s.starts_at)}
                       </button>
                     ))}
                   </div>
@@ -609,43 +594,109 @@ export function BookingForm({
                     : profile.timezone}
                   .
                 </p>
-                {hasModes && (
-                  <div
-                    role="group"
-                    aria-label="Modalidad del turno"
-                    className="relative grid grid-cols-2 rounded-full bg-primary-soft p-1"
-                  >
-                    <span
-                      aria-hidden
-                      className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-primary shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${
-                        mode === "virtual" ? "translate-x-full" : "translate-x-0"
-                      }`}
-                    />
-                    {(["presencial", "virtual"] as const).map((option) => {
-                      const selected = mode === option;
-                      return (
-                        <button
-                          key={option}
-                          type="button"
-                          aria-pressed={selected}
-                          onClick={() => switchMode(option)}
-                          className={`relative z-10 rounded-full px-4 py-2.5 text-[15px] font-semibold transition-colors duration-300 motion-reduce:transition-none ${
-                            selected
-                              ? "text-white"
-                              : "text-primary/60 hover:text-primary"
-                          }`}
-                        >
-                          {option === "virtual" ? "Virtual" : "Presencial"}
-                        </button>
-                      );
-                    })}
-                  </div>
+                {day && allDaySlots.length > 0 && (
+                  <ModeSwitch
+                    value={mode}
+                    available={dayModes}
+                    onChange={switchMode}
+                  />
                 )}
               </section>
             )}
             {summary}
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// Segmented switch Presencial | Virtual. The thumb slides between both
+// halves: tap a side, swipe it left or right, or use the arrow keys. A side
+// the chosen day does not offer is disabled.
+function ModeSwitch({
+  value,
+  available,
+  onChange,
+}: {
+  value: Modality;
+  available: Modality[];
+  onChange: (next: Modality) => void;
+}) {
+  const startX = useRef<number | null>(null);
+  // A swipe ends with a click on the button under the finger: ignore it.
+  const swiped = useRef(false);
+  const only = available.length === 1 ? available[0] : null;
+
+  function pick(next: Modality) {
+    if (next !== value && available.includes(next)) onChange(next);
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div
+        role="radiogroup"
+        aria-label="Modalidad del turno"
+        onPointerDown={(e) => {
+          startX.current = e.clientX;
+          swiped.current = false;
+        }}
+        onPointerUp={(e) => {
+          if (startX.current === null) return;
+          const dx = e.clientX - startX.current;
+          startX.current = null;
+          if (Math.abs(dx) <= 24) return;
+          swiped.current = true;
+          pick(dx > 0 ? "virtual" : "in_person");
+        }}
+        onPointerCancel={() => {
+          startX.current = null;
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowRight") pick("virtual");
+          if (e.key === "ArrowLeft") pick("in_person");
+        }}
+        className="relative grid touch-pan-y select-none grid-cols-2 rounded-full bg-primary-soft p-1"
+      >
+        <span
+          aria-hidden
+          className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-primary shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${
+            value === "virtual" ? "translate-x-full" : "translate-x-0"
+          }`}
+        />
+        {MODES.map((option) => {
+          const selected = value === option;
+          const enabled = available.includes(option);
+          return (
+            <button
+              key={option}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              disabled={!enabled}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => {
+                if (swiped.current) swiped.current = false;
+                else pick(option);
+              }}
+              className={`relative z-10 flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-[15px] font-semibold transition-colors duration-300 disabled:cursor-not-allowed motion-reduce:transition-none ${
+                selected
+                  ? "text-white"
+                  : enabled
+                    ? "text-primary/60 hover:text-primary"
+                    : "text-primary/25"
+              }`}
+            >
+              <ModalityIcon modality={option} className="h-[18px] w-[18px]" />
+              {MODALITY_LABEL[option]}
+            </button>
+          );
+        })}
+      </div>
+      {only && (
+        <p className="text-xs text-muted">
+          Este día se atiende solo de forma {only === "virtual" ? "virtual" : "presencial"}.
+        </p>
       )}
     </div>
   );
