@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PickerInput } from "@/components/picker-input";
 import type { DayOff } from "../_lib/types";
 import { addDays, dayKey, instant, shortDay, timeOf } from "../_lib/dates";
 import { btnPrimary, card, errorClass, focus, inputClass, labelClass } from "../_components/ui";
@@ -107,7 +108,7 @@ export function DaysOff({ blocks }: { blocks: DayOff[] }) {
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className={labelClass}>{allDay ? "Desde el" : "Día"}</span>
-            <input
+            <PickerInput
               type="date"
               value={from}
               required
@@ -121,7 +122,7 @@ export function DaysOff({ blocks }: { blocks: DayOff[] }) {
           {allDay ? (
             <label className="flex flex-col gap-1.5">
               <span className={labelClass}>Hasta el (inclusive)</span>
-              <input
+              <PickerInput
                 type="date"
                 value={to}
                 min={from}
@@ -134,11 +135,11 @@ export function DaysOff({ blocks }: { blocks: DayOff[] }) {
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">
                 <span className={labelClass}>Desde</span>
-                <input name="start_time" type="time" defaultValue="09:00" required className={inputClass} />
+                <PickerInput name="start_time" type="time" defaultValue="09:00" required className={inputClass} />
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className={labelClass}>Hasta</span>
-                <input name="end_time" type="time" defaultValue="10:00" required className={inputClass} />
+                <PickerInput name="end_time" type="time" defaultValue="10:00" required className={inputClass} />
               </label>
             </div>
           )}

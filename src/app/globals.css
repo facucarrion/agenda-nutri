@@ -266,3 +266,9 @@ body {
   background-size: 256px;
   opacity: 0.35;
 }
+
+/* Date and time fields: the browser's own picker icon is a Tab stop in
+   Chrome and Edge. It is hidden; PickerInput draws one that only takes clicks. */
+.picker-input::-webkit-calendar-picker-indicator {
+  display: none;
+}

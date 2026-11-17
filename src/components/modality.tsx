@@ -23,6 +23,7 @@ export function InPersonIcon({ className = "h-4 w-4" }: IconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
+      focusable="false"
       className={className}
     >
       <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
@@ -42,6 +43,7 @@ export function VirtualIcon({ className = "h-4 w-4" }: IconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
+      focusable="false"
       className={className}
     >
       <rect x="2.5" y="6" width="13" height="12" rx="2.5" />

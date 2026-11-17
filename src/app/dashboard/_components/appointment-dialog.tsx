@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { PhoneField } from "@/components/phone-field";
+import { PickerInput } from "@/components/picker-input";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { createAppointmentWithPatient, updateAppointment } from "../agenda/actions";
 import { dayKey, instant, timeOf } from "../_lib/dates";
@@ -220,7 +221,7 @@ export function AppointmentDialog({
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="flex flex-col gap-1.5">
                 <span className={labelClass}>Día</span>
-                <input
+                <PickerInput
                   name="date"
                   type="date"
                   required
@@ -230,7 +231,7 @@ export function AppointmentDialog({
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className={labelClass}>Hora</span>
-                <input
+                <PickerInput
                   name="time"
                   type="time"
                   step={300}
