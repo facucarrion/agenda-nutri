@@ -27,7 +27,7 @@ async function Agenda() {
 
 export default function AgendaPage() {
   return (
-    <main className="mx-auto w-full max-w-[1280px] px-4 pb-16 pt-8 sm:px-12 sm:pt-10">
+    <main className="mx-auto w-full max-w-[1280px] px-4 pb-12 pt-5 sm:px-12 sm:pt-6">
       <Suspense fallback={<p className="text-muted">Cargando agenda...</p>}>
         <Agenda />
       </Suspense>

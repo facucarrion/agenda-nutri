@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import type { WeeklyRule } from "../_lib/types";
+import { useRef, useState } from "react";
+import { PickerInput } from "@/components/picker-input";
+import { MODALITY_LABEL, ModalityIcon } from "@/components/modality";
+import type { RuleModality, WeeklyRule } from "../_lib/types";
 import { btnPrimary, card, errorClass, focus, inputClass, labelClass } from "../_components/ui";
 import { useRun } from "../_components/use-run";
 import { addAvailabilityRule, deleteAvailabilityRule } from "./actions";
@@ -17,8 +19,30 @@ const DAYS = [
   { day: 0, label: "Domingo", short: "Dom" },
 ];
 
+const MODALITIES: { value: RuleModality; label: string }[] = [
+  { value: "in_person", label: "Presencial" },
+  { value: "virtual", label: "Virtual" },
+  { value: "both", label: "Ambas" },
+];
+
+const pill = (on: boolean) =>
+  `h-9 min-w-12 rounded-full px-3 text-sm font-semibold transition-colors ${focus} ${
+    on ? "bg-primary text-white" : "border border-line bg-surface text-ink hover:border-primary"
+  }`;
+
 export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
   const [selected, setSelected] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [modality, setModality] = useState<RuleModality>("both");
+  // Swipe on the modality toggle: start point, and whether the swipe already
+  // picked an option (the click that follows it is then ignored).
+  const swipeX = useRef<number | null>(null);
+  const swiped = useRef(false);
+  const modalityIndex = MODALITIES.findIndex((m) => m.value === modality);
+
+  function stepModality(delta: number) {
+    const next = MODALITIES[modalityIndex + delta];
+    if (next) setModality(next.value);
+  }
   const { run, error, pending } = useRun();
 
   function toggle(day: number) {
@@ -36,6 +60,7 @@ export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
         data.set("weekday", String(day.day));
         data.set("start_time", start);
         data.set("end_time", end);
+        data.set("modality", modality);
         const result = await addAvailabilityRule(data);
         if (!result.ok) return { ok: false, error: `${day.label}: ${result.error}` };
       }
@@ -68,6 +93,10 @@ export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
                       key={r.id}
                       className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft py-1 pl-3 pr-1.5 text-sm font-medium text-primary"
                     >
+                      <span className="sr-only">{MODALITY_LABEL[r.modality]}: </span>
+                      <span title={MODALITY_LABEL[r.modality]} className="inline-flex">
+                        <ModalityIcon modality={r.modality} className="h-3.5 w-3.5" />
+                      </span>
                       {r.start_time} a {r.end_time} hs
                       <button
                         type="button"
@@ -102,13 +131,67 @@ export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
                   aria-pressed={on}
                   aria-label={label}
                   onClick={() => toggle(day)}
-                  className={`h-9 min-w-12 rounded-full px-3 text-sm font-semibold transition-colors ${focus} ${
-                    on
-                      ? "bg-primary text-white"
-                      : "border border-line bg-surface text-ink hover:border-primary"
-                  }`}
+                  className={pill(on)}
                 >
                   {short}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <fieldset className="flex flex-col gap-2">
+          <legend className={labelClass}>Modalidad</legend>
+          {/* Sliding toggle, same look as Mes | Semana in the agenda: tap an
+              option, swipe left or right, or use the arrow keys. */}
+          <div
+            role="radiogroup"
+            aria-label="Modalidad"
+            onPointerDown={(e) => {
+              swipeX.current = e.clientX;
+              swiped.current = false;
+            }}
+            onPointerUp={(e) => {
+              if (swipeX.current === null) return;
+              const dx = e.clientX - swipeX.current;
+              swipeX.current = null;
+              if (Math.abs(dx) <= 24) return;
+              swiped.current = true;
+              stepModality(dx > 0 ? 1 : -1);
+            }}
+            onPointerCancel={() => {
+              swipeX.current = null;
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowRight") stepModality(1);
+              if (e.key === "ArrowLeft") stepModality(-1);
+            }}
+            className="relative grid w-full max-w-md touch-pan-y select-none grid-cols-3 rounded-full border border-line bg-surface p-1"
+          >
+            <span
+              aria-hidden
+              style={{ transform: `translateX(${modalityIndex * 100}%)` }}
+              className="absolute inset-y-1 left-1 w-[calc((100%-8px)/3)] rounded-full bg-primary shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none"
+            />
+            {MODALITIES.map((m) => {
+              const on = modality === m.value;
+              return (
+                <button
+                  key={m.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  tabIndex={on ? 0 : -1}
+                  onClick={() => {
+                    if (swiped.current) swiped.current = false;
+                    else setModality(m.value);
+                  }}
+                  className={`relative z-10 inline-flex h-9 items-center justify-center gap-1.5 rounded-full px-2 text-sm font-semibold transition-colors duration-300 motion-reduce:transition-none ${focus} ${
+                    on ? "text-white" : "text-muted hover:text-ink"
+                  }`}
+                >
+                  <ModalityIcon modality={m.value} className="hidden h-4 w-4 shrink-0 min-[400px]:block" />
+                  {m.label}
                 </button>
               );
             })}
@@ -118,11 +201,11 @@ export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className={labelClass}>Desde</span>
-            <input name="start_time" type="time" defaultValue="09:00" required className={inputClass} />
+            <PickerInput name="start_time" type="time" defaultValue="09:00" required className={inputClass} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className={labelClass}>Hasta</span>
-            <input name="end_time" type="time" defaultValue="13:00" required className={inputClass} />
+            <PickerInput name="end_time" type="time" defaultValue="13:00" required className={inputClass} />
           </label>
         </div>
 

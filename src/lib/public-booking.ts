@@ -4,7 +4,13 @@ import { createHash, randomBytes } from "node:crypto";
 import { accessState } from "@/lib/access";
 import { POLICY_VERSION } from "@/lib/legal";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { computeSlots, parseDate } from "@/lib/slots";
+import {
+  computeSlotOptions,
+  modalityAllowed,
+  parseDate,
+  type Modality,
+  type SlotOption,
+} from "@/lib/slots";
 
 // Everything here runs with the service_role key (RLS bypassed), so each
 // function returns only what a stranger on the public link may see.
@@ -67,7 +73,7 @@ export async function getPublicProfile(slug: string) {
 }
 
 type SlotsResult =
-  | { ok: true; slots: string[]; timezone: string }
+  | { ok: true; slots: SlotOption[]; timezone: string }
   | { ok: false; error: string };
 
 export async function getPublicSlots(
@@ -109,7 +115,7 @@ export async function getPublicSlots(
   const [rules, blocks, appointments] = await Promise.all([
     admin
       .from("availability_rules")
-      .select("weekday, start_time, end_time")
+      .select("weekday, start_time, end_time, modality")
       .eq("nutritionist_id", profile.id),
     admin
       .from("availability_blocks")
@@ -134,7 +140,7 @@ export async function getPublicSlots(
     (b) => ({ start: new Date(b.starts_at), end: new Date(b.ends_at) }),
   );
 
-  const slots = computeSlots({
+  const slots = computeSlotOptions({
     rules: rules.data ?? [],
     busy,
     timezone: profile.timezone,
@@ -157,6 +163,8 @@ export type BookingInput = {
   lastName: string;
   email: string;
   phone: string;
+  /** "in_person" or "virtual"; required when the slot allows both. */
+  modality: string;
   /** The patient accepted the privacy notice. */
   consent: boolean;
 };
@@ -230,8 +238,33 @@ export async function createPublicBooking(
     localDate,
     localDate,
   );
-  if (!offered.ok || !offered.slots.includes(startsAt.toISOString())) {
+  const offeredSlot = offered.ok
+    ? offered.slots.find((s) => s.starts_at === startsAt.toISOString())
+    : undefined;
+  if (!offeredSlot) {
     return { ok: false, error: "Ese horario ya no está disponible." };
+  }
+
+  // A window attended only one way fixes the modality; one that allows both
+  // needs the patient's choice.
+  let modality: Modality;
+  if (input.modality === "in_person" || input.modality === "virtual") {
+    if (!modalityAllowed(offeredSlot.modality, input.modality)) {
+      return {
+        ok: false,
+        error:
+          offeredSlot.modality === "virtual"
+            ? "Ese horario es solo virtual."
+            : "Ese horario es solo presencial.",
+      };
+    }
+    modality = input.modality;
+  } else if (input.modality) {
+    return { ok: false, error: "Modalidad inválida." };
+  } else if (offeredSlot.modality !== "both") {
+    modality = offeredSlot.modality;
+  } else {
+    return { ok: false, error: "Elegí si el turno es presencial o virtual." };
   }
 
   // Reuse the patient by email; never overwrite an existing ficha from the
@@ -294,6 +327,7 @@ export async function createPublicBooking(
       nutritionist_id: profile.id,
       patient_id: patientId,
       appointment_type_id: type.id,
+      modality,
       starts_at: startsAt.toISOString(),
       ends_at: endsAt.toISOString(),
       status: "pending",

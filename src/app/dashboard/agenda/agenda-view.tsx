@@ -108,18 +108,18 @@ export function AgendaView({
 
   return (
     <>
-      <h1 className="text-[34px] font-bold leading-tight tracking-tight sm:text-[40px]">
+      <h1 className="text-[26px] font-bold leading-tight tracking-tight sm:text-[30px]">
         Agenda
       </h1>
-      <p className="mt-1 text-muted">{subtitle}</p>
+      <p className="mt-0.5 text-sm text-muted">{subtitle}</p>
       {error && (
         <p role="alert" className="mt-4 rounded-xl bg-bad-soft px-4 py-3 text-sm text-bad">
           {error}
         </p>
       )}
 
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_270px]">
-        <section className="min-w-0 rounded-[24px] border border-line bg-surface p-4 sm:p-6">
+      <div className="mt-4 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_270px]">
+        <section className="min-w-0 rounded-[24px] border border-line bg-surface p-3 sm:p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 sm:gap-3">
               <button type="button" className={iconButton} onClick={() => move(-1)} aria-label={view === "month" ? "Mes anterior" : "Semana anterior"}>
@@ -166,7 +166,7 @@ export function AgendaView({
             </div>
           </div>
 
-          <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted">
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted">
             {LEGEND[view].map((item) => (
               <li key={item.label} className="flex items-center gap-2">
                 <span className={item.mark} />
@@ -175,7 +175,7 @@ export function AgendaView({
             ))}
           </ul>
 
-          <div className="mt-5">
+          <div className="mt-3">
             {view === "month" ? (
               <MonthGrid month={anchor.slice(0, 7)} info={info} selected={selected} onSelect={setSelected} />
             ) : (

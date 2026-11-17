@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { PhoneField } from "@/components/phone-field";
+import { PickerInput } from "@/components/picker-input";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { createAppointmentWithPatient, updateAppointment } from "../agenda/actions";
 import { dayKey, instant, timeOf } from "../_lib/dates";
-import type { DashboardAppointment, TypeOption } from "../_lib/types";
-import { btnPrimary, btnSecondary, errorClass, inputClass, labelClass } from "./ui";
+import { MODALITY_LABEL, ModalityIcon } from "@/components/modality";
+import type { DashboardAppointment, Modality, TypeOption } from "../_lib/types";
+import { btnPrimary, btnSecondary, errorClass, focus, inputClass, labelClass } from "./ui";
 
 export type DialogState =
   | { mode: "create"; day: string }
@@ -31,6 +33,7 @@ export function AppointmentDialog({
   // kept so the choice can be sent with it.
   const [conflict, setConflict] = useState<{ patientName: string; data: FormData } | null>(null);
   const editing = state.mode === "edit" ? state.appointment : null;
+  const [modality, setModality] = useState<Modality>(editing?.modality ?? "in_person");
 
   useEffect(() => {
     ref.current?.showModal();
@@ -67,6 +70,7 @@ export function AppointmentDialog({
     const data = new FormData();
     data.set("appointment_type_id", field("type"));
     data.set("starts_at", instant(date, time));
+    data.set("modality", modality);
 
     if (editing) {
       data.set("patient_id", editing.patient_id);
@@ -123,7 +127,7 @@ export function AppointmentDialog({
           </h2>
           <p className="mt-1 text-sm text-muted">
             {editing
-              ? "Cambiá el día, la hora o el servicio."
+              ? "Cambiá el día, la hora, el servicio o la modalidad."
               : "Cargá un turno que pediste por teléfono o en persona. Queda confirmado."}
           </p>
         </div>
@@ -185,10 +189,39 @@ export function AppointmentDialog({
               </select>
             </label>
 
+            <fieldset className="flex flex-col gap-1.5">
+              <legend className={`${labelClass} mb-1.5`}>Modalidad</legend>
+              <div role="radiogroup" aria-label="Modalidad" className="flex flex-wrap gap-2">
+                {(["in_person", "virtual"] as const).map((m) => {
+                  const on = modality === m;
+                  return (
+                    <button
+                      key={m}
+                      type="button"
+                      role="radio"
+                      aria-checked={on}
+                      onClick={() => {
+                        setModality(m);
+                        setConflict(null);
+                      }}
+                      className={`inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-colors ${focus} ${
+                        on
+                          ? "bg-primary text-white"
+                          : "border border-line bg-surface text-ink hover:border-primary"
+                      }`}
+                    >
+                      <ModalityIcon modality={m} className="h-4 w-4" />
+                      {MODALITY_LABEL[m]}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="flex flex-col gap-1.5">
                 <span className={labelClass}>Día</span>
-                <input
+                <PickerInput
                   name="date"
                   type="date"
                   required
@@ -198,7 +231,7 @@ export function AppointmentDialog({
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className={labelClass}>Hora</span>
-                <input
+                <PickerInput
                   name="time"
                   type="time"
                   step={300}

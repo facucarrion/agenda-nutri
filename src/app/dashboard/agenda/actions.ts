@@ -21,6 +21,16 @@ function refresh() {
   revalidatePath("/dashboard/turnos");
 }
 const OVERLAP = "23P01"; // exclusion_violation
+const MODALITIES = ["in_person", "virtual"] as const;
+type Modality = (typeof MODALITIES)[number];
+
+// "" means the form did not send it (kept as is when editing).
+function modalityOf(formData: FormData): Modality | null | "invalid" {
+  const value = text(formData, "modality");
+  if (!value) return null;
+  return (MODALITIES as readonly string[]).includes(value) ? (value as Modality) : "invalid";
+}
+
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -46,6 +56,7 @@ type Parsed =
       patientId: string;
       typeId: string;
       startsAt: Date;
+      modality: Modality | null;
       notes: string | null;
     }
   | { error: string };
@@ -55,12 +66,14 @@ function parse(formData: FormData): Parsed {
   const typeId = text(formData, "appointment_type_id");
   const startsAt = new Date(text(formData, "starts_at"));
   const notes = text(formData, "notes", 2000);
+  const modality = modalityOf(formData);
 
+  if (modality === "invalid") return { error: "Modalidad inválida." };
   if (!UUID_RE.test(patientId)) return { error: "Elegí un paciente." };
   if (!UUID_RE.test(typeId)) return { error: "Elegí un tipo de consulta." };
   if (Number.isNaN(startsAt.getTime())) return { error: "Fecha u hora inválida." };
 
-  return { patientId, typeId, startsAt, notes: notes || null };
+  return { patientId, typeId, startsAt, modality, notes: notes || null };
 }
 
 // The end time comes from the consultation type, never from the client.
@@ -90,7 +103,13 @@ type Supabase = Awaited<ReturnType<typeof createClient>>;
 async function insertManualAppointment(
   supabase: Supabase,
   userId: string,
-  input: { patientId: string; typeId: string; startsAt: Date; notes: string | null },
+  input: {
+    patientId: string;
+    typeId: string;
+    startsAt: Date;
+    modality: Modality | null;
+    notes: string | null;
+  },
 ): Promise<AppointmentResult> {
   const end = await endsAtFor(supabase, input.typeId, input.startsAt);
   if ("error" in end) return { ok: false, error: end.error };
@@ -101,6 +120,7 @@ async function insertManualAppointment(
       nutritionist_id: userId,
       patient_id: input.patientId,
       appointment_type_id: input.typeId,
+      modality: input.modality,
       starts_at: input.startsAt.toISOString(),
       ends_at: end.endsAt.toISOString(),
       status: "confirmed",
@@ -161,12 +181,14 @@ export async function createAppointmentWithPatient(
   const typeId = text(formData, "appointment_type_id");
   const startsAt = new Date(text(formData, "starts_at"));
   const choice = text(formData, "patient_choice");
+  const modality = modalityOf(formData);
 
   if (!firstName || !lastName) return { ok: false, error: "Completá nombre y apellido." };
   if (!PHONE_RE.test(phone)) return { ok: false, error: "Completá un teléfono válido." };
   if (typedEmail && !EMAIL_RE.test(typedEmail)) return { ok: false, error: "El email no es válido." };
   if (!UUID_RE.test(typeId)) return { ok: false, error: "Elegí un tipo de consulta." };
   if (Number.isNaN(startsAt.getTime())) return { ok: false, error: "Fecha u hora inválida." };
+  if (modality === "invalid") return { ok: false, error: "Modalidad inválida." };
   if (choice && choice !== "existing" && choice !== "new") {
     return { ok: false, error: "Opción inválida." };
   }
@@ -240,6 +262,7 @@ export async function createAppointmentWithPatient(
     patientId,
     typeId,
     startsAt,
+    modality,
     notes: null,
   });
 
@@ -285,6 +308,7 @@ export async function updateAppointment(
       appointment_type_id: parsed.typeId,
       starts_at: parsed.startsAt.toISOString(),
       ends_at: end.endsAt.toISOString(),
+      ...(parsed.modality ? { modality: parsed.modality } : {}),
       // Notes change only when the form sends them, so a form without the
       // field (like the edit dialog) does not erase them.
       ...(formData.has("notes") ? { notes: parsed.notes } : {}),

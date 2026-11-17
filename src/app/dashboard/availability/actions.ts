@@ -12,6 +12,8 @@ function refresh() {
 }
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const OVERLAP_CODE = "23P01"; // exclusion_violation
+const RULE_MODALITIES = ["in_person", "virtual", "both"] as const;
+type RuleModality = (typeof RULE_MODALITIES)[number];
 
 function text(formData: FormData, name: string) {
   const value = formData.get(name);
@@ -47,7 +49,12 @@ export async function addAvailabilityRule(
   const weekday = int(formData, "weekday");
   const start = text(formData, "start_time");
   const end = text(formData, "end_time");
+  // Older clients do not send it: the window allows both, as before.
+  const modality = (text(formData, "modality") || "both") as RuleModality;
 
+  if (!RULE_MODALITIES.includes(modality)) {
+    return { ok: false, error: "Modalidad inválida." };
+  }
   if (!(weekday >= 0 && weekday <= 6)) {
     return { ok: false, error: "Día inválido." };
   }
@@ -66,6 +73,7 @@ export async function addAvailabilityRule(
     weekday,
     start_time: start,
     end_time: end,
+    modality,
   });
 
   return done(error, "Ese horario se superpone con otro del mismo día.");

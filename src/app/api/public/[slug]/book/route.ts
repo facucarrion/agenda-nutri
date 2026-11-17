@@ -12,7 +12,7 @@ function tooMany(retryAfter: number) {
 }
 
 // POST /api/public/:slug/book
-// body: { type, starts_at, first_name, last_name, email, phone, website? }
+// body: { type, starts_at, modality, first_name, last_name, email, phone, website? }
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -64,6 +64,7 @@ export async function POST(
     lastName: str("last_name"),
     email: str("email"),
     phone: str("phone"),
+    modality: str("modality"),
     consent: body.consent === true,
   });
 

@@ -17,7 +17,7 @@ const DAYS_AHEAD = 120;
 const PAGE = 1000;
 
 const SELECT =
-  "id, starts_at, ends_at, status, source, notes, patient_id, appointment_type_id, whatsapp_reminded_at, patients(first_name, last_name, phone), appointment_types(name, duration_minutes)";
+  "id, starts_at, ends_at, status, source, modality, notes, patient_id, appointment_type_id, whatsapp_reminded_at, patients(first_name, last_name, phone), appointment_types(name, duration_minutes)";
 
 // RLS limits the rows to the signed-in nutritionist. Unconfirmed public
 // bookings that already expired are left out: they no longer hold the slot.
@@ -56,6 +56,7 @@ export async function getAppointments(now: Date): Promise<DashboardAppointment[]
       ends_at: endsAt.toISOString(),
       status: row.status,
       source: row.source,
+      modality: row.modality,
       notes: row.notes,
       patient_id: row.patient_id,
       appointment_type_id: row.appointment_type_id,
@@ -177,7 +178,7 @@ export async function getAvailability(now: Date): Promise<AvailabilityData> {
     supabase.from("nutritionists").select("slug, slot_minutes, min_notice_hours").single(),
     supabase
       .from("availability_rules")
-      .select("id, weekday, start_time, end_time")
+      .select("id, weekday, start_time, end_time, modality")
       .order("weekday")
       .order("start_time"),
     supabase
@@ -204,6 +205,7 @@ export async function getAvailability(now: Date): Promise<AvailabilityData> {
       weekday: r.weekday,
       start_time: hhmm(r.start_time),
       end_time: hhmm(r.end_time),
+      modality: r.modality,
     })),
     blocks: blocks.data.map((b) => ({
       id: b.id,

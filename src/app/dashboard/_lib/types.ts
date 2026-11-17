@@ -9,12 +9,18 @@ export type AppointmentStatus =
   | "completed"
   | "no_show";
 
+import type { Modality, RuleModality } from "@/components/modality";
+
+// How a turno takes place, and what a weekly window allows.
+export type { Modality, RuleModality };
+
 export type DashboardAppointment = {
   id: string;
   starts_at: string; // UTC ISO
   ends_at: string; // UTC ISO
   status: AppointmentStatus;
   source: "manual" | "public";
+  modality: Modality | null; // null: booked before modality existed
   notes: string | null;
   patient_id: string;
   appointment_type_id: string | null;
@@ -45,6 +51,7 @@ export type WeeklyRule = {
   weekday: number; // 0 = Sunday ... 6 = Saturday (as stored)
   start_time: string; // HH:MM
   end_time: string; // HH:MM
+  modality: RuleModality;
 };
 
 export type DayOff = {
