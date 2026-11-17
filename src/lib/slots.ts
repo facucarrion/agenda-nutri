@@ -1,6 +1,22 @@
 // Pure slot generation: no I/O, so it is easy to test.
 
-export type Rule = { weekday: number; start_time: string; end_time: string };
+export type Modality = "in_person" | "virtual";
+/** What a weekly window allows. Rules without it allow both. */
+export type RuleModality = Modality | "both";
+
+export type Rule = {
+  weekday: number;
+  start_time: string;
+  end_time: string;
+  modality?: RuleModality;
+};
+
+export type SlotOption = { starts_at: string; modality: RuleModality };
+
+/** Whether a slot that allows `allowed` can be booked as `chosen`. */
+export function modalityAllowed(allowed: RuleModality, chosen: Modality) {
+  return allowed === "both" || allowed === chosen;
+}
 export type Busy = { start: Date; end: Date };
 
 export type SlotInput = {
@@ -71,13 +87,19 @@ export function zonedToUtc(
 }
 
 export function computeSlots(input: SlotInput): string[] {
+  return computeSlotOptions(input).map((s) => s.starts_at);
+}
+
+// Same as computeSlots, plus the modality each start time allows (taken from
+// the weekly window it belongs to; windows of one day never overlap).
+export function computeSlotOptions(input: SlotInput): SlotOption[] {
   const from = parseDate(input.fromDate);
   const to = parseDate(input.toDate);
   if (!from || !to) return [];
 
   const earliest = input.now.getTime() + input.minNoticeHours * 3_600_000;
   const durationMs = input.durationMinutes * 60_000;
-  const slots: string[] = [];
+  const slots: SlotOption[] = [];
 
   const end = Date.UTC(to.y, to.mo - 1, to.d);
   for (
@@ -111,10 +133,15 @@ export function computeSlots(input: SlotInput): string[] {
         const clash = input.busy.some(
           (b) => startMs < b.end.getTime() && endMs > b.start.getTime(),
         );
-        if (!clash) slots.push(start.toISOString());
+        if (!clash) {
+          slots.push({
+            starts_at: start.toISOString(),
+            modality: rule.modality ?? "both",
+          });
+        }
       }
     }
   }
 
-  return slots.sort();
+  return slots.sort((a, b) => a.starts_at.localeCompare(b.starts_at));
 }

@@ -48,6 +48,7 @@ export type Database = {
           created_at: string
           ends_at: string
           id: string
+          modality: Database["public"]["Enums"]["appointment_modality"] | null
           notes: string | null
           nutritionist_id: string
           patient_id: string
@@ -64,6 +65,7 @@ export type Database = {
           created_at?: string
           ends_at: string
           id?: string
+          modality?: Database["public"]["Enums"]["appointment_modality"] | null
           notes?: string | null
           nutritionist_id: string
           patient_id: string
@@ -80,6 +82,7 @@ export type Database = {
           created_at?: string
           ends_at?: string
           id?: string
+          modality?: Database["public"]["Enums"]["appointment_modality"] | null
           notes?: string | null
           nutritionist_id?: string
           patient_id?: string
@@ -185,6 +188,7 @@ export type Database = {
         Row: {
           end_time: string
           id: string
+          modality: Database["public"]["Enums"]["availability_modality"]
           nutritionist_id: string
           start_time: string
           weekday: number
@@ -192,6 +196,7 @@ export type Database = {
         Insert: {
           end_time: string
           id?: string
+          modality?: Database["public"]["Enums"]["availability_modality"]
           nutritionist_id: string
           start_time: string
           weekday: number
@@ -199,6 +204,7 @@ export type Database = {
         Update: {
           end_time?: string
           id?: string
+          modality?: Database["public"]["Enums"]["availability_modality"]
           nutritionist_id?: string
           start_time?: string
           weekday?: number
@@ -373,6 +379,7 @@ export type Database = {
       }
     }
     Enums: {
+      appointment_modality: "in_person" | "virtual"
       appointment_source: "manual" | "public"
       appointment_status:
         | "pending"
@@ -380,6 +387,7 @@ export type Database = {
         | "cancelled"
         | "completed"
         | "no_show"
+      availability_modality: "in_person" | "virtual" | "both"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -402,6 +410,7 @@ export type Enums<T extends keyof Database["public"]["Enums"]> =
 export const Constants = {
   public: {
     Enums: {
+      appointment_modality: ["in_person", "virtual"],
       appointment_source: ["manual", "public"],
       appointment_status: [
         "pending",
@@ -410,6 +419,7 @@ export const Constants = {
         "completed",
         "no_show",
       ],
+      availability_modality: ["in_person", "virtual", "both"],
     },
   },
 } as const

@@ -107,7 +107,7 @@ Actions en `src/app/dashboard/availability/actions.ts`. Resultado: `{ ok: true }
 
 | Action | Campos |
 |---|---|
-| `addAvailabilityRule(formData)` | `weekday` (0 = domingo … 6 = sábado), `start_time`, `end_time` en `HH:MM` |
+| `addAvailabilityRule(formData)` | `weekday` (0 = domingo … 6 = sábado), `start_time`, `end_time` en `HH:MM`, `modality` (`in_person`, `virtual` o `both`; por defecto `both`) |
 | `deleteAvailabilityRule(id)` | – |
 | `addAvailabilityBlock(formData)` | `starts_at`, `ends_at` (ISO **con offset**, ej. `2026-12-24T00:00:00-03:00`), `reason` (opcional) |
 | `deleteAvailabilityBlock(id)` | – |
@@ -122,6 +122,7 @@ Actions en `src/app/dashboard/availability/actions.ts`. Resultado: `{ ok: true }
 - Se permiten varios bloques por día (ej. 09:00–13:00 y 15:00–18:00), pero **no superpuestos**: devuelve "Ese horario se superpone con otro del mismo día".
 - `slot_minutes` es cada cuánto arranca un turno posible; la **duración** de cada consulta sale del tipo.
 - `min_notice_hours` es la anticipación mínima para reservas públicas (por defecto 12).
+- `modality` dice cómo se atiende en ese horario: solo presencial, solo virtual o ambas. La reserva pública solo deja elegir lo que el horario permite.
 
 **Lecturas**: no hay helpers; leé directo con el cliente de servidor (RLS filtra por profesional):
 
@@ -140,9 +141,9 @@ Actions en `src/app/dashboard/agenda/actions.ts`. Resultado: `{ ok: true, id } |
 
 | Action | Campos |
 |---|---|
-| `createAppointment(formData)` | `patient_id`, `appointment_type_id`, `starts_at` (ISO con offset), `notes` (opcional) |
-| `createAppointmentWithPatient(formData)` | turno a mano cargando al paciente en el momento: `first_name`, `last_name`, `phone` (obligatorios), `email` (opcional), `appointment_type_id`, `starts_at`. Guarda solo esos datos de contacto y nunca pisa una ficha. Reutiliza al paciente si coinciden email y nombre (sin distinguir mayúsculas ni tildes), o, sin email, teléfono y nombre. Si el email es de un paciente con otro nombre, no guarda nada y devuelve `{ ok: false, error, conflict: { patientName } }`; se vuelve a mandar con `patient_choice`: `"existing"` (el turno va a ese paciente) o `"new"` (paciente nuevo sin email) |
-| `updateAppointment(id, formData)` | mismos campos; solo turnos activos (pendientes o confirmados). Si no se manda `notes`, se conservan las actuales. Acepta el tipo de consulta actual del turno aunque esté pausado |
+| `createAppointment(formData)` | `patient_id`, `appointment_type_id`, `starts_at` (ISO con offset), `modality` (`in_person` o `virtual`, opcional), `notes` (opcional) |
+| `createAppointmentWithPatient(formData)` | turno a mano cargando al paciente en el momento: `first_name`, `last_name`, `phone` (obligatorios), `email` (opcional), `appointment_type_id`, `starts_at`, `modality` (opcional). Guarda solo esos datos de contacto y nunca pisa una ficha. Reutiliza al paciente si coinciden email y nombre (sin distinguir mayúsculas ni tildes), o, sin email, teléfono y nombre. Si el email es de un paciente con otro nombre, no guarda nada y devuelve `{ ok: false, error, conflict: { patientName } }`; se vuelve a mandar con `patient_choice`: `"existing"` (el turno va a ese paciente) o `"new"` (paciente nuevo sin email) |
+| `updateAppointment(id, formData)` | mismos campos; solo turnos activos (pendientes o confirmados). Si no se manda `notes` o `modality`, se conservan los actuales. Acepta el tipo de consulta actual del turno aunque esté pausado |
 | `confirmAppointment(id)` | confirma a mano un pedido pendiente que todavía no venció (por ejemplo tras un llamado); el paciente también puede confirmarlo con el link del email |
 | `cancelAppointment(id)` | libera el horario |
 | `completeAppointment(id)` | marca como atendido |
@@ -160,12 +161,12 @@ Actions en `src/app/dashboard/agenda/actions.ts`. Resultado: `{ ok: true, id } |
 
 ```ts
 const turnos = await listAppointments(desde, hasta); // Date, Date (hasta excluido)
-// cada item: id, starts_at, ends_at, status, source, notes, patient_id,
+// cada item: id, starts_at, ends_at, status, source, modality, notes, patient_id,
 // appointment_type_id, patients { first_name, last_name, phone },
 // appointment_types { name, duration_minutes }
 ```
 
-Estados: `pending` (reserva pública sin confirmar), `confirmed`, `cancelled`, `completed`, `no_show`. Origen: `manual` o `public`. Los `pending` vencen a los 30 minutos y liberan el horario.
+Estados: `pending` (reserva pública sin confirmar), `confirmed`, `cancelled`, `completed`, `no_show`. Origen: `manual` o `public`. Modalidad: `in_person`, `virtual` o `null` (turnos anteriores a la columna). Los `pending` vencen a los 30 minutos y liberan el horario.
 
 ## 6. Reserva pública (sin login)
 
@@ -188,12 +189,15 @@ Solo expone el nombre, la timezone y los tipos de consulta activos.
 Query: `type` (uuid del tipo), `from` y `to` (`YYYY-MM-DD`, fechas locales del profesional, máximo 31 días).
 
 ```json
-200 { "slots": ["2026-10-19T12:00:00.000Z", "..."], "timezone": "America/Argentina/Buenos_Aires" }
+200 {
+  "slots": [{ "starts_at": "2026-10-19T12:00:00.000Z", "modality": "both" }, "..."],
+  "timezone": "America/Argentina/Buenos_Aires"
+}
 400 { "error": "Tipo de consulta inválido." }
 429 { "error": "Demasiados pedidos. Probá de nuevo en un minuto." }
 ```
 
-Los `slots` vienen en UTC: mostralos en la `timezone` devuelta, no en la del navegador.
+Los `slots` vienen en UTC: mostralos en la `timezone` devuelta, no en la del navegador. `modality` es lo que permite el horario de atención de ese slot: `in_person`, `virtual` o `both`.
 
 ### `POST /api/public/:slug/book`
 
@@ -201,6 +205,7 @@ Los `slots` vienen en UTC: mostralos en la `timezone` devuelta, no en la del nav
 {
   "type": "<uuid del tipo>",
   "starts_at": "<uno de los slots devueltos>",
+  "modality": "in_person",
   "first_name": "Ana",
   "last_name": "Pérez",
   "email": "ana@correo.com",
@@ -221,6 +226,7 @@ Los `slots` vienen en UTC: mostralos en la `timezone` devuelta, no en la del nav
 **Obligatorio en el formulario**
 
 - `consent` debe ser el **booleano `true`**, desde una casilla que diga que acepta la [política de privacidad](/privacidad) y los [términos](/terminos) (con links).
+- `modality` (`in_person` o `virtual`) es obligatorio cuando el slot permite `both`; si el slot es de una sola modalidad se puede omitir y se usa esa. Una modalidad que el horario no permite devuelve `409`.
 - `website` es un campo **oculto y vacío** (honeypot contra bots). No lo muestres ni lo autocompletes.
 
 ### Confirmación

@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
-import { computeSlots, zonedToUtc } from "../src/lib/slots.ts";
+import {
+  computeSlotOptions,
+  computeSlots,
+  modalityAllowed,
+  zonedToUtc,
+} from "../src/lib/slots.ts";
 
 const tz = "America/Argentina/Buenos_Aires"; // UTC-3, no DST
 
@@ -59,5 +64,27 @@ assert.deepEqual(computeSlots({ ...base, fromDate: "2030-01-08", toDate: "2030-0
 
 // invalid date
 assert.deepEqual(computeSlots({ ...base, fromDate: "2030-13-40" }), []);
+
+// modality comes from the window each slot belongs to; missing means both
+const options = computeSlotOptions({
+  ...base,
+  rules: [
+    { weekday: 1, start_time: "09:00", end_time: "10:00", modality: "in_person" as const },
+    { weekday: 1, start_time: "15:00", end_time: "15:30", modality: "virtual" as const },
+    { weekday: 1, start_time: "18:00", end_time: "18:30" },
+  ],
+});
+assert.deepEqual(options, [
+  { starts_at: "2030-01-07T12:00:00.000Z", modality: "in_person" },
+  { starts_at: "2030-01-07T12:30:00.000Z", modality: "in_person" },
+  { starts_at: "2030-01-07T18:00:00.000Z", modality: "virtual" },
+  { starts_at: "2030-01-07T21:00:00.000Z", modality: "both" },
+]);
+
+assert.equal(modalityAllowed("both", "virtual"), true);
+assert.equal(modalityAllowed("both", "in_person"), true);
+assert.equal(modalityAllowed("virtual", "virtual"), true);
+assert.equal(modalityAllowed("virtual", "in_person"), false);
+assert.equal(modalityAllowed("in_person", "virtual"), false);
 
 console.log("slots: all tests passed");

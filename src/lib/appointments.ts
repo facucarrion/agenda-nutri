@@ -8,7 +8,7 @@ export async function listAppointments(from: Date, to: Date) {
   const { data, error } = await supabase
     .from("appointments")
     .select(
-      "id, starts_at, ends_at, status, source, notes, patient_id, appointment_type_id, patients(first_name, last_name, phone), appointment_types(name, duration_minutes)",
+      "id, starts_at, ends_at, status, source, modality, notes, patient_id, appointment_type_id, patients(first_name, last_name, phone), appointment_types(name, duration_minutes)",
     )
     .gte("starts_at", from.toISOString())
     .lt("starts_at", to.toISOString())
