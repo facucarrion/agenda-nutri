@@ -2,6 +2,7 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { ensureAal2 } from "@/lib/mfa";
 import { passwordError } from "@/lib/password";
 import { createClient } from "@/lib/supabase/server";
 import { SESSION_ONLY_COOKIE } from "@/lib/supabase/session-cookie";
@@ -11,6 +12,8 @@ export type AuthState = {
   message?: string;
   // Echoed back so the form keeps what the user typed.
   email?: string;
+  // The account has two-step verification: the form asks for the code.
+  needsMfa?: boolean;
 };
 
 export type ResetState = { error?: string; sentTo?: string; sentAt?: number };
@@ -175,10 +178,18 @@ export async function updatePassword(
     return { error: "expired" };
   }
 
+  // The recovery link opens an aal1 session; an account with two-step
+  // verification also has to enter its code.
+  const mfa = await ensureAal2(supabase, formData);
+  if (!mfa.ok) return { error: mfa.error, needsMfa: true };
+
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {
     if (error.code === "same_password") {
       return { error: "Elegí una contraseña distinta de la anterior." };
+    }
+    if (error.code === "weak_password") {
+      return { error: "Elegí una contraseña más segura." };
     }
     return { error: "No pudimos guardar la contraseña. Intentá de nuevo." };
   }
