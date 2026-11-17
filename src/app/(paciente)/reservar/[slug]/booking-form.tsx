@@ -272,7 +272,11 @@ export function BookingForm({
         : null;
 
   const summary = (
-    <section className={`${card} flex flex-1 flex-col gap-3.5 !p-6`}>
+    <section
+      className={`${card} flex flex-1 flex-col gap-3.5 !p-6 ${
+        step === 1 ? "xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:!p-5" : ""
+      }`}
+    >
       <h2 className="text-lg font-semibold">Tu turno</h2>
       <SummaryRow label="Servicio" value={type.name} />
       <SummaryRow label="Modalidad" value={day ? MODALITY_LABEL[mode] : "—"} />
@@ -330,15 +334,30 @@ export function BookingForm({
   );
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold sm:text-[40px] sm:leading-tight">
-          {title}
-        </h1>
-        {subtitle && <p className="text-[17px] text-muted">{subtitle}</p>}
-      </div>
+    // On wide screens step 1 fits the window (header 69px + page padding
+    // 40px), so the patient sees everything without scrolling. Below the
+    // minimum height, or on narrower screens, the page scrolls as usual.
+    <div
+      className={`flex flex-col gap-6 ${
+        step === 1
+          ? "xl:h-[min(calc(100dvh-110px),700px)] xl:min-h-[520px] xl:gap-5"
+          : ""
+      }`}
+    >
+      <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between xl:gap-8">
+        <div className="flex flex-col gap-2 xl:gap-1">
+          <h1 className="text-3xl font-bold sm:text-[40px] sm:leading-tight xl:text-[32px]">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="text-[17px] text-muted xl:text-[15px]">{subtitle}</p>
+          )}
+        </div>
 
-      <Stepper current={step} allDone={step === 3} />
+        <div className="xl:shrink-0 xl:pb-1">
+          <Stepper current={step} allDone={step === 3} />
+        </div>
+      </div>
 
       {step === 3 && slot ? (
         <section className="mx-auto flex w-full max-w-[640px] flex-col items-center gap-[18px] rounded-3xl border border-line bg-surface p-6 sm:p-10">
@@ -369,11 +388,24 @@ export function BookingForm({
           </button>
         </section>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_392px]">
+        <div
+          className={`grid gap-6 lg:grid-cols-[minmax(0,1fr)_392px] ${
+            // Three columns (calendar | horarios | resumen) that share the
+            // remaining height; each one scrolls inside if it ever needs to.
+            step === 1
+              ? "xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_300px_300px] xl:grid-rows-[minmax(0,1fr)] xl:gap-5"
+              : ""
+          }`}
+        >
           {step === 1 ? (
-            <div className="flex flex-col gap-6">
-              <section className={`${card} flex flex-col gap-4`}>
-                <h2 className="text-lg font-semibold">1 · Elegí el servicio</h2>
+            // On xl the two cards merge into one, so they fit in one column.
+            <div className="flex flex-col gap-6 xl:min-h-0 xl:gap-4 xl:rounded-[20px] xl:border xl:border-line xl:bg-surface xl:p-5">
+              <section
+                className={`${card} flex flex-col gap-4 xl:flex-row xl:items-center xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0`}
+              >
+                <h2 className="text-lg font-semibold xl:shrink-0 xl:text-base">
+                  1 · Elegí el servicio
+                </h2>
                 <ServiceSelect
                   types={profile.types}
                   value={type.id}
@@ -381,8 +413,12 @@ export function BookingForm({
                 />
               </section>
 
-              <section className={`${card} flex flex-1 flex-col gap-5`}>
-                <h2 className="text-lg font-semibold">2 · Elegí día y horario</h2>
+              <section
+                className={`${card} flex flex-1 flex-col gap-5 xl:min-h-0 xl:gap-3 xl:rounded-none xl:border-x-0 xl:border-b-0 xl:bg-transparent xl:px-0 xl:pb-0 xl:pt-4`}
+              >
+                <h2 className="text-lg font-semibold xl:text-base">
+                  2 · Elegí día y horario
+                </h2>
 
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -416,7 +452,8 @@ export function BookingForm({
                   </p>
                 ) : (
                   <div
-                    className={`grid grid-cols-7 gap-1.5 transition-opacity ${
+                    // On xl the weeks grow with the card, up to 56px each.
+                    className={`grid grid-cols-7 gap-1.5 transition-opacity xl:min-h-0 xl:flex-1 xl:auto-rows-[minmax(0,56px)] xl:grid-rows-[auto] xl:gap-1 ${
                       loading ? "opacity-50" : ""
                     }`}
                     aria-busy={loading}
@@ -448,7 +485,7 @@ export function BookingForm({
                             setDay(key);
                             setSlot(null);
                           }}
-                          className={`flex h-14 flex-col items-start gap-1.5 rounded-xl p-2 text-left transition-colors sm:h-16 sm:p-2.5 ${
+                          className={`flex h-14 flex-col items-start gap-1.5 rounded-xl p-2 text-left transition-colors sm:h-16 sm:p-2.5 xl:h-auto xl:min-h-0 xl:flex-row xl:items-center xl:justify-between xl:px-2.5 xl:py-1 ${
                             selected
                               ? "border-2 border-primary bg-primary-soft"
                               : selectable
@@ -555,9 +592,9 @@ export function BookingForm({
             </form>
           )}
 
-          <div className="flex flex-col gap-6">
+          <div className={`flex flex-col gap-6 ${step === 1 ? "xl:contents" : ""}`}>
             {step === 1 && (
-              <section className={`${card} flex flex-col gap-4 !p-6`}>
+              <section className={`${card} flex flex-col gap-4 !p-6 xl:min-h-0 xl:gap-3 xl:!p-5`}>
                 <div className="flex flex-col gap-1">
                   <h2 className="text-lg font-semibold">
                     {day ? formatDay(day) : "Horarios"}
@@ -569,14 +606,14 @@ export function BookingForm({
                   </p>
                 </div>
                 {day && (
-                  <div className="grid max-h-56 grid-cols-2 gap-3 overflow-y-auto pr-1">
+                  <div className="grid max-h-56 grid-cols-2 gap-3 overflow-y-auto pr-1 xl:max-h-none xl:min-h-0 xl:flex-1 xl:content-start xl:gap-2.5">
                     {daySlots.map((s) => (
                       <button
                         key={s.starts_at}
                         type="button"
                         aria-pressed={slot === s.starts_at}
                         onClick={() => setSlot(s.starts_at)}
-                        className={`h-11 rounded-xl text-[15px] font-medium transition-colors ${
+                        className={`h-11 shrink-0 rounded-xl text-[15px] font-medium transition-colors xl:h-10 ${
                           slot === s.starts_at
                             ? "bg-primary text-white"
                             : "border-[1.5px] border-line bg-surface hover:border-primary"
@@ -587,7 +624,7 @@ export function BookingForm({
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-muted">
+                <p className="text-xs text-muted xl:mt-auto">
                   Horarios en hora de{" "}
                   {profile.timezone.startsWith("America/Argentina")
                     ? "Argentina"
@@ -802,15 +839,15 @@ function ServiceSelect({
   }, [open]);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative xl:flex-1">
       <button
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-3 rounded-xl border-[1.5px] border-primary bg-surface px-4 py-3.5 text-left"
+        className="flex w-full items-center gap-3 rounded-xl border-[1.5px] border-primary bg-surface px-4 py-3.5 text-left xl:py-2.5"
       >
-        <span className="flex flex-1 flex-col gap-0.5">
+        <span className="flex flex-1 flex-col gap-0.5 xl:flex-row xl:items-baseline xl:gap-2">
           <span className="text-base font-medium">{current.name}</span>
           <span className="text-[13px] text-muted">
             {current.duration_minutes} min

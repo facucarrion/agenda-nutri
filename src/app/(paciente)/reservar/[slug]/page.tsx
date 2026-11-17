@@ -46,7 +46,7 @@ async function Booking({ params }: { params: Promise<{ slug: string }> }) {
 
 export default function BookingPage({ params }: PageProps<"/reservar/[slug]">) {
   return (
-    <main className="mx-auto w-full max-w-[1280px] px-4 pb-16 pt-8 sm:px-12 sm:pt-10">
+    <main className="mx-auto w-full max-w-[1280px] px-4 pb-16 pt-8 sm:px-12 sm:pt-10 xl:pb-5 xl:pt-5">
       <Suspense fallback={<p className="text-muted">Cargando...</p>}>
         <Booking params={params} />
       </Suspense>
