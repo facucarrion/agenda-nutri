@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { MODALITY_LABEL, ModalityIcon } from "@/components/modality";
 import type { Schedule } from "../_lib/types";
 import { addDays, longDay, timeOf } from "../_lib/dates";
 import { STATUS, focus, shortName, shortType } from "../_components/ui";
@@ -78,14 +79,17 @@ export function WeekGrid({
                     key={day.key}
                     type="button"
                     onClick={select}
-                    title={`${a.patients.first_name} ${a.patients.last_name} · ${a.appointment_types.name}`}
+                    title={`${a.patients.first_name} ${a.patients.last_name} · ${a.appointment_types.name}${a.modality ? ` · ${MODALITY_LABEL[a.modality]}` : ""}`}
                     className={`flex h-11 min-w-0 flex-col justify-center rounded-lg px-2 text-left ${focus} ${status.chip}`}
                   >
                     <span className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-ink">
                       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${status.dot}`} />
                       <span className={`truncate ${a.status === "no_show" ? "line-through" : ""}`}>{shortName(a)}</span>
                     </span>
-                    <span className="truncate text-[11px] text-muted">{shortType(a.appointment_types.name)}</span>
+                    <span className="flex min-w-0 items-center gap-1 text-[11px] text-muted">
+                      {a.modality && <ModalityIcon modality={a.modality} className="h-3 w-3 shrink-0" />}
+                      <span className="truncate">{shortType(a.appointment_types.name)}</span>
+                    </span>
                   </button>
                 );
               }

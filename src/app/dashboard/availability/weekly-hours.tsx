@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { WeeklyRule } from "../_lib/types";
+import { MODALITY_LABEL, ModalityIcon } from "@/components/modality";
+import type { RuleModality, WeeklyRule } from "../_lib/types";
 import { btnPrimary, card, errorClass, focus, inputClass, labelClass } from "../_components/ui";
 import { useRun } from "../_components/use-run";
 import { addAvailabilityRule, deleteAvailabilityRule } from "./actions";
@@ -17,8 +18,20 @@ const DAYS = [
   { day: 0, label: "Domingo", short: "Dom" },
 ];
 
+const MODALITIES: { value: RuleModality; label: string }[] = [
+  { value: "in_person", label: "Presencial" },
+  { value: "virtual", label: "Virtual" },
+  { value: "both", label: "Ambas" },
+];
+
+const pill = (on: boolean) =>
+  `h-9 min-w-12 rounded-full px-3 text-sm font-semibold transition-colors ${focus} ${
+    on ? "bg-primary text-white" : "border border-line bg-surface text-ink hover:border-primary"
+  }`;
+
 export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
   const [selected, setSelected] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [modality, setModality] = useState<RuleModality>("both");
   const { run, error, pending } = useRun();
 
   function toggle(day: number) {
@@ -36,6 +49,7 @@ export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
         data.set("weekday", String(day.day));
         data.set("start_time", start);
         data.set("end_time", end);
+        data.set("modality", modality);
         const result = await addAvailabilityRule(data);
         if (!result.ok) return { ok: false, error: `${day.label}: ${result.error}` };
       }
@@ -68,6 +82,10 @@ export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
                       key={r.id}
                       className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft py-1 pl-3 pr-1.5 text-sm font-medium text-primary"
                     >
+                      <span className="sr-only">{MODALITY_LABEL[r.modality]}: </span>
+                      <span title={MODALITY_LABEL[r.modality]} className="inline-flex">
+                        <ModalityIcon modality={r.modality} className="h-3.5 w-3.5" />
+                      </span>
                       {r.start_time} a {r.end_time} hs
                       <button
                         type="button"
@@ -102,13 +120,31 @@ export function WeeklyHours({ rules }: { rules: WeeklyRule[] }) {
                   aria-pressed={on}
                   aria-label={label}
                   onClick={() => toggle(day)}
-                  className={`h-9 min-w-12 rounded-full px-3 text-sm font-semibold transition-colors ${focus} ${
-                    on
-                      ? "bg-primary text-white"
-                      : "border border-line bg-surface text-ink hover:border-primary"
-                  }`}
+                  className={pill(on)}
                 >
                   {short}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <fieldset className="flex flex-col gap-2">
+          <legend className={labelClass}>Modalidad</legend>
+          <div role="radiogroup" aria-label="Modalidad" className="flex flex-wrap gap-2">
+            {MODALITIES.map((m) => {
+              const on = modality === m.value;
+              return (
+                <button
+                  key={m.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setModality(m.value)}
+                  className={`${pill(on)} inline-flex items-center gap-1.5`}
+                >
+                  <ModalityIcon modality={m.value} className="h-4 w-4" />
+                  {m.label}
                 </button>
               );
             })}

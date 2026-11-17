@@ -1,3 +1,4 @@
+import { ModalityBadge } from "@/components/modality";
 import type { AppointmentStatus, DashboardAppointment } from "../_lib/types";
 import { longDay, timeOf } from "../_lib/dates";
 import { AppointmentActions } from "../_components/appointment-actions";
@@ -32,7 +33,7 @@ export function DayPanel({
   return (
     <aside
       aria-live="polite"
-      className="rounded-[24px] border border-line bg-surface p-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto"
+      className="rounded-[24px] border border-line bg-surface p-4 sm:p-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto"
     >
       <h2 className="text-lg font-bold">{longDay(day.key)}</h2>
       <p className="mt-0.5 text-sm text-muted">{total ? summary : day.today ? "Hoy" : "Sin turnos"}</p>
@@ -49,7 +50,7 @@ export function DayPanel({
           {day.appointments.map((a) => {
             const status = STATUS[a.status];
             return (
-              <li key={a.id} className="rounded-2xl bg-canvas p-4">
+              <li key={a.id} className="rounded-2xl bg-canvas px-3 py-4 sm:px-3.5">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-bold">{timeOf(a.starts_at)} hs</span>
                   <span
@@ -62,7 +63,10 @@ export function DayPanel({
                 <p className="mt-2 font-semibold">
                   {a.patients.first_name} {a.patients.last_name}
                 </p>
-                <p className="text-sm text-muted">{a.appointment_types.name}</p>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className="text-sm text-muted">{a.appointment_types.name}</p>
+                  {a.modality && <ModalityBadge modality={a.modality} />}
+                </div>
                 <div className="mt-3 flex flex-wrap items-center gap-2 empty:hidden">
                   <AppointmentActions
                     appointment={a}

@@ -39,7 +39,11 @@ function whenLabel(startsAt: string) {
 
 function defaultMessage(a: DashboardAppointment, sender: string, kind: MessageKind) {
   const when = `${whenLabel(a.starts_at)} a las ${time.format(new Date(a.starts_at))} hs`;
-  const virtual = /telemedicina|virtual|online/i.test(a.appointment_types.name);
+  // Turnos booked before modality existed fall back to the service name.
+  const virtual = a.modality
+    ? a.modality === "virtual"
+    : /telemedicina|virtual|online/i.test(a.appointment_types.name);
+  const kindLabel = a.modality ? ` (${a.modality === "virtual" ? "virtual" : "presencial"})` : "";
   const hello = `Hola ${a.patients.first_name}, te escribo de ${sender}.`;
   const rule = virtual
     ? "Un rato antes te paso el link de la videollamada."
@@ -48,12 +52,12 @@ function defaultMessage(a: DashboardAppointment, sender: string, kind: MessageKi
   if (kind === "reminder") {
     return [
       hello,
-      `Te recuerdo tu turno de ${a.appointment_types.name} ${when}.`,
+      `Te recuerdo tu turno de ${a.appointment_types.name}${kindLabel} ${when}.`,
       rule,
       "¿Me confirmás que venís?",
     ].join(" ");
   }
-  return [hello, `Te confirmo tu turno de ${a.appointment_types.name} ${when}.`, rule, "¡Nos vemos!"].join(" ");
+  return [hello, `Te confirmo tu turno de ${a.appointment_types.name}${kindLabel} ${when}.`, rule, "¡Nos vemos!"].join(" ");
 }
 
 // wa.me only accepts digits, with the country code and no "+".
