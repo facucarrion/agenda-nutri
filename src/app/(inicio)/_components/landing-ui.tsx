@@ -71,7 +71,7 @@ export function ClosingCta({ joined = false }: { joined?: boolean }) {
         src="/landing/cta-citricos.webp"
         alt=""
         fill
-        quality={95}
+        quality={80}
         sizes="100vw"
         className="-z-10 object-cover object-bottom"
       />
