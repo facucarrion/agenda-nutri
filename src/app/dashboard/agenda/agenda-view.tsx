@@ -118,7 +118,7 @@ export function AgendaView({
         </p>
       )}
 
-      <div className="mt-4 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_270px]">
+      <div className="mt-4 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section className="min-w-0 rounded-[24px] border border-line bg-surface p-3 sm:p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 sm:gap-3">

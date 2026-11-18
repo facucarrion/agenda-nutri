@@ -135,7 +135,7 @@ export function AppointmentsBoard({
         })}
       </div>
 
-      <ul className="mt-3 flex flex-col gap-2.5">
+      <ul className="mt-3 flex flex-col gap-2">
         {visible.length === 0 && (
           <li className="rounded-[20px] border border-dashed border-line bg-surface/60 px-6 py-12 text-center text-muted">
             {tab === "pending"
@@ -149,14 +149,14 @@ export function AppointmentsBoard({
           return (
             <li
               key={a.id}
-              className={`grid gap-4 rounded-[20px] border bg-surface p-3 sm:p-4 lg:grid-cols-[minmax(0,1.5fr)_120px_110px_160px_130px_minmax(0,1.4fr)] lg:items-center ${
+              className={`grid gap-3 rounded-2xl border bg-surface px-3 py-2.5 sm:px-4 lg:grid-cols-[minmax(0,1.5fr)_120px_110px_160px_130px_minmax(0,1.4fr)] lg:items-center ${
                 a.status === "pending" ? "border-warn/50" : "border-line"
               } ${a.status === "cancelled" || a.status === "no_show" ? "opacity-70" : ""}`}
             >
               <div className="flex min-w-0 items-center gap-3">
                 <span
                   aria-hidden
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-semibold text-primary"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-semibold text-primary"
                 >
                   {initials(a)}
                 </span>
