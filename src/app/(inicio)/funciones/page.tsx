@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: `Funciones · ${BRAND_NAME}`,
   description:
     "Reserva online, agenda de mes y semana, y recordatorios por email y WhatsApp para profesionales de la nutrición.",
+  alternates: { canonical: "/funciones" },
 };
 
 // The screenshots are the real app, filled with sample patients.

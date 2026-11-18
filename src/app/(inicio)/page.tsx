@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Fraunces } from "next/font/google";
@@ -15,6 +16,10 @@ import {
 import { PlanCard, type Plan } from "./_components/plan-card";
 import { PlansCarousel } from "./_components/plans-carousel";
 import { PilotWhatsappLink } from "./_components/pilot-whatsapp-link";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 // Serif italic for one accent phrase per title.
 const accentFont = Fraunces({ subsets: ["latin"], style: "italic", display: "swap" });
