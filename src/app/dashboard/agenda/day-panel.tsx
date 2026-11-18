@@ -1,9 +1,18 @@
-import { ModalityBadge } from "@/components/modality";
+import { MODALITY_LABEL, ModalityIcon } from "@/components/modality";
 import type { AppointmentStatus, DashboardAppointment } from "../_lib/types";
 import { longDay, timeOf } from "../_lib/dates";
 import { AppointmentActions } from "../_components/appointment-actions";
-import { STATUS, btnPrimary } from "../_components/ui";
+import { STATUS, btnPrimary, fullName } from "../_components/ui";
 import type { DayInfo } from "./agenda-view";
+
+// Status colour of each turno's left border.
+const BORDER: Record<AppointmentStatus, string> = {
+  pending: "border-warn",
+  confirmed: "border-ok",
+  completed: "border-faint",
+  no_show: "border-faint",
+  cancelled: "border-bad",
+};
 
 export function DayPanel({
   day,
@@ -33,7 +42,7 @@ export function DayPanel({
   return (
     <aside
       aria-live="polite"
-      className="rounded-[24px] border border-line bg-surface p-4 sm:p-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto"
+      className="rounded-[24px] border border-line bg-surface p-4 sm:px-3.5 sm:py-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto"
     >
       <h2 className="text-base font-bold">{longDay(day.key)}</h2>
       <p className="mt-0.5 text-sm text-muted">{total ? summary : day.today ? "Hoy" : "Sin turnos"}</p>
@@ -46,35 +55,47 @@ export function DayPanel({
           {empty}
         </p>
       ) : (
-        <ul className="mt-3 flex flex-col gap-2.5">
+        <ul className="mt-3 flex flex-col gap-2">
           {day.appointments.map((a) => {
             const status = STATUS[a.status];
             return (
-              <li key={a.id} className="rounded-2xl bg-canvas px-3 py-3 sm:px-3.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold">{timeOf(a.starts_at)} hs</span>
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${status.badge}`}
-                  >
-                    <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
-                    {status.label}
-                  </span>
+              // Two lines per turno: time and patient, then type and modality.
+              // The left border carries the status colour; icons sit on the right.
+              // The text keeps at least 8rem, so a wide confirm step ("¿Cancelar
+              // turno?") drops to its own line instead of hiding the name.
+              <li
+                key={a.id}
+                className={`flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-xl border-l-[3px] bg-canvas py-2.5 pl-3 pr-1 ${BORDER[a.status]} ${
+                  a.status === "cancelled" || a.status === "no_show" ? "opacity-70" : ""
+                }`}
+              >
+                <div className="min-w-0 grow basis-32">
+                  <p className="flex min-w-0 items-baseline gap-2">
+                    <span className="shrink-0 font-bold tabular-nums">{timeOf(a.starts_at)}</span>
+                    <span className="min-w-0 break-words font-semibold leading-snug">{fullName(a)}</span>
+                  </p>
+                  <p className="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-muted">
+                    <span className="sr-only">{status.label}.</span>
+                    <span className="truncate">{a.appointment_types.name}</span>
+                    {a.modality && (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span className="inline-flex shrink-0 items-center gap-1">
+                          <ModalityIcon modality={a.modality} className="h-3.5 w-3.5" />
+                          {MODALITY_LABEL[a.modality]}
+                        </span>
+                      </>
+                    )}
+                  </p>
                 </div>
-                <p className="mt-1.5 font-semibold">
-                  {a.patients.first_name} {a.patients.last_name}
-                </p>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <p className="text-sm text-muted">{a.appointment_types.name}</p>
-                  {a.modality && <ModalityBadge modality={a.modality} />}
-                </div>
-                <div className="mt-2.5 flex flex-wrap items-center gap-2 empty:hidden">
+                <div className="ml-auto flex shrink-0 items-center empty:hidden">
                   <AppointmentActions
                     appointment={a}
                     now={now}
                     onStatus={onStatus}
                     onNotify={onNotify}
                     onEdit={onEdit}
-                    block
+                    compact
                   />
                 </div>
               </li>
