@@ -17,6 +17,8 @@ const PUBLIC_PATHS = [
   "/terminos",
   "/api/public",
   "/api/cron", // authenticated with CRON_SECRET inside the route
+  "/robots.txt", // crawlers must get the file, not a redirect to /login
+  "/sitemap.xml",
 ];
 
 function isPublic(pathname: string) {
