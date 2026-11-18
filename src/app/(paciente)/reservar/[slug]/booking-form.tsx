@@ -274,7 +274,7 @@ export function BookingForm({
   const summary = (
     <section
       className={`${card} flex flex-1 flex-col gap-3.5 !p-6 ${
-        step === 1 ? "xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:!p-5" : ""
+        step === 1 ? "xl:ml-5 xl:min-h-0 xl:gap-3 xl:overflow-y-auto xl:!p-5" : ""
       }`}
     >
       <h2 className="text-lg font-semibold">Tu turno</h2>
@@ -392,14 +392,25 @@ export function BookingForm({
           className={`grid gap-6 lg:grid-cols-[minmax(0,1fr)_392px] ${
             // Three columns (calendar | horarios | resumen) that share the
             // remaining height; each one scrolls inside if it ever needs to.
+            // The horarios column is closed until a day is picked: then it
+            // slides out of the calendar and pushes the summary to the right.
             step === 1
-              ? "xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_300px_300px] xl:grid-rows-[minmax(0,1fr)] xl:gap-5"
+              ? `xl:min-h-0 xl:flex-1 xl:grid-rows-[minmax(0,1fr)] xl:gap-0 xl:transition-[grid-template-columns] xl:duration-500 xl:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+                  day
+                    ? "xl:grid-cols-[minmax(0,1fr)_300px_320px]"
+                    : "xl:grid-cols-[minmax(0,1fr)_0px_320px]"
+                }`
               : ""
           }`}
         >
           {step === 1 ? (
             // On xl the two cards merge into one, so they fit in one column.
-            <div className="flex flex-col gap-6 xl:min-h-0 xl:gap-4 xl:rounded-[20px] xl:border xl:border-line xl:bg-surface xl:p-5">
+            <div
+              className={`flex flex-col gap-6 xl:relative xl:z-10 xl:min-h-0 xl:gap-4 xl:border xl:border-line xl:bg-surface xl:p-5 ${
+                // Joined to the open horarios panel: square right corners.
+                day ? "xl:rounded-l-[20px]" : "xl:rounded-[20px]"
+              }`}
+            >
               <section
                 className={`${card} flex flex-col gap-4 xl:flex-row xl:items-center xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0`}
               >
@@ -594,50 +605,63 @@ export function BookingForm({
 
           <div className={`flex flex-col gap-6 ${step === 1 ? "xl:contents" : ""}`}>
             {step === 1 && (
-              <section className={`${card} flex flex-col gap-4 !p-6 xl:min-h-0 xl:gap-3 xl:!p-5`}>
-                <div className="flex flex-col gap-1">
-                  <h2 className="text-lg font-semibold">
-                    {day ? formatDay(day) : "Horarios"}
-                  </h2>
-                  <p className="text-sm text-muted">
-                    {day
-                      ? `${daySlots.length} ${daySlots.length === 1 ? "turno libre" : "turnos libres"}`
-                      : "Elegí un día del calendario para ver los horarios."}
-                  </p>
-                </div>
-                {day && (
-                  <div className="grid max-h-56 grid-cols-2 gap-3 overflow-y-auto pr-1 xl:max-h-none xl:min-h-0 xl:flex-1 xl:content-start xl:gap-2.5">
-                    {daySlots.map((s) => (
-                      <button
-                        key={s.starts_at}
-                        type="button"
-                        aria-pressed={slot === s.starts_at}
-                        onClick={() => setSlot(s.starts_at)}
-                        className={`h-11 shrink-0 rounded-xl text-[15px] font-medium transition-colors xl:h-10 ${
-                          slot === s.starts_at
-                            ? "bg-primary text-white"
-                            : "border-[1.5px] border-line bg-surface hover:border-primary"
-                        }`}
-                      >
-                        {time(s.starts_at)}
-                      </button>
-                    ))}
+              <section
+                className={`${card} flex flex-col !p-6 xl:min-h-0 xl:min-w-0 xl:overflow-hidden xl:!p-0 ${
+                  day
+                    ? "xl:rounded-l-none xl:border-l-0"
+                    : "xl:border-0"
+                }`}
+              >
+                {/* Fixed width on xl, so the panel is revealed, not squeezed. */}
+                <div
+                  className={`flex flex-col gap-4 xl:h-full xl:w-[300px] xl:gap-3 xl:p-5 xl:transition-opacity xl:duration-300 motion-reduce:transition-none ${
+                    day ? "xl:opacity-100 xl:delay-150" : "xl:opacity-0"
+                  }`}
+                >
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-lg font-semibold">
+                      {day ? formatDay(day) : "Horarios"}
+                    </h2>
+                    <p className="text-sm text-muted">
+                      {day
+                        ? `${daySlots.length} ${daySlots.length === 1 ? "turno libre" : "turnos libres"}`
+                        : "Elegí un día del calendario para ver los horarios."}
+                    </p>
                   </div>
-                )}
-                <p className="text-xs text-muted xl:mt-auto">
-                  Horarios en hora de{" "}
-                  {profile.timezone.startsWith("America/Argentina")
-                    ? "Argentina"
-                    : profile.timezone}
-                  .
-                </p>
-                {day && allDaySlots.length > 0 && (
-                  <ModeSwitch
-                    value={mode}
-                    available={dayModes}
-                    onChange={switchMode}
-                  />
-                )}
+                  {day && (
+                    <div className="grid max-h-56 grid-cols-2 gap-3 overflow-y-auto pr-1 xl:max-h-none xl:min-h-0 xl:flex-1 xl:content-start xl:gap-2.5">
+                      {daySlots.map((s) => (
+                        <button
+                          key={s.starts_at}
+                          type="button"
+                          aria-pressed={slot === s.starts_at}
+                          onClick={() => setSlot(s.starts_at)}
+                          className={`h-11 shrink-0 rounded-xl text-[15px] font-medium transition-colors xl:h-10 ${
+                            slot === s.starts_at
+                              ? "bg-primary text-white"
+                              : "border-[1.5px] border-line bg-surface hover:border-primary"
+                          }`}
+                        >
+                          {time(s.starts_at)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-muted xl:mt-auto">
+                    Horarios en hora de{" "}
+                    {profile.timezone.startsWith("America/Argentina")
+                      ? "Argentina"
+                      : profile.timezone}
+                    .
+                  </p>
+                  {day && allDaySlots.length > 0 && (
+                    <ModeSwitch
+                      value={mode}
+                      available={dayModes}
+                      onChange={switchMode}
+                    />
+                  )}
+                </div>
               </section>
             )}
             {summary}
