@@ -101,7 +101,10 @@ export default function Home() {
             fill
             priority
             // Served as-is: the photo's background was regraded to exactly
-            // bg-forest, and re-encoding shifts those dark greens.
+            // bg-forest, and the optimizer's re-encoding shifts those dark
+            // greens. The file itself is WebP q80 (cwebp-style, method 6),
+            // checked to keep the background average within 0.1 of the
+            // original per channel.
             unoptimized
             sizes="100vw"
             className="object-cover object-[78%_bottom] lg:object-[right_bottom]"

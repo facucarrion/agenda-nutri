@@ -145,7 +145,7 @@ body {
   border-radius: inherit;
   z-index: -1;
   pointer-events: none;
-  background-image: url("/landing/grano.png");
+  background-image: url("/landing/grano.webp");
   background-size: 256px;
   mix-blend-mode: soft-light;
   opacity: 0.22;
@@ -271,7 +271,7 @@ body {
    is flat green and reads as a band between the two sections. */
 .grain-fill {
   pointer-events: none;
-  background-image: url("/landing/grano.png");
+  background-image: url("/landing/grano.webp");
   background-size: 256px;
   mix-blend-mode: soft-light;
   opacity: 0.22;
@@ -284,7 +284,7 @@ body {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: url("/landing/grano-claro.png");
+  background-image: url("/landing/grano-claro.webp");
   background-size: 256px;
   opacity: 0.35;
 }
